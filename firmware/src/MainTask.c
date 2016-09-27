@@ -110,6 +110,59 @@ MAINTASK_DATA maintaskData;
 QueueHandle_t queue;
 void milestone_update() {
     char a;
+    
+    TRISBbits.TRISB0 = 0;
+    TRISBbits.TRISB1 = 0;
+    TRISBbits.TRISB2 = 0;
+    TRISBbits.TRISB3 = 0;
+    TRISBbits.TRISB4 = 0;
+    TRISBbits.TRISB5 = 0;
+    TRISBbits.TRISB6 = 0;
+    TRISBbits.TRISB7 = 0;
+    
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_0, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_1, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_2, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_3, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_4, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_5, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_6, 1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_7, 1);   
+    
+    int i = 0;
+    while(i < 100000) { i++; }
+    i = 0;
+    
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_0, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_1, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_2, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_3, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_4, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_5, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_6, 0);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_7, 0);
+    
+    TRISBbits.TRISB0 = 1;
+    TRISBbits.TRISB1 = 1;
+    TRISBbits.TRISB2 = 1;
+    TRISBbits.TRISB3 = 1;
+    TRISBbits.TRISB4 = 1;
+    TRISBbits.TRISB5 = 1;
+    TRISBbits.TRISB6 = 1;
+    TRISBbits.TRISB7 = 1;   
+    
+    while(i < 100000) { i++; }
+    i = 0;
+    
+    a = ((PORTBbits.RB7 << 7) +
+        (PORTBbits.RB6 << 6) +
+        (PORTBbits.RB5 << 5) +
+        (PORTBbits.RB4 << 4) +
+        (PORTBbits.RB3 << 3) +
+        (PORTBbits.RB2 << 2) +
+        (PORTBbits.RB1 << 1) +
+        (PORTBbits.RB0));
+    
     dbgOutputLoc(SENDING_TO_QUEUE);
     xQueueSendToBackFromISR(queue, &a, NULL);
     dbgOutputLoc(SENT_TO_QUEUE);
@@ -179,7 +232,7 @@ void MAINTASK_Tasks ( void )
             if (a == 'X') {
                 dbgOutputLoc(ERROR_HAS_OCCURED);
             }
-            dbgOutputVal(name[i]);
+            dbgOutputVal(a);
             i++;
             if (i > 5) 
                 i = 0;
