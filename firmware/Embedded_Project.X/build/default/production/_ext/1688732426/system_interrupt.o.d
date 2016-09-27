@@ -233,4 +233,5 @@ build/default/production/_ext/1688732426/system_interrupt.o:  \
 ../src/uartrx.h  \
 ../src/uarttx_public.h  \
  ../src/uartrx_public1.h  \
- ../src/system_config/default/system_definitions.h 
+ ../src/system_config/default/system_definitions.h  \
+ ../src/uartrx_public1.h 

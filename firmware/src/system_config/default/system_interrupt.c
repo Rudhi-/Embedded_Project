@@ -64,6 +64,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrx.h"
 #include "uarttx.h"
 #include "system_definitions.h"
+#include "uartrx_public1.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -72,9 +73,23 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 void IntHandlerDrvUsartInstance0(void)
 {
-    DRV_USART_TasksTransmit(sysObj.drvUsart0);
-    DRV_USART_TasksReceive(sysObj.drvUsart0);
-    DRV_USART_TasksError(sysObj.drvUsart0);
+    if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE))
+    {
+        /* Make sure receive buffer has data availible */
+        if (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
+        {
+            /* Get the data from the buffer */
+            SendToTheQueue();
+        }
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_RECEIVE);
+    }
+    else if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
+    {
+        TransmitTheMessage();
+        PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
+        PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
+    }
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_ERROR);
 }
  
  
