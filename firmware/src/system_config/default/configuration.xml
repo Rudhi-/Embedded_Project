@@ -13,12 +13,12 @@
         <Path>Header Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
-        <Name>drv_tmr_mapping.h</Name>
-        <Path>Header Files/framework/driver/tmr</Path>
-      </File>
-      <File>
         <Name>semphr.h</Name>
         <Path>Header Files/FreeRTOS</Path>
+      </File>
+      <File>
+        <Name>driver_common.h</Name>
+        <Path>Header Files/framework/driver</Path>
       </File>
       <File>
         <Name>queue.h</Name>
@@ -39,6 +39,10 @@
       <File>
         <Name>list.h</Name>
         <Path>Header Files/FreeRTOS</Path>
+      </File>
+      <File>
+        <Name>driver.h</Name>
+        <Path>Header Files/framework/driver</Path>
       </File>
       <File>
         <Name>peripheral_common.h</Name>
@@ -97,16 +101,8 @@
         <Path>Header Files/framework/peripheral</Path>
       </File>
       <File>
-        <Name>drv_tmr_variant_mapping.h</Name>
-        <Path>Header Files/framework/driver/tmr/src</Path>
-      </File>
-      <File>
         <Name>list.c</Name>
         <Path>Source Files/FreeRTOS</Path>
-      </File>
-      <File>
-        <Name>drv_tmr.h</Name>
-        <Path>Header Files/framework/driver/tmr</Path>
       </File>
       <File>
         <Name>sys_devcon.c</Name>
@@ -227,18 +223,19 @@
     </Files>
     <Templates>
       <Template>
+        <Name>drv_usart_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>2A4AED7552D145ED28C2C52BFC04AD9D</Checksum>
+      </Template>
+      <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
-        <Checksum>64DC3A83B401CDBC3A569D7BAB925C7B</Checksum>
+        <Checksum>5220A49E29CE78BDA761E7EAC8FFC0A4</Checksum>
       </Template>
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>19EF7A6E2791E83717C29E3CD08EE64F</Checksum>
-      </Template>
-      <Template>
-        <Name>MainTask.c</Name>
-        <Path>Source Files/app</Path>
+        <Checksum>3A1204375F9077B3F87EE1CA308D99EB</Checksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -247,26 +244,20 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>B6CBE423647A8929F1046AB6F68B1BD1</Checksum>
+        <Checksum>5C0D911C19B5E425D7F0FB89E579F457</Checksum>
       </Template>
       <Template>
-        <Name>MainTask.h</Name>
+        <Name>uartrx.h</Name>
         <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>drv_tmr_static.h</Name>
-        <Path>Header Files/app/system_config/default/framework/driver/tmr</Path>
-        <Checksum>5B1227C9C8A50A58EB2DAB66BF09B4E6</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_tmr_mapping.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>0651845480D5D3E21D8BF17EE68DBEAC</Checksum>
+        <Name>uarttx.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>0C5DD588E67F4D6C514BA8892348C3AE</Checksum>
+        <Checksum>22438607EF2C31CE2029F040014BE2DF</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -274,24 +265,34 @@
         <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
       </Template>
       <Template>
+        <Name>drv_usart_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>115DDE4372E58D4116BC77DC36FD97DC</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/usart</Path>
+        <Checksum>AE37BD63B6EC9F6ADD6B8006CE192FCB</Checksum>
+      </Template>
+      <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>A1F6B14C1BF51E577014DBC1D4C92CF1</Checksum>
+        <Checksum>9DDBED97A2EC7C203259C27CF97B3E70</Checksum>
       </Template>
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>7586F62F4F92C9F497C3412A6D715057</Checksum>
+        <Checksum>333979D07C6C4752D40039EFDE747598</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_static_byte_model.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>D5948AEF4AF5421D38884F763CC54517</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_tmr_static.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>04B678DD289E2879424E19AC63EB1AB6</Checksum>
+        <Checksum>D85882DE0EFA3100011A6BAD36524919</Checksum>
       </Template>
       <Template>
         <Name>sys_clk_static.h</Name>
@@ -301,7 +302,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>57F8AA5CB6085B07906FE170AFA503AD</Checksum>
+        <Checksum>880897F52A1EFB30EBA74E5CF47ACCF1</Checksum>
         <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
@@ -313,6 +314,19 @@
         <Name>sys_clk_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
         <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+      </Template>
+      <Template>
+        <Name>uarttx.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>uartrx.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>drv_usart_static_local.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>2C3E6EE85E05512BB9836B81EB3DB0E4</Checksum>
       </Template>
     </Templates>
     <CompilerItems>

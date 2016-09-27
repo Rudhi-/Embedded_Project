@@ -48,39 +48,39 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "ISR_Support.h"
 
 
-/* TMR Instance 0 Interrupt */
-   .extern  IntHandlerDrvTmrInstance0
+/* USART Instance 0 Interrupt */
 
-   .section	.vector_8,code, keep
-   .equ     __vector_dispatch_8, IntVectorDrvTmrInstance0
-   .global  __vector_dispatch_8
+   .extern  IntHandlerDrvUsartInstance0
+
+   .section	.vector_24,code, keep
+   .equ     __vector_dispatch_24, IntVectorDrvUsartInstance0
+   .global  __vector_dispatch_24
    .set     nomicromips
    .set     noreorder
    .set     nomips16
    .set     noat
-   .ent  IntVectorDrvTmrInstance0
+   .ent  IntVectorDrvUsartInstance0
 
-IntVectorDrvTmrInstance0:
-    la    $26,  _IntHandlerDrvTmrInstance0         
+IntVectorDrvUsartInstance0:
+    la    $26,  _IntHandlerDrvUsartInstance0         
     jr    $26
     nop
-	.end	IntVectorDrvTmrInstance0
+	.end	IntVectorDrvUsartInstance0
 
-   .section	.DrvTmrInstance0_vector_text, code, keep
+   .section	.DrvUsartInstance0_vector_text, code, keep
    .set     nomicromips
    .set     noreorder
    .set     nomips16
    .set     noat
-   .ent  _IntHandlerDrvTmrInstance0
+   .ent  _IntHandlerDrvUsartInstance0
 
-_IntHandlerDrvTmrInstance0:
+_IntHandlerDrvUsartInstance0:
     portSAVE_CONTEXT
-    la    s6,  IntHandlerDrvTmrInstance0
+    la    s6,  IntHandlerDrvUsartInstance0
     jalr  s6
     nop
     portRESTORE_CONTEXT
-    .end	_IntHandlerDrvTmrInstance0
-
+    .end	_IntHandlerDrvUsartInstance0
 
 
 /*******************************************************************************

@@ -61,24 +61,34 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "maintask.h"
+#include "uartrx.h"
+#include "uarttx.h"
 #include "system_definitions.h"
-#include "debug.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
-
-    
-void IntHandlerDrvTmrInstance0(void)
+void IntHandlerDrvUsartInstance0(void)
 {
-    dbgOutputLoc(ENTERING_ISR);
-    milestone_update();
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
-    dbgOutputLoc(LEAVING_ISR);
+    DRV_USART_TasksTransmit(sysObj.drvUsart0);
+    DRV_USART_TasksReceive(sysObj.drvUsart0);
+    DRV_USART_TasksError(sysObj.drvUsart0);
 }
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
   
 /*******************************************************************************
  End of File
