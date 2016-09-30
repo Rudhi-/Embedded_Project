@@ -56,6 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "uartrx.h"
 #include "uarttx.h"
+#include "motors.h"
 
 
 // *****************************************************************************
@@ -69,6 +70,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _UARTRX_Tasks(void);
 static void _UARTTX_Tasks(void);
+static void _MOTORS_Tasks(void);
 
 
 // *****************************************************************************
@@ -102,6 +104,11 @@ void SYS_Tasks ( void )
                 "UARTTX Tasks",
                 1024, NULL, 1, NULL);
 
+    /* Create OS Thread for MOTORS Tasks. */
+    xTaskCreate((TaskFunction_t) _MOTORS_Tasks,
+                "MOTORS Tasks",
+                1024, NULL, 1, NULL);
+
     /**************
      * Start RTOS * 
      **************/
@@ -124,6 +131,9 @@ static void _SYS_Tasks ( void)
         SYS_DEVCON_Tasks(sysObj.sysDevcon);
 
         /* Maintain Device Drivers */
+    DRV_USART_TasksTransmit(sysObj.drvUsart0);
+    DRV_USART_TasksReceive(sysObj.drvUsart0);
+    DRV_USART_TasksError (sysObj.drvUsart0);
 
         /* Maintain Middleware */
 
@@ -162,6 +172,23 @@ static void _UARTTX_Tasks(void)
     while(1)
     {
         UARTTX_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _MOTORS_Tasks ( void )
+
+  Summary:
+    Maintains state machine of MOTORS.
+*/
+
+static void _MOTORS_Tasks(void)
+{
+    while(1)
+    {
+        MOTORS_Tasks();
     }
 }
 

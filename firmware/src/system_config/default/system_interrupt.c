@@ -63,48 +63,22 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <sys/attribs.h>
 #include "uartrx.h"
 #include "uarttx.h"
+#include "motors.h"
 #include "system_definitions.h"
-#include "uartrx_public1.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
-void IntHandlerDrvUsartInstance0(void)
+
+    
+void IntHandlerDrvTmrInstance0(void)
 {
-    if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE))
-    {
-        /* Make sure receive buffer has data availible */
-        if (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
-        {
-            /* Get the data from the buffer */
-            SendToTheQueue();
-        }
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_RECEIVE);
-    }
-    else if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
-    {
-        TransmitTheMessage();
-        PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
-        PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
-    }
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_ERROR);
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
- 
- 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
   
+ 
 /*******************************************************************************
  End of File
 */

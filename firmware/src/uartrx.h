@@ -59,7 +59,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "queue.h"
-#include "uartrx_public1.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -109,7 +108,6 @@ typedef enum
   Remarks:
     Application strings and buffers are be defined outside this structure.
  */
-
 
 typedef struct
 {

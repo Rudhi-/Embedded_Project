@@ -132,18 +132,6 @@ void UARTTX_Initialize ( void )
     See prototype in uarttx.h.
  */
 
-void TransmitTheMessage ()
-{
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'B');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'Y');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'T');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'E');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, ' ');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data);
-    PLIB_USART_TransmitterByteSend(USART_ID_1, '\n');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, '\r');
-}
-
 void UARTTX_Tasks ( void )
 {
 
@@ -166,10 +154,9 @@ void UARTTX_Tasks ( void )
 
         case UARTTX_STATE_SERVICE_TASKS:
         {
+            char a;
             if (uxQueueMessagesWaiting(queue)) {
-                xQueueReceive(queue, &uarttxData.tx_data, portMAX_DELAY);
-                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
-                /*
+                xQueueReceive(queue, &a, portMAX_DELAY);
                 if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()  ))
                 {
                     DRV_USART0_WriteByte('R');
@@ -185,7 +172,6 @@ void UARTTX_Tasks ( void )
                     DRV_USART0_WriteByte('\n');
                     DRV_USART0_WriteByte('\r');
                 }
-                 */
             }
             break;
         }

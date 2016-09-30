@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    uartrx.c
+    motors.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,7 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "uartrx.h"
+#include "motors.h"
+#include "system_config/default/framework/driver/tmr/drv_tmr_static.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,7 +77,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-UARTRX_DATA uartrxData;
+MOTORS_DATA motorsData;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -97,6 +98,113 @@ UARTRX_DATA uartrxData;
 /* TODO:  Add any necessary local functions.
 */
 
+// Helper functions
+//initialize motors to be able to run
+void init_motors() {
+    //keep motors off during init
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    
+    //right motor enable
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_0);
+    //right motor direction
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    
+    //left motor enable
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_1);
+    //left motor direction
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    
+    //Start OC drivers    
+    PLIB_OC_Enable(OC_ID_1);
+    PLIB_OC_Enable(OC_ID_2);
+    
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);    
+    
+    //start timer
+    DRV_TMR0_Start();
+}
+
+// Follower rover
+// Clear is forwards, set is backwards
+//set the speeds to given inputs
+void set_speed(int leftSpeed, int rightSpeed) {
+    //right motor
+    if (leftSpeed < 0) {
+        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        leftSpeed *= -1;
+    } else {
+        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    }
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, leftSpeed); //placeholder
+    
+    //left motor
+    if (rightSpeed < 0) {
+        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        rightSpeed *= -1;
+    } else {
+        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    }
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, rightSpeed); //placeholder    
+}
+
+//Stops all motors immediately
+void move_stop() {
+    //right motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+    //left motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+}
+
+// Leader Rover
+
+//turn the rover to the right
+void turn_right() {
+    int placeholder;
+    //right motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder = 200); //placeholder
+    
+    //stop left motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+}
+
+//turn the rover to the left
+void turn_left() {
+    int placeholder;
+    //stop right motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+    
+    //left motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder = 200); //placeholder 
+}
+
+//function to move forwards
+void move_forward() {
+    int placeholder1, placeholder2;
+    //right motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder1 = 0); //placeholder
+    
+    //left motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder2 = 0); //placeholder        
+}
+
+//function to move backwards
+void move_backward() {
+    int placeholder1, placeholder2;
+    //right motor
+    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder1 = 200); //placeholder
+    
+    //left motor
+    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder2 = 200); //placeholder        
+}
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -104,22 +212,21 @@ UARTRX_DATA uartrxData;
 // *****************************************************************************
 // *****************************************************************************
 
+
 /*******************************************************************************
   Function:
-    void UARTRX_Initialize ( void )
+    void MOTORS_Initialize ( void )
 
   Remarks:
-    See prototype in uartrx.h.
+    See prototype in motors.h.
  */
 
-void UARTRX_Initialize ( void )
+void MOTORS_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
-    uartrxData.state = UARTRX_STATE_INIT;
-    queue = xQueueCreate(2, sizeof(char));
-   
-    
-    
+    motorsData.state = MOTORS_STATE_INIT;
+
+    init_motors();
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -128,20 +235,19 @@ void UARTRX_Initialize ( void )
 
 /******************************************************************************
   Function:
-    void UARTRX_Tasks ( void )
+    void MOTORS_Tasks ( void )
 
   Remarks:
-    See prototype in uartrx.h.
+    See prototype in motors.h.
  */
 
-void UARTRX_Tasks ( void )
+void MOTORS_Tasks ( void )
 {
-
     /* Check the application's current state. */
-    switch ( uartrxData.state )
+    switch ( motorsData.state )
     {
         /* Application's initial state. */
-        case UARTRX_STATE_INIT:
+        case MOTORS_STATE_INIT:
         {
             bool appInitialized = true;
        
@@ -149,26 +255,15 @@ void UARTRX_Tasks ( void )
             if (appInitialized)
             {
             
-                uartrxData.state = UARTRX_STATE_SERVICE_TASKS;
+                motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
             break;
         }
 
-        case UARTRX_STATE_SERVICE_TASKS:
+        case MOTORS_STATE_SERVICE_TASKS:
         {
+            move_backward();
             
-            uartrxData.tx_data = ' ';
-            //PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1, 1);
-            if (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
-            {
-               uartrxData.rx_data = DRV_USART0_ReadByte(); // read received byte
-               xQueueSend(queue, (void *) &uartrxData.rx_data, pdFAIL);
-               uartrxData.tx_data = uartrxData.rx_data;
-            }
-            //if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()  )  & uartrxData.tx_data != ' ')
-            //{
-                //DRV_USART0_WriteByte('R');
-            //}
             break;
         }
 
@@ -184,7 +279,6 @@ void UARTRX_Tasks ( void )
     }
 }
 
- 
 
 /*******************************************************************************
  End of File

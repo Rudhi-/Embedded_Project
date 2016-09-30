@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    uarttx.h
+    motors.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _UARTTX_H
-#define _UARTTX_H
+#ifndef _MOTORS_H
+#define _MOTORS_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,7 +58,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "uartrx.h"
+
+#include "peripheral/ports/plib_ports.h"
+#include "peripheral/tmr/plib_tmr.h"
+#include "peripheral/oc/plib_oc.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -88,12 +91,12 @@ extern "C" {
 typedef enum
 {
 	/* Application's state machine's initial state. */
-	UARTTX_STATE_INIT=0,
-	UARTTX_STATE_SERVICE_TASKS,
+	MOTORS_STATE_INIT=0,
+	MOTORS_STATE_SERVICE_TASKS,
 
 	/* TODO: Define states used by the application state machine. */
 
-} UARTTX_STATES;
+} MOTORS_STATES;
 
 
 // *****************************************************************************
@@ -112,11 +115,11 @@ typedef enum
 typedef struct
 {
     /* The application's current state */
-    UARTTX_STATES state;
+    MOTORS_STATES state;
 
     /* TODO: Define any additional data used by the application. */
 
-} UARTTX_DATA;
+} MOTORS_DATA;
 
 
 // *****************************************************************************
@@ -135,7 +138,7 @@ typedef struct
 
 /*******************************************************************************
   Function:
-    void UARTTX_Initialize ( void )
+    void MOTORS_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -157,19 +160,19 @@ typedef struct
 
   Example:
     <code>
-    UARTTX_Initialize();
+    MOTORS_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void UARTTX_Initialize ( void );
+void MOTORS_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void UARTTX_Tasks ( void )
+    void MOTORS_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -190,17 +193,29 @@ void UARTTX_Initialize ( void );
 
   Example:
     <code>
-    UARTTX_Tasks();
+    MOTORS_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void UARTTX_Tasks( void );
+void MOTORS_Tasks( void );
 
+// Helper functions
+void init_motors();
 
-#endif /* _UARTTX_H */
+// Follower rover
+void set_speed(int rightSpeed, int leftSpeed);
+void move_stop();
+
+// Leader Rover
+void turn_right();
+void turn_left();
+void move_forward();
+void move_backward();
+
+#endif /* _MOTORS_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus
