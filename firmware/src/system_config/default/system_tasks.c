@@ -57,6 +57,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrx.h"
 #include "uarttx.h"
 #include "reflectance.h"
+#include "ultrasonic.h"
+#include "main_task.h"
 
 
 // *****************************************************************************
@@ -71,6 +73,8 @@ static void _SYS_Tasks ( void );
 static void _UARTRX_Tasks(void);
 static void _UARTTX_Tasks(void);
 static void _REFLECTANCE_Tasks(void);
+static void _ULTRASONIC_Tasks(void);
+static void _MAIN_TASK_Tasks(void);
 
 
 // *****************************************************************************
@@ -107,6 +111,16 @@ void SYS_Tasks ( void )
     /* Create OS Thread for REFLECTANCE Tasks. */
     xTaskCreate((TaskFunction_t) _REFLECTANCE_Tasks,
                 "REFLECTANCE Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for ULTRASONIC Tasks. */
+    xTaskCreate((TaskFunction_t) _ULTRASONIC_Tasks,
+                "ULTRASONIC Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for MAIN_TASK Tasks. */
+    xTaskCreate((TaskFunction_t) _MAIN_TASK_Tasks,
+                "MAIN_TASK Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -186,6 +200,40 @@ static void _REFLECTANCE_Tasks(void)
     while(1)
     {
         REFLECTANCE_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _ULTRASONIC_Tasks ( void )
+
+  Summary:
+    Maintains state machine of ULTRASONIC.
+*/
+
+static void _ULTRASONIC_Tasks(void)
+{
+    while(1)
+    {
+        ULTRASONIC_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _MAIN_TASK_Tasks ( void )
+
+  Summary:
+    Maintains state machine of MAIN_TASK.
+*/
+
+static void _MAIN_TASK_Tasks(void)
+{
+    while(1)
+    {
+        MAIN_TASK_Tasks();
     }
 }
 

@@ -235,6 +235,10 @@
     </Files>
     <Templates>
       <Template>
+        <Name>ultrasonic.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
         <Checksum>BBA108262A754FA2117433A224D3810A</Checksum>
@@ -270,6 +274,10 @@
         <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
       </Template>
       <Template>
+        <Name>main_task.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
         <Name>sys_clk_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/system/clk</Path>
         <Checksum>B4BD59D8D7C4DA95DC5E3B57755FD352</Checksum>
@@ -277,12 +285,17 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>9C53864A16A280A2CAD661CA57BC5AC1</Checksum>
+        <Checksum>FEB0466413A85CE518C1BB5127E9CBEC</Checksum>
+        <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>sys_clk_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
         <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+      </Template>
+      <Template>
+        <Name>main_task.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>drv_usart_static.c</Name>
@@ -292,7 +305,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>E1A5B0A0ED09F9296E5866DDB68E126F</Checksum>
+        <Checksum>2C00EB8BA5F49F8C57ECAB5BF027E406</Checksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -309,12 +322,16 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>731B241708CDD7868612BE362DECB175</Checksum>
+        <Checksum>6689B0F69BCE7A384BCDEB0808D8A9E6</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
+      </Template>
+      <Template>
+        <Name>ultrasonic.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>reflectance.c</Name>
@@ -332,12 +349,12 @@
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>4A687BE1F81120A6A17AC5C9213A10F6</Checksum>
+        <Checksum>7590E5136D1F0B9B37AFDDDBD700DA94</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>EB04CA216B71FB84B489A3B95D146789</Checksum>
+        <Checksum>FDDA33B9ADA74E66B6A4847110A67B92</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
@@ -370,11 +387,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default/framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

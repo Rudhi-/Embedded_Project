@@ -153,8 +153,12 @@ void REFLECTANCE_Tasks ( void )
         }
 
         case REFLECTANCE_STATE_SERVICE_TASKS:
-        {
-        
+        {   
+            /*
+            if (flag) {
+                do reflectance stuff
+            }
+            */
             break;
         }
 

@@ -1,7 +1,7 @@
 build/default/production/_ext/1360937237/debug.o:  \
 ../src/debug.c  \
  ../src/debug.h  \
-../src/MainTask.h  \
+../src/main_task.h  \
  ../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../framework/system/common/sys_common.h  \
@@ -265,4 +265,6 @@ build/default/production/_ext/1360937237/debug.o:  \
 ../src/uarttx.h  \
 ../src/uartrx.h  \
  ../src/uarttx_public.h  \
-../src/reflectance.h 
+../src/reflectance.h  \
+../src/ultrasonic.h  \
+ ../src/main_task.h 

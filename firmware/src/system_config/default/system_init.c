@@ -189,6 +189,8 @@ void SYS_Initialize ( void* data )
     UARTRX_Initialize();
     UARTTX_Initialize();
     REFLECTANCE_Initialize();
+    ULTRASONIC_Initialize();
+    MAIN_TASK_Initialize();
 }
 
 

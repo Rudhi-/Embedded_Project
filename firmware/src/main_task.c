@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    maintask.c
+    main_task.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,10 +53,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "maintask.h"
-#include "MainTask_public.h"
-#include "debug.h"
-#include "queue.h"
+#include "main_task.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -79,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-MAINTASK_DATA maintaskData;
+MAIN_TASK_DATA main_taskData;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -107,33 +104,19 @@ MAINTASK_DATA maintaskData;
 // *****************************************************************************
 // *****************************************************************************
 
-QueueHandle_t queue;
-void milestone_update() {
-    char a;
-    dbgOutputLoc(SENDING_TO_QUEUE);
-    xQueueSendToBackFromISR(queue, &a, NULL);
-    dbgOutputLoc(SENT_TO_QUEUE);
-}
 /*******************************************************************************
   Function:
-    void MAINTASK_Initialize ( void )
+    void MAIN_TASK_Initialize ( void )
 
   Remarks:
-    See prototype in maintask.h.
+    See prototype in main_task.h.
  */
 
-void MAINTASK_Initialize ( void )
+void MAIN_TASK_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
-    maintaskData.state = MAINTASK_STATE_INIT;
-    dbgOutputLoc(RECEIVING_FROM_QUEUE);
-    queue = xQueueCreate(2, sizeof(char));
-    if (queue == 0) {
-        maintaskData.state = -1;
-    }
-    dbgOutputLoc(RECEIVED_FROM_QUEUE);
-    dbgOutputLocReset();
-    DRV_TMR0_Start();
+    main_taskData.state = MAIN_TASK_STATE_INIT;
+
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -143,23 +126,20 @@ void MAINTASK_Initialize ( void )
 
 /******************************************************************************
   Function:
-    void MAINTASK_Tasks ( void )
+    void MAIN_TASK_Tasks ( void )
 
   Remarks:
-    See prototype in maintask.h.
+    See prototype in main_task.h.
  */
 
-void MAINTASK_Tasks ( void )
+void MAIN_TASK_Tasks ( void )
 {
-    dbgOutputLoc(ENTERING_TASK);
-    char *name = "TEAM 9";
-    int i = 0;
-    dbgOutputLoc(BEFORE_WHILE_LOOP);
+
     /* Check the application's current state. */
-    switch ( maintaskData.state )
+    switch ( main_taskData.state )
     {
         /* Application's initial state. */
-        case MAINTASK_STATE_INIT:
+        case MAIN_TASK_STATE_INIT:
         {
             bool appInitialized = true;
        
@@ -167,23 +147,14 @@ void MAINTASK_Tasks ( void )
             if (appInitialized)
             {
             
-                maintaskData.state = MAINTASK_STATE_SERVICE_TASKS;
+                main_taskData.state = MAIN_TASK_STATE_SERVICE_TASKS;
             }
             break;
         }
 
-        case MAINTASK_STATE_SERVICE_TASKS:
+        case MAIN_TASK_STATE_SERVICE_TASKS:
         {
-            char a;                 
-            xQueueReceive(queue, &a, portMAX_DELAY);
-            if (a == 'X') {
-                dbgOutputLoc(ERROR_HAS_OCCURED);
-            }
-            dbgOutputVal(name[i]);
-            i++;
-            if (i > 5) 
-                i = 0;
-               
+        
             break;
         }
 

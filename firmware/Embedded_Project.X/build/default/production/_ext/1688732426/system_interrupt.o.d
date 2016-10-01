@@ -263,5 +263,9 @@ build/default/production/_ext/1688732426/system_interrupt.o:  \
 ../src/uartrx.h  \
 ../src/uarttx_public.h  \
  ../src/reflectance.h  \
+../src/main_task.h  \
+../src/debug.h  \
+ ../src/ultrasonic.h  \
+../src/main_task.h  \
 ../src/uartrx_public.h  \
  ../src/system_config/default/system_definitions.h 

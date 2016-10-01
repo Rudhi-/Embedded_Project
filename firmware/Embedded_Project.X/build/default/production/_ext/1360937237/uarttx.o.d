@@ -263,5 +263,9 @@ build/default/production/_ext/1360937237/uarttx.o:  \
 ../src/uartrx_public.h  \
 ../src/uarttx.h  \
  ../src/reflectance.h  \
+../src/main_task.h  \
+../src/debug.h  \
+ ../src/ultrasonic.h  \
+../src/main_task.h  \
 ../src/uartrx.h  \
-../src/uarttx_public.h 
+ ../src/uarttx_public.h 

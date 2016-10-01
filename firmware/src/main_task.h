@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    reflectance.h
+    main_task.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _REFLECTANCE_H
-#define _REFLECTANCE_H
+#ifndef _MAIN_TASK_H
+#define _MAIN_TASK_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "main_task.h"
+#include "debug.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -88,12 +88,12 @@ extern "C" {
 typedef enum
 {
 	/* Application's state machine's initial state. */
-	REFLECTANCE_STATE_INIT=0,
-	REFLECTANCE_STATE_SERVICE_TASKS,
+	MAIN_TASK_STATE_INIT=0,
+	MAIN_TASK_STATE_SERVICE_TASKS,
 
 	/* TODO: Define states used by the application state machine. */
 
-} REFLECTANCE_STATES;
+} MAIN_TASK_STATES;
 
 
 // *****************************************************************************
@@ -112,11 +112,11 @@ typedef enum
 typedef struct
 {
     /* The application's current state */
-    REFLECTANCE_STATES state;
+    MAIN_TASK_STATES state;
 
     /* TODO: Define any additional data used by the application. */
 
-} REFLECTANCE_DATA;
+} MAIN_TASK_DATA;
 
 
 // *****************************************************************************
@@ -135,7 +135,7 @@ typedef struct
 
 /*******************************************************************************
   Function:
-    void REFLECTANCE_Initialize ( void )
+    void MAIN_TASK_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -157,19 +157,19 @@ typedef struct
 
   Example:
     <code>
-    REFLECTANCE_Initialize();
+    MAIN_TASK_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void REFLECTANCE_Initialize ( void );
+void MAIN_TASK_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void REFLECTANCE_Tasks ( void )
+    void MAIN_TASK_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -190,17 +190,17 @@ void REFLECTANCE_Initialize ( void );
 
   Example:
     <code>
-    REFLECTANCE_Tasks();
+    MAIN_TASK_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void REFLECTANCE_Tasks( void );
+void MAIN_TASK_Tasks( void );
 
 
-#endif /* _REFLECTANCE_H */
+#endif /* _MAIN_TASK_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

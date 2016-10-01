@@ -64,6 +64,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrx.h"
 #include "uarttx.h"
 #include "reflectance.h"
+#include "ultrasonic.h"
+#include "main_task.h"
 #include "system_definitions.h"
 
 // *****************************************************************************
@@ -75,6 +77,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     
 void IntHandlerDrvTmrInstance0(void)
 {
+    /* set flag */
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 

@@ -265,4 +265,8 @@ build/default/production/_ext/1688732426/system_init.o:  \
 ../src/uarttx.h  \
 ../src/uartrx.h  \
  ../src/uarttx_public.h  \
-../src/reflectance.h 
+../src/reflectance.h  \
+../src/main_task.h  \
+ ../src/debug.h  \
+../src/ultrasonic.h  \
+../src/main_task.h 

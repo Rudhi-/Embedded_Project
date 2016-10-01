@@ -5,10 +5,11 @@
  * Created on September 14, 2016, 10:21 PM
  */
 
-#include "MainTask.h"
 
 #ifndef DEBUG_H
 #define	DEBUG_H
+
+#include "main_task.h"
 
 #define ENTERING_TASK '1'
 #define BEFORE_WHILE_LOOP '2'

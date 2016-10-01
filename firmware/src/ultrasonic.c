@@ -1,24 +1,27 @@
 /*******************************************************************************
-  MPLAB Harmony Application Header File
-
+  MPLAB Harmony Application Source File
+  
   Company:
     Microchip Technology Inc.
-
+  
   File Name:
-    maintask.h
+    ultrasonic.c
 
   Summary:
-    This header file provides prototypes and definitions for the application.
+    This file contains the source code for the MPLAB Harmony application.
 
   Description:
-    This header file provides function prototypes and data type definitions for
-    the application.  Some of these are required by the system (such as the
-    "APP_Initialize" and "APP_Tasks" prototypes) and some of them are only used
-    internally by the application (such as the "APP_STATES" definition).  Both
-    are defined here for convenience.
-*******************************************************************************/
+    This file contains the source code for the MPLAB Harmony application.  It 
+    implements the logic of the application's state machine and it may call 
+    API routines of other MPLAB Harmony modules in the system, such as drivers,
+    system services, and middleware.  However, it does not call any of the
+    system interfaces (such as the "Initialize" and "Tasks" functions) of any of
+    the modules in the system or make any assumptions about when those functions
+    are called.  That is the responsibility of the configuration-specific system
+    files.
+ *******************************************************************************/
 
-//DOM-IGNORE-BEGIN
+// DOM-IGNORE-BEGIN
 /*******************************************************************************
 Copyright (c) 2013-2014 released Microchip Technology Inc.  All rights reserved.
 
@@ -41,59 +44,22 @@ CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF
 SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
  *******************************************************************************/
-//DOM-IGNORE-END
+// DOM-IGNORE-END
 
-#ifndef _MAINTASK_H
-#define _MAINTASK_H
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files
+// Section: Included Files 
 // *****************************************************************************
 // *****************************************************************************
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include "system_config.h"
-#include "system_definitions.h"
-
-// DOM-IGNORE-BEGIN
-#ifdef __cplusplus  // Provide C++ Compatibility
-
-extern "C" {
-
-#endif
-// DOM-IGNORE-END 
+#include "ultrasonic.h"
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Type Definitions
+// Section: Global Data Definitions
 // *****************************************************************************
 // *****************************************************************************
-
-// *****************************************************************************
-/* Application states
-
-  Summary:
-    Application states enumeration
-
-  Description:
-    This enumeration defines the valid application states.  These states
-    determine the behavior of the application at various times.
-*/
-
-typedef enum
-{
-	/* Application's state machine's initial state. */
-	MAINTASK_STATE_INIT=0,
-	MAINTASK_STATE_SERVICE_TASKS,
-
-	/* TODO: Define states used by the application state machine. */
-
-} MAINTASK_STATES;
-
 
 // *****************************************************************************
 /* Application Data
@@ -105,27 +71,33 @@ typedef enum
     This structure holds the application's data.
 
   Remarks:
+    This structure should be initialized by the APP_Initialize function.
+    
     Application strings and buffers are be defined outside this structure.
- */
-
-typedef struct
-{
-    /* The application's current state */
-    MAINTASK_STATES state;
-
-    /* TODO: Define any additional data used by the application. */
-
-} MAINTASK_DATA;
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Routines
-// *****************************************************************************
-// *****************************************************************************
-/* These routines are called by drivers when certain events occur.
 */
-	
+
+ULTRASONIC_DATA ultrasonicData;
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Callback Functions
+// *****************************************************************************
+// *****************************************************************************
+
+/* TODO:  Add any necessary callback functions.
+*/
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Local Functions
+// *****************************************************************************
+// *****************************************************************************
+
+
+/* TODO:  Add any necessary local functions.
+*/
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
@@ -134,80 +106,72 @@ typedef struct
 
 /*******************************************************************************
   Function:
-    void MAINTASK_Initialize ( void )
-
-  Summary:
-     MPLAB Harmony application initialization routine.
-
-  Description:
-    This function initializes the Harmony application.  It places the 
-    application in its initial state and prepares it to run so that its 
-    APP_Tasks function can be called.
-
-  Precondition:
-    All other system initialization routines should be called before calling
-    this routine (in "SYS_Initialize").
-
-  Parameters:
-    None.
-
-  Returns:
-    None.
-
-  Example:
-    <code>
-    MAINTASK_Initialize();
-    </code>
+    void ULTRASONIC_Initialize ( void )
 
   Remarks:
-    This routine must be called from the SYS_Initialize function.
-*/
-
-void MAINTASK_Initialize ( void );
-
-
-/*******************************************************************************
-  Function:
-    void MAINTASK_Tasks ( void )
-
-  Summary:
-    MPLAB Harmony Demo application tasks function
-
-  Description:
-    This routine is the Harmony Demo application's tasks function.  It
-    defines the application's state machine and core logic.
-
-  Precondition:
-    The system and application initialization ("SYS_Initialize") should be
-    called before calling this.
-
-  Parameters:
-    None.
-
-  Returns:
-    None.
-
-  Example:
-    <code>
-    MAINTASK_Tasks();
-    </code>
-
-  Remarks:
-    This routine must be called from SYS_Tasks() routine.
+    See prototype in ultrasonic.h.
  */
 
-void MAINTASK_Tasks( void );
+void ULTRASONIC_Initialize ( void )
+{
+    /* Place the App state machine in its initial state. */
+    ultrasonicData.state = ULTRASONIC_STATE_INIT;
 
-
-#endif /* _MAINTASK_H */
-
-//DOM-IGNORE-BEGIN
-#ifdef __cplusplus
+    
+    /* TODO: Initialize your application's state machine and other
+     * parameters.
+     */
 }
-#endif
-//DOM-IGNORE-END
+
+
+/******************************************************************************
+  Function:
+    void ULTRASONIC_Tasks ( void )
+
+  Remarks:
+    See prototype in ultrasonic.h.
+ */
+
+void ULTRASONIC_Tasks ( void )
+{
+
+    /* Check the application's current state. */
+    switch ( ultrasonicData.state )
+    {
+        /* Application's initial state. */
+        case ULTRASONIC_STATE_INIT:
+        {
+            bool appInitialized = true;
+       
+        
+            if (appInitialized)
+            {
+            
+                ultrasonicData.state = ULTRASONIC_STATE_SERVICE_TASKS;
+            }
+            break;
+        }
+
+        case ULTRASONIC_STATE_SERVICE_TASKS:
+        {
+        
+            break;
+        }
+
+        /* TODO: implement your application state machine.*/
+        
+
+        /* The default state should never be executed. */
+        default:
+        {
+            /* TODO: Handle error in application's state machine. */
+            break;
+        }
+    }
+}
+
+ 
 
 /*******************************************************************************
  End of File
  */
-
