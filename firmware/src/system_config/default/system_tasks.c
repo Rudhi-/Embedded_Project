@@ -56,6 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "uartrx.h"
 #include "uarttx.h"
+#include "reflectance.h"
 
 
 // *****************************************************************************
@@ -69,6 +70,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _UARTRX_Tasks(void);
 static void _UARTTX_Tasks(void);
+static void _REFLECTANCE_Tasks(void);
 
 
 // *****************************************************************************
@@ -100,6 +102,11 @@ void SYS_Tasks ( void )
     /* Create OS Thread for UARTTX Tasks. */
     xTaskCreate((TaskFunction_t) _UARTTX_Tasks,
                 "UARTTX Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for REFLECTANCE Tasks. */
+    xTaskCreate((TaskFunction_t) _REFLECTANCE_Tasks,
+                "REFLECTANCE Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -162,6 +169,23 @@ static void _UARTTX_Tasks(void)
     while(1)
     {
         UARTTX_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _REFLECTANCE_Tasks ( void )
+
+  Summary:
+    Maintains state machine of REFLECTANCE.
+*/
+
+static void _REFLECTANCE_Tasks(void)
+{
+    while(1)
+    {
+        REFLECTANCE_Tasks();
     }
 }
 
