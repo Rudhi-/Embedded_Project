@@ -121,6 +121,8 @@ void ULTRASONIC_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+    
+    /* init stuff, configure devices*/
 }
 
 
@@ -154,7 +156,11 @@ void ULTRASONIC_Tasks ( void )
 
         case ULTRASONIC_STATE_SERVICE_TASKS:
         {
-        
+            /*
+            if (flag) {
+                do ultrasonic stuff
+            }
+            */
             break;
         }
 

@@ -121,6 +121,8 @@ void REFLECTANCE_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+    
+    /* init stuff, configure devices*/
 }
 
 
