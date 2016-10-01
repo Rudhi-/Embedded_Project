@@ -259,7 +259,7 @@ build/default/production/_ext/327000265/drv_usart_static.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
-../src/uartrx_public1.h  \
+../src/uartrx_public.h  \
 ../src/uarttx.h  \
 ../src/uartrx.h  \
  ../src/uarttx_public.h  \

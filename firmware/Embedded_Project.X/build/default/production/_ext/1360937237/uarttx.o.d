@@ -260,7 +260,7 @@ build/default/production/_ext/1360937237/uarttx.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
-../src/uartrx_public1.h  \
+../src/uartrx_public.h  \
 ../src/uarttx.h  \
  ../src/reflectance.h  \
 ../src/uartrx.h  \
