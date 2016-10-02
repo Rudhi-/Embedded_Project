@@ -131,22 +131,22 @@ void init_motors() {
 //set the speeds to given inputs
 void set_speed(int leftSpeed, int rightSpeed) {
     //right motor
-    if (leftSpeed < 0) {
+    if (rightSpeed < 0) {
         PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-        leftSpeed *= -1;
+        rightSpeed *= -1;
     } else {
         PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     }
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, leftSpeed); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed); //placeholder
     
     //left motor
-    if (rightSpeed < 0) {
+    if (leftSpeed < 0) {
         PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-        rightSpeed *= -1;
+        leftSpeed *= -1;
     } else {
         PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
     }
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, rightSpeed); //placeholder    
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed); //placeholder    
 }
 
 //Stops all motors immediately
@@ -155,12 +155,13 @@ void move_stop() {
     PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     //left motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    
 }
 
 // Leader Rover
 
 //turn the rover to the right
-void turn_right() {
+void turn_left() {
     int placeholder;
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
@@ -171,7 +172,7 @@ void turn_right() {
 }
 
 //turn the rover to the left
-void turn_left() {
+void turn_right() {
     int placeholder;
     //stop right motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
@@ -262,7 +263,7 @@ void MOTORS_Tasks ( void )
 
         case MOTORS_STATE_SERVICE_TASKS:
         {
-            move_backward();
+            move_forward();
             
             break;
         }
