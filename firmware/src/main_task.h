@@ -109,6 +109,8 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
+int counter;
+
 typedef struct
 {
     /* The application's current state */

@@ -161,6 +161,12 @@ void REFLECTANCE_Tasks ( void )
                 do reflectance stuff
             }
             */
+            PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1, 1);
+            counter = 0;
+            while(counter < 10000) {counter++;}
+            PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1, 0);
+            counter = 0;
+            while(counter < 10000) {counter++;}
             break;
         }
 

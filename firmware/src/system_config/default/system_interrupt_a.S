@@ -51,9 +51,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 /* TMR Instance 0 Interrupt */
    .extern  IntHandlerDrvTmrInstance0
 
-   .section	.vector_8,code, keep
-   .equ     __vector_dispatch_8, IntVectorDrvTmrInstance0
-   .global  __vector_dispatch_8
+   .section	.vector_20,code, keep
+   .equ     __vector_dispatch_20, IntVectorDrvTmrInstance0
+   .global  __vector_dispatch_20
    .set     nomicromips
    .set     noreorder
    .set     nomips16
@@ -80,6 +80,40 @@ _IntHandlerDrvTmrInstance0:
     nop
     portRESTORE_CONTEXT
     .end	_IntHandlerDrvTmrInstance0
+
+
+/* TMR Instance 1 Interrupt */
+   .extern  IntHandlerDrvTmrInstance1
+
+   .section	.vector_8,code, keep
+   .equ     __vector_dispatch_8, IntVectorDrvTmrInstance1
+   .global  __vector_dispatch_8
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorDrvTmrInstance1
+
+IntVectorDrvTmrInstance1:
+    la    $26,  _IntHandlerDrvTmrInstance1         
+    jr    $26
+    nop
+	.end	IntVectorDrvTmrInstance1
+
+   .section	.DrvTmrInstance1_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _IntHandlerDrvTmrInstance1
+
+_IntHandlerDrvTmrInstance1:
+    portSAVE_CONTEXT
+    la    s6,  IntHandlerDrvTmrInstance1
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end	_IntHandlerDrvTmrInstance1
 
 
 

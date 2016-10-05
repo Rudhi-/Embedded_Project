@@ -262,6 +262,7 @@ build/default/production/_ext/1688732426/system_init.o:  \
  ../src/uartrx.h  \
 ../src/system_config/default/system_definitions.h  \
  ../src/uartrx_public.h  \
+../src/crc.h  \
 ../src/uarttx.h  \
 ../src/uartrx.h  \
  ../src/uarttx_public.h  \

@@ -8,7 +8,11 @@
 #ifndef UARTTX_PUBLIC_H
 #define	UARTTX_PUBLIC_H
 
+QueueHandle_t MessageQueueWout;
+
 void TransmitTheMessage();
+void ReSendMessage();
+
 
 #endif	/* UARTTX_PUBLIC_H */
 

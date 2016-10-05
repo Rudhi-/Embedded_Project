@@ -116,7 +116,9 @@ void UARTRX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uartrxData.state = UARTRX_STATE_INIT;
-    queue = xQueueCreate(2, sizeof(char));
+    receiveState = WAIT_ON_MESSAGE;
+    MessageQueueWin = xQueueCreate(2, 8*sizeof(char));
+    makeCRCTable();
     
     
     /* TODO: Initialize your application's state machine and other
@@ -135,10 +137,44 @@ void UARTRX_Initialize ( void )
 
 void SendToTheQueue()
 {
-    
-    uartrxData.rx_data = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-    PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1, 1);
-    xQueueSendFromISR( queue, &uartrxData.rx_data, pdFAIL );
+    uartrxData.rx_data[0] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    if (uartrxData.rx_data[0] != 'm')
+    {
+        
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[1] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[2] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[3] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[4] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[5] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[6] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+        uartrxData.rx_data[7] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+        
+        
+        if ((uartrxData.rx_data[0] & 0x07) == PIC_ID) {
+            switch (receiveState) {
+                case WAIT_ON_MESSAGE:
+                    if (crcMatches(uartrxData.rx_data, 7)) {
+                        xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                    }
+                    break;
+                case WAIT_ON_ACK:
+                    if ((uartrxData.rx_data[0] & 0x80)) {
+                        break;
+                    }
+                    PLIB_TMR_Stop(TMR_ID_5);
+                    receiveState = WAIT_ON_MESSAGE;
+                    break;
+            }
+        }
+                
+    }
 }
 
 void UARTRX_Tasks ( void )
@@ -150,8 +186,6 @@ void UARTRX_Tasks ( void )
         case UARTRX_STATE_INIT:
         {
             bool appInitialized = true;
-       
-        
             if (appInitialized)
             {
             
@@ -162,20 +196,7 @@ void UARTRX_Tasks ( void )
 
         case UARTRX_STATE_SERVICE_TASKS:
         {
-            /*
-            if (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
-            {
-               uartrxData.rx_data = DRV_USART0_ReadByte(); // read received byte
-               //xQueueSend(queue, (void *) &uartrxData.rx_data, pdFAIL);
-               uartrxData.tx_data = uartrxData.rx_data;
-            }
-             * */
-            //if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()  )  & uartrxData.tx_data != ' ')
-            //{
-                //DRV_USART0_WriteByte('R');
-            //}
-            break;
-        
+            
             break;
         }
 

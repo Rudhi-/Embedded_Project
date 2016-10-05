@@ -116,7 +116,7 @@ void UARTTX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
-
+    MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -132,16 +132,26 @@ void UARTTX_Initialize ( void )
     See prototype in uarttx.h.
  */
 
+void ReSendMessage()
+{
+    xQueueSend( MessageQueueWout, uarttxData.tx_data, pdFAIL );
+}
+
 void TransmitTheMessage ()
 {
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'B');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'Y');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'T');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, 'E');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, ' ');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data);
-    PLIB_USART_TransmitterByteSend(USART_ID_1, '\n');
-    PLIB_USART_TransmitterByteSend(USART_ID_1, '\r');
+    if (uarttxData.tx_data[0] != 'm') 
+    {
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
+        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
+    }
+    else
+        PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
 }
 
 void UARTTX_Tasks ( void )
@@ -166,26 +176,16 @@ void UARTTX_Tasks ( void )
 
         case UARTTX_STATE_SERVICE_TASKS:
         {
-            if (uxQueueMessagesWaiting(queue)) {
-                xQueueReceive(queue, &uarttxData.tx_data, portMAX_DELAY);
-                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
-                /*
-                if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()  ))
-                {
-                    DRV_USART0_WriteByte('R');
-                    DRV_USART0_WriteByte('E');
-                    DRV_USART0_WriteByte('C');
-                    DRV_USART0_WriteByte('E');
-                    DRV_USART0_WriteByte('I');
-                    DRV_USART0_WriteByte('V');
-                    DRV_USART0_WriteByte('E');
-                    DRV_USART0_WriteByte('D');
-                    DRV_USART0_WriteByte(' ');
-                    DRV_USART0_WriteByte(a);
-                    DRV_USART0_WriteByte('\n');
-                    DRV_USART0_WriteByte('\r');
+            if (uxQueueMessagesWaiting(MessageQueueWout)) {
+                xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
+                uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
+                if (uarttxData.tx_data[0] & 0x80) {
+                    PLIB_TMR_Counter16BitClear(TMR_ID_5);
+                    PLIB_TMR_Start(TMR_ID_5);
+                    receiveState = WAIT_ON_ACK;
                 }
-                 */
+                
+                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
             }
             break;
         }

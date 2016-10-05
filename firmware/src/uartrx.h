@@ -85,7 +85,6 @@ extern "C" {
     This enumeration defines the valid application states.  These states
     determine the behavior of the application at various times.
 */
-QueueHandle_t queue;
 typedef enum
 {
 	/* Application's state machine's initial state. */
@@ -115,8 +114,8 @@ typedef struct
 {
     /* The application's current state */
     UARTRX_STATES state;
-    char rx_data;
-    char tx_data;
+    uint8_t rx_data [8];
+    uint8_t tx_data;
 
     /* TODO: Define any additional data used by the application. */
 

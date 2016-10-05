@@ -267,4 +267,5 @@ build/default/production/_ext/1360937237/uartrx.o:  \
 ../src/debug.h  \
  ../src/ultrasonic.h  \
 ../src/main_task.h  \
-../src/uartrx_public.h 
+../src/uartrx_public.h  \
+ ../src/crc.h 

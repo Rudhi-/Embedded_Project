@@ -261,10 +261,11 @@ build/default/production/_ext/1360937237/main_task.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
 ../src/uartrx_public.h  \
+../src/crc.h  \
 ../src/uarttx.h  \
-../src/uartrx.h  \
- ../src/uarttx_public.h  \
+ ../src/uartrx.h  \
+../src/uarttx_public.h  \
 ../src/reflectance.h  \
-../src/ultrasonic.h  \
- ../src/main_task.h  \
+ ../src/ultrasonic.h  \
+../src/main_task.h  \
 ../src/debug.h 

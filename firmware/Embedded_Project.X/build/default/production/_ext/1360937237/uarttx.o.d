@@ -261,6 +261,7 @@ build/default/production/_ext/1360937237/uarttx.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
 ../src/uartrx_public.h  \
+../src/crc.h  \
 ../src/uarttx.h  \
  ../src/reflectance.h  \
 ../src/main_task.h  \

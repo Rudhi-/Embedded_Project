@@ -246,17 +246,17 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>208C38F4220EB3D701B5B9CC9CB6A378</Checksum>
+        <Checksum>32DF207C8A9683E9F46B6E5B243CE041</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/tmr</Path>
-        <Checksum>5B1227C9C8A50A58EB2DAB66BF09B4E6</Checksum>
+        <Checksum>3848B1C3EC270575ACBA3B9AE1CB12DD</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_mapping.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>0651845480D5D3E21D8BF17EE68DBEAC</Checksum>
+        <Checksum>2CAE56994AB8C4966A293572681FF5BE</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_mapping.c</Name>
@@ -285,7 +285,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>FEB0466413A85CE518C1BB5127E9CBEC</Checksum>
+        <Checksum>5479CCC6F98B1778D0C33988F4FB2A38</Checksum>
         <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
@@ -305,7 +305,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>2C00EB8BA5F49F8C57ECAB5BF027E406</Checksum>
+        <Checksum>A10CBA6F783D43A03FDD2D57FCE5D485</Checksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -322,7 +322,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>6689B0F69BCE7A384BCDEB0808D8A9E6</Checksum>
+        <Checksum>4F7C5BF32893D04C6B76FEC10F715526</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -354,12 +354,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>FDDA33B9ADA74E66B6A4847110A67B92</Checksum>
+        <Checksum>3A34CF31B071BCE841D394AD91BC1341</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>04B678DD289E2879424E19AC63EB1AB6</Checksum>
+        <Checksum>403969E763C369B596BD98BAA5C337FC</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
