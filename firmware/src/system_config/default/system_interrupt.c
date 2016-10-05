@@ -63,14 +63,23 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <sys/attribs.h>
 #include "uartrx.h"
 #include "uarttx.h"
+#include "motors.h"
+#include "sensor.h"
+#include "control.h"
 #include "system_definitions.h"
-#include "uartrx_public1.h"
+#include "uartrx_public.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
+void IntHandlerDrvTmrInstance0(void)
+{
+    ReSendMessage();
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+}
+
 void IntHandlerDrvUsartInstance0(void)
 {
     if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE))

@@ -5,7 +5,12 @@
  * Created on September 14, 2016, 10:21 PM
  */
 
-#include "MainTask.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include "system_config.h"
+#include "system_definitions.h"
 
 #ifndef DEBUG_H
 #define	DEBUG_H

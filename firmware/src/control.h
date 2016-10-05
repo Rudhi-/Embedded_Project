@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    uartrx.h
+    control.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _UARTRX_H
-#define _UARTRX_H
+#ifndef _CONTROL_H
+#define _CONTROL_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -84,15 +84,16 @@ extern "C" {
     This enumeration defines the valid application states.  These states
     determine the behavior of the application at various times.
 */
+
 typedef enum
 {
 	/* Application's state machine's initial state. */
-	UARTRX_STATE_INIT=0,
-	UARTRX_STATE_SERVICE_TASKS,
+	CONTROL_STATE_INIT=0,
+	CONTROL_STATE_SERVICE_TASKS,
 
 	/* TODO: Define states used by the application state machine. */
 
-} UARTRX_STATES;
+} CONTROL_STATES;
 
 
 // *****************************************************************************
@@ -108,17 +109,14 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
-
 typedef struct
 {
     /* The application's current state */
-    UARTRX_STATES state;
-    uint8_t rx_data [8];
-    uint8_t tx_data;
+    CONTROL_STATES state;
 
     /* TODO: Define any additional data used by the application. */
 
-} UARTRX_DATA;
+} CONTROL_DATA;
 
 
 // *****************************************************************************
@@ -137,7 +135,7 @@ typedef struct
 
 /*******************************************************************************
   Function:
-    void UARTRX_Initialize ( void )
+    void CONTROL_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -159,19 +157,19 @@ typedef struct
 
   Example:
     <code>
-    UARTRX_Initialize();
+    CONTROL_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void UARTRX_Initialize ( void );
+void CONTROL_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void UARTRX_Tasks ( void )
+    void CONTROL_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -192,17 +190,17 @@ void UARTRX_Initialize ( void );
 
   Example:
     <code>
-    UARTRX_Tasks();
+    CONTROL_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void UARTRX_Tasks( void );
+void CONTROL_Tasks( void );
 
 
-#endif /* _UARTRX_H */
+#endif /* _CONTROL_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

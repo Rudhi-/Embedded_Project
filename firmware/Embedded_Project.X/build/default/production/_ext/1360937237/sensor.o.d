@@ -1,6 +1,7 @@
-build/default/production/_ext/327000265/drv_usart_mapping.o:  \
- ../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c  \
- ../src/system_config/default/system_config.h  \
+build/default/production/_ext/1360937237/sensor.o:  \
+../src/sensor.c  \
+ ../src/sensor.h  \
+../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../framework/system/common/sys_common.h  \
  ../../../../framework/system/common/sys_module.h  \
