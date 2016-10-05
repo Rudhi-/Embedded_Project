@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    uarttx.c
+    magnetometer.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,7 +53,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "uarttx.h"
+#include "magnetometer.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-UARTTX_DATA uarttxData;
+MAGNETOMETER_DATA magnetometerData;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -106,17 +106,17 @@ UARTTX_DATA uarttxData;
 
 /*******************************************************************************
   Function:
-    void UARTTX_Initialize ( void )
+    void MAGNETOMETER_Initialize ( void )
 
   Remarks:
-    See prototype in uarttx.h.
+    See prototype in magnetometer.h.
  */
 
-void UARTTX_Initialize ( void )
+void MAGNETOMETER_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
-    uarttxData.state = UARTTX_STATE_INIT;
-    MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
+    magnetometerData.state = MAGNETOMETER_STATE_INIT;
+
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -126,42 +126,20 @@ void UARTTX_Initialize ( void )
 
 /******************************************************************************
   Function:
-    void UARTTX_Tasks ( void )
+    void MAGNETOMETER_Tasks ( void )
 
   Remarks:
-    See prototype in uarttx.h.
+    See prototype in magnetometer.h.
  */
 
-void ReSendMessage()
-{
-    xQueueSend( MessageQueueWout, uarttxData.tx_data, pdFAIL );
-}
-
-void TransmitTheMessage ()
-{
-    if (uarttxData.tx_data[0] != 'm') 
-    {
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
-    }
-    else
-        PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
-}
-
-void UARTTX_Tasks ( void )
+void MAGNETOMETER_Tasks ( void )
 {
 
     /* Check the application's current state. */
-    switch ( uarttxData.state )
+    switch ( magnetometerData.state )
     {
         /* Application's initial state. */
-        case UARTTX_STATE_INIT:
+        case MAGNETOMETER_STATE_INIT:
         {
             bool appInitialized = true;
        
@@ -169,24 +147,14 @@ void UARTTX_Tasks ( void )
             if (appInitialized)
             {
             
-                uarttxData.state = UARTTX_STATE_SERVICE_TASKS;
+                magnetometerData.state = MAGNETOMETER_STATE_SERVICE_TASKS;
             }
             break;
         }
 
-        case UARTTX_STATE_SERVICE_TASKS:
+        case MAGNETOMETER_STATE_SERVICE_TASKS:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWout)) {
-                xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
-                uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
-                if (uarttxData.tx_data[0] & 0x80) {
-                    PLIB_TMR_Counter16BitClear(TMR_ID_5);
-                    PLIB_TMR_Start(TMR_ID_5);
-                    receiveState = WAIT_ON_ACK;
-                }
-                
-                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
-            }
+        
             break;
         }
 

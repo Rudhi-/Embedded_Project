@@ -1,5 +1,6 @@
-build/default/production/_ext/327000265/drv_usart_static.o:  \
- ../src/system_config/default/framework/driver/usart/src/drv_usart_static.c  \
+build/default/production/_ext/1360937237/magnetometer.o:  \
+ ../src/magnetometer.c  \
+../src/magnetometer.h  \
  ../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../framework/system/common/sys_common.h  \

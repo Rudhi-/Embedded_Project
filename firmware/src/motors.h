@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    uartrx.h
+    motors.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _UARTRX_H
-#define _UARTRX_H
+#ifndef _MOTORS_H
+#define _MOTORS_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,8 +58,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "queue.h"
-#include "uartrx_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -85,15 +83,20 @@ extern "C" {
     This enumeration defines the valid application states.  These states
     determine the behavior of the application at various times.
 */
+
 typedef enum
 {
 	/* Application's state machine's initial state. */
-	UARTRX_STATE_INIT=0,
-	UARTRX_STATE_SERVICE_TASKS,
+	MOTORS_STATE_INIT=0,
+	MOTORS_STATE_RECEIVE_MESSAGE,
+            MOTORS_STATE_SEND_ACK,
+            MOTORS_STATE_WORK_ON_DATA,
+            MOTORS_STATE_TRANSMIT_DATA,
+            MOTORS_STATE_WAIT_ACK
 
 	/* TODO: Define states used by the application state machine. */
 
-} UARTRX_STATES;
+} MOTORS_STATES;
 
 
 // *****************************************************************************
@@ -109,17 +112,16 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
-
 typedef struct
 {
     /* The application's current state */
-    UARTRX_STATES state;
-    uint8_t rx_data [8];
-    uint8_t tx_data;
+    MOTORS_STATES state;
+    char rx_data [8];
+    char tx_data [8];
 
     /* TODO: Define any additional data used by the application. */
 
-} UARTRX_DATA;
+} MOTORS_DATA;
 
 
 // *****************************************************************************
@@ -138,7 +140,7 @@ typedef struct
 
 /*******************************************************************************
   Function:
-    void UARTRX_Initialize ( void )
+    void MOTORS_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -160,19 +162,19 @@ typedef struct
 
   Example:
     <code>
-    UARTRX_Initialize();
+    MOTORS_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void UARTRX_Initialize ( void );
+void MOTORS_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void UARTRX_Tasks ( void )
+    void MOTORS_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -193,17 +195,17 @@ void UARTRX_Initialize ( void );
 
   Example:
     <code>
-    UARTRX_Tasks();
+    MOTORS_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void UARTRX_Tasks( void );
+void MOTORS_Tasks( void );
 
 
-#endif /* _UARTRX_H */
+#endif /* _MOTORS_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

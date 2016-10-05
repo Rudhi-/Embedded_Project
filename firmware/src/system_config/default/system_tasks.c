@@ -56,6 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "uartrx.h"
 #include "uarttx.h"
+#include "motors.h"
+#include "magnetometer.h"
 
 
 // *****************************************************************************
@@ -69,6 +71,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _UARTRX_Tasks(void);
 static void _UARTTX_Tasks(void);
+static void _MOTORS_Tasks(void);
+static void _MAGNETOMETER_Tasks(void);
 
 
 // *****************************************************************************
@@ -100,6 +104,16 @@ void SYS_Tasks ( void )
     /* Create OS Thread for UARTTX Tasks. */
     xTaskCreate((TaskFunction_t) _UARTTX_Tasks,
                 "UARTTX Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for MOTORS Tasks. */
+    xTaskCreate((TaskFunction_t) _MOTORS_Tasks,
+                "MOTORS Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for MAGNETOMETER Tasks. */
+    xTaskCreate((TaskFunction_t) _MAGNETOMETER_Tasks,
+                "MAGNETOMETER Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -162,6 +176,40 @@ static void _UARTTX_Tasks(void)
     while(1)
     {
         UARTTX_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _MOTORS_Tasks ( void )
+
+  Summary:
+    Maintains state machine of MOTORS.
+*/
+
+static void _MOTORS_Tasks(void)
+{
+    while(1)
+    {
+        MOTORS_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _MAGNETOMETER_Tasks ( void )
+
+  Summary:
+    Maintains state machine of MAGNETOMETER.
+*/
+
+static void _MAGNETOMETER_Tasks(void)
+{
+    while(1)
+    {
+        MAGNETOMETER_Tasks();
     }
 }
 

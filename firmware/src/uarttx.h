@@ -114,7 +114,8 @@ typedef struct
 {
     /* The application's current state */
     UARTTX_STATES state;
-    char tx_data;
+    uint8_t saved_message[8];
+    uint8_t tx_data[8];
 
     /* TODO: Define any additional data used by the application. */
 

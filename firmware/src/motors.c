@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    uarttx.c
+    motors.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,7 +53,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "uarttx.h"
+#include "motors.h"
+#include "uartrx_public.h"
+#include "uarttx_public.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,7 +78,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-UARTTX_DATA uarttxData;
+MOTORS_DATA motorsData;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -106,17 +108,17 @@ UARTTX_DATA uarttxData;
 
 /*******************************************************************************
   Function:
-    void UARTTX_Initialize ( void )
+    void MOTORS_Initialize ( void )
 
   Remarks:
-    See prototype in uarttx.h.
+    See prototype in motors.h.
  */
 
-void UARTTX_Initialize ( void )
+void MOTORS_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
-    uarttxData.state = UARTTX_STATE_INIT;
-    MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
+    motorsData.state = MOTORS_STATE_INIT;
+
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -126,42 +128,21 @@ void UARTTX_Initialize ( void )
 
 /******************************************************************************
   Function:
-    void UARTTX_Tasks ( void )
+    void MOTORS_Tasks ( void )
 
   Remarks:
-    See prototype in uarttx.h.
+    See prototype in motors.h.
  */
 
-void ReSendMessage()
-{
-    xQueueSend( MessageQueueWout, uarttxData.tx_data, pdFAIL );
-}
 
-void TransmitTheMessage ()
-{
-    if (uarttxData.tx_data[0] != 'm') 
-    {
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
-    }
-    else
-        PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
-}
-
-void UARTTX_Tasks ( void )
+void MOTORS_Tasks ( void )
 {
 
     /* Check the application's current state. */
-    switch ( uarttxData.state )
+    switch ( motorsData.state )
     {
         /* Application's initial state. */
-        case UARTTX_STATE_INIT:
+        case MOTORS_STATE_INIT:
         {
             bool appInitialized = true;
        
@@ -169,29 +150,62 @@ void UARTTX_Tasks ( void )
             if (appInitialized)
             {
             
-                uarttxData.state = UARTTX_STATE_SERVICE_TASKS;
+                motorsData.state = MOTORS_STATE_RECEIVE_MESSAGE;
             }
             break;
         }
 
-        case UARTTX_STATE_SERVICE_TASKS:
+        case MOTORS_STATE_RECEIVE_MESSAGE:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWout)) {
-                xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
-                uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
-                if (uarttxData.tx_data[0] & 0x80) {
-                    PLIB_TMR_Counter16BitClear(TMR_ID_5);
-                    PLIB_TMR_Start(TMR_ID_5);
-                    receiveState = WAIT_ON_ACK;
-                }
+            // Wait till the message has been received before moving to the 
+            // Next state
+            if (uxQueueMessagesWaiting(MessageQueueWin))
+            {
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
-                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
+                char ack [8] = "ACKNOWLG";
+                //Send the acknowledge message
+                xQueueSend( MessageQueueWout, ack, pdFAIL );
+                
+                // Go to the work on data state
+                motorsData.state = MOTORS_STATE_WORK_ON_DATA;
+                //PLIB_TMR_Counter16BitClear(TMR_ID_5);
+                //PLIB_TMR_Start(TMR_ID_5);
             }
             break;
         }
 
         /* TODO: implement your application state machine.*/
+        case MOTORS_STATE_WORK_ON_DATA:
+        {
+            strcpy(motorsData.tx_data, motorsData.rx_data);
+            motorsData.state = MOTORS_STATE_TRANSMIT_DATA;
+            break;
+        }
         
+        case MOTORS_STATE_TRANSMIT_DATA:
+        {
+            xQueueSend( MessageQueueWout, motorsData.tx_data, pdFAIL );
+            //StoreMessage(motorsData.tx_data);
+            motorsData.state = MOTORS_STATE_WAIT_ACK;
+            break;
+        }
+        
+        case MOTORS_STATE_WAIT_ACK:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueWin))
+            {
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
+                
+                //Do some sort of check
+                
+                //Go back to waiting for data
+                PLIB_TMR_Stop(TMR_ID_5);
+                motorsData.state = MOTORS_STATE_RECEIVE_MESSAGE;
+            }
+        }
 
         /* The default state should never be executed. */
         default:

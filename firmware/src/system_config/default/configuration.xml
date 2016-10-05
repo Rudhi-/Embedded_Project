@@ -13,6 +13,10 @@
         <Path>Header Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
+        <Name>drv_tmr_mapping.h</Name>
+        <Path>Header Files/framework/driver/tmr</Path>
+      </File>
+      <File>
         <Name>semphr.h</Name>
         <Path>Header Files/FreeRTOS</Path>
       </File>
@@ -101,8 +105,16 @@
         <Path>Header Files/framework/peripheral</Path>
       </File>
       <File>
+        <Name>drv_tmr_variant_mapping.h</Name>
+        <Path>Header Files/framework/driver/tmr/src</Path>
+      </File>
+      <File>
         <Name>list.c</Name>
         <Path>Source Files/FreeRTOS</Path>
+      </File>
+      <File>
+        <Name>drv_tmr.h</Name>
+        <Path>Header Files/framework/driver/tmr</Path>
       </File>
       <File>
         <Name>sys_devcon.c</Name>
@@ -223,28 +235,77 @@
     </Files>
     <Templates>
       <Template>
-        <Name>drv_usart_static.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
-        <Checksum>2A4AED7552D145ED28C2C52BFC04AD9D</Checksum>
-      </Template>
-      <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
         <Checksum>5220A49E29CE78BDA761E7EAC8FFC0A4</Checksum>
       </Template>
       <Template>
-        <Name>system_init.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>3A1204375F9077B3F87EE1CA308D99EB</Checksum>
+        <Name>motors.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>main.c</Name>
+        <Name>motors.c</Name>
         <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>5C0D911C19B5E425D7F0FB89E579F457</Checksum>
+        <Checksum>CD9D37775C01F87558BDB580FE807703</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_tmr_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/tmr</Path>
+        <Checksum>5B1227C9C8A50A58EB2DAB66BF09B4E6</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_tmr_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
+        <Checksum>0651845480D5D3E21D8BF17EE68DBEAC</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>115DDE4372E58D4116BC77DC36FD97DC</Checksum>
+      </Template>
+      <Template>
+        <Name>FreeRTOSConfig.h</Name>
+        <Path>Header Files/app/system_config/default</Path>
+        <Checksum>9DDBED97A2EC7C203259C27CF97B3E70</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_static_byte_model.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
+      </Template>
+      <Template>
+        <Name>sys_clk_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/system/clk</Path>
+        <Checksum>B4BD59D8D7C4DA95DC5E3B57755FD352</Checksum>
+      </Template>
+      <Template>
+        <Name>system_interrupt.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>1CA93EF51F33C16124BD42C7FD344B93</Checksum>
+        <ProjectFileChecksum>B48512F7E372A807B0BE40B28E405A88</ProjectFileChecksum>
+      </Template>
+      <Template>
+        <Name>sys_clk_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
+        <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>2A4AED7552D145ED28C2C52BFC04AD9D</Checksum>
+      </Template>
+      <Template>
+        <Name>system_init.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>65025C09476A5B5A8860D6631EB31F84</Checksum>
+      </Template>
+      <Template>
+        <Name>main.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>uartrx.h</Name>
@@ -257,7 +318,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>22438607EF2C31CE2029F040014BE2DF</Checksum>
+        <Checksum>A9D184100CB609CADDFEB0953EB66961</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -265,9 +326,8 @@
         <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
       </Template>
       <Template>
-        <Name>drv_usart_mapping.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
-        <Checksum>115DDE4372E58D4116BC77DC36FD97DC</Checksum>
+        <Name>magnetometer.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>drv_usart_static.h</Name>
@@ -275,35 +335,19 @@
         <Checksum>AE37BD63B6EC9F6ADD6B8006CE192FCB</Checksum>
       </Template>
       <Template>
-        <Name>FreeRTOSConfig.h</Name>
-        <Path>Header Files/app/system_config/default</Path>
-        <Checksum>9DDBED97A2EC7C203259C27CF97B3E70</Checksum>
-      </Template>
-      <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>333979D07C6C4752D40039EFDE747598</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_usart_static_byte_model.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
-        <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
+        <Checksum>255FECF6C001DADC611525023F21311B</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>D85882DE0EFA3100011A6BAD36524919</Checksum>
+        <Checksum>4001987578A82F1617E40482A0D7FA41</Checksum>
       </Template>
       <Template>
-        <Name>sys_clk_static.h</Name>
-        <Path>Header Files/app/system_config/default/framework/system/clk</Path>
-        <Checksum>B4BD59D8D7C4DA95DC5E3B57755FD352</Checksum>
-      </Template>
-      <Template>
-        <Name>system_interrupt.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>880897F52A1EFB30EBA74E5CF47ACCF1</Checksum>
-        <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
+        <Name>drv_tmr_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
+        <Checksum>FF6D85289CC799148419226E8626CF1A</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -311,13 +355,12 @@
         <Checksum>FA52743264536E5207D2ADBE57B48D05</Checksum>
       </Template>
       <Template>
-        <Name>sys_clk_static.c</Name>
-        <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
-        <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
-      </Template>
-      <Template>
         <Name>uarttx.c</Name>
         <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>magnetometer.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>uartrx.c</Name>
@@ -336,11 +379,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\system_config\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\default"/>
         <Include value="C:\microchip\harmony\v1_08_01\framework"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\system_config\default\framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>
