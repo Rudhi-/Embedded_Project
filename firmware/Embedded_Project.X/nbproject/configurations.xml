@@ -37,21 +37,11 @@
         <itemPath>../src/control.h</itemPath>
         <itemPath>../src/debug.h</itemPath>
         <itemPath>../src/uartrx_public.h</itemPath>
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
         <itemPath>../src/uarttx_public.h</itemPath>
-=======
->>>>>>> c92df2f1c9a785990841b348783f8dc28c19c35a
         <itemPath>../src/crc.h</itemPath>
-        <itemPath>../src/uarttx_public.h</itemPath>
         <itemPath>../src/headers.h</itemPath>
         <itemPath>../src/motors_public.h</itemPath>
         <itemPath>../src/sensor_public.h</itemPath>
-<<<<<<< HEAD
-=======
->>>>>>> Integrated TK's new messaging code, added headers.h
->>>>>>> c92df2f1c9a785990841b348783f8dc28c19c35a
         <itemPath>../src/control_public.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
