@@ -118,6 +118,9 @@ void UARTTX_Initialize ( void )
     uarttxData.state = UARTTX_STATE_INIT;
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     //DRV_TMR0_Start();
+    wait_on_ack = false;
+    //PLIB_TMR_Start(TMR_ID_2);
+    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -135,7 +138,7 @@ void UARTTX_Initialize ( void )
 
 void ReSendMessage()
 {
-    xQueueSend( MessageQueueWout, uarttxData.tx_data, pdFAIL );
+    xQueueSendFromISR( MessageQueueWout, uarttxData.tx_data, pdFAIL );
 }
 
 void TransmitTheMessage ()
@@ -180,12 +183,27 @@ void UARTTX_Tasks ( void )
             if (uxQueueMessagesWaiting(MessageQueueWout)) {
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
-                if (uarttxData.tx_data[0] & 0x80) {
-                    PLIB_TMR_Counter16BitClear(TMR_ID_5);
-                    PLIB_TMR_Start(TMR_ID_5);
+                if (uarttxData.tx_data[0] & 0x80)
+                {
+                    PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     receiveState = WAIT_ON_ACK;
+                    wait_on_ack = true;
+                    uarttxData.state = UARTTX_STATE_WAIT;
                 }
+                PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
                 
+                
+            }
+            break;
+        }
+        
+        case UARTTX_STATE_WAIT:
+        {
+            if (!wait_on_ack)
+                uarttxData.state = UARTTX_STATE_SERVICE_TASKS;
+            if (uxQueueMessagesWaiting(MessageQueueWout)) {
+                xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
+                uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
                 PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
             }
             break;

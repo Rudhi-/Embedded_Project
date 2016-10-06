@@ -9,10 +9,10 @@
 #define	UARTTX_PUBLIC_H
 
 QueueHandle_t MessageQueueWout;
+bool wait_on_ack;
 
-void TransmitTheMessage();
 void ReSendMessage();
-
+void TransmitTheMessage();
 
 #endif	/* UARTTX_PUBLIC_H */
 

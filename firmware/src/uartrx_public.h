@@ -8,12 +8,9 @@
 #ifndef UARTRX_PUBLIC1_H
 #define	UARTRX_PUBLIC1_H
 
-#include "crc.h"
 
 enum RECEIVE_STATES {WAIT_ON_MESSAGE = 0, WAIT_ON_ACK} receiveState; 
 QueueHandle_t MessageQueueWin;
-
-#define PIC_ID 1 //set to your pic
 
 void SendToTheQueue();
 void Transmit2();

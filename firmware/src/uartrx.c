@@ -120,7 +120,7 @@ void UARTRX_Initialize ( void )
     MessageQueueWin = xQueueCreate(2, 8*sizeof(char));
     makeCRCTable();
     
-    DRV_TMR0_Start();
+    
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -156,7 +156,6 @@ void SendToTheQueue()
         while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
         uartrxData.rx_data[7] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
         
-        
         if ((uartrxData.rx_data[0] & 0x07) == PIC_ID) {
             switch (receiveState) {
                 case WAIT_ON_MESSAGE:
@@ -165,15 +164,21 @@ void SendToTheQueue()
                     }
                     break;
                 case WAIT_ON_ACK:
+                    
                     if ((uartrxData.rx_data[0] & 0x80)) {
                         break;
                     }
-                    PLIB_TMR_Stop(TMR_ID_5);
+                    // xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                    wait_on_ack = false;
                     receiveState = WAIT_ON_MESSAGE;
                     break;
             }
         }
                 
+    }
+    else
+    {
+        xQueueSendFromISR( MessageQueueWout, uartrxData.rx_data, pdFAIL );
     }
 }
 

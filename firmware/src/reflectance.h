@@ -59,6 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "main_task.h"
+#include "header.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -115,6 +116,7 @@ typedef struct
 {
     /* The application's current state */
     REFLECTANCE_STATES state;
+    uint8_t tx_data[8];
 
     /* TODO: Define any additional data used by the application. */
 

@@ -260,13 +260,14 @@ build/default/debug/_ext/1360937237/main_task.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
+../src/header.h  \
 ../src/uartrx_public.h  \
+ ../src/uarttx_public.h  \
+../src/debug.h  \
 ../src/crc.h  \
 ../src/uarttx.h  \
  ../src/uartrx.h  \
-../src/uarttx_public.h  \
 ../src/reflectance.h  \
- ../src/ultrasonic.h  \
-../src/main_task.h  \
-../src/debug.h  \
- ../../../../framework/driver/tmr/drv_tmr_mapping.h 
+../src/ultrasonic.h  \
+ ../src/main_task.h  \
+../../../../framework/driver/tmr/drv_tmr_mapping.h 

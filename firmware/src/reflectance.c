@@ -242,8 +242,8 @@ void REFLECTANCE_Tasks ( void )
                 
                 DRV_TMR3_Stop();
                 
-                char a;
-                a = ((PORTBbits.RB15 << 7) +
+                uint8_t reflectance_output;
+                reflectance_output = ((PORTBbits.RB15 << 7) +
                      (PORTBbits.RB14 << 6) +
                      (PORTBbits.RB13 << 5) +
                      (PORTBbits.RB12 << 4) +
@@ -252,8 +252,23 @@ void REFLECTANCE_Tasks ( void )
                      (PORTBbits.RB9 << 1) +
                      (PORTBbits.RB8));
                 
-                a = a;
-                //dbgOutputVal(a);
+                reflectance_output = reflectance_output ^ 0xFF;
+                dbgOutputVal(reflectance_output);
+                
+                if (reflectance_output) 
+                {
+                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                    
+                    reflectanceData.tx_data[0] = 0x91;
+                    reflectanceData.tx_data[1] = reflectance_output;
+                    int i = 2;
+                    for (i = 2; i < 7; i++)
+                    {
+                        reflectanceData.tx_data[i] = 0x00;
+                    }
+                    
+                    xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
+                }
                 
                 reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }
