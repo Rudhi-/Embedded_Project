@@ -158,7 +158,7 @@ void MAIN_TASK_Tasks ( void )
         {
             if (uxQueueMessagesWaiting(MessageQueueWout)) 
             {
-                xQueueReceive(MessageQueueWout, main_taskData.rx_data, portMAX_DELAY);
+                xQueueReceive(MessageQueueWin, main_taskData.rx_data, portMAX_DELAY);
             }
             break;
         }

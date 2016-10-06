@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/uarttx.h</file>
+            <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/main_task.h</file>
             <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/reflectance.c</file>
             <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default/system_interrupt.c</file>
-            <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/reflectance.h</file>
             <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/uarttx.c</file>
-            <file>file:/C:/microchip/harmony/v1_08_01/framework/peripheral/usart/templates/usart_ReceiverDataAvailable_Default.h</file>
             <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/main_task.c</file>
             <file>file:/C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/uartrx.c</file>
         </group>
