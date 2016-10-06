@@ -159,14 +159,34 @@ void BRAINS_Tasks ( void )
         }
         case WAIT_ON_START:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWin)) {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
                 
                 xQueueReceive(MessageQueueWin, brainsData.receivedMessage, portMAX_DELAY);
+                
+                /*Sending ACK*/
+                brainsData.sendMessage[0] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[1] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[2] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[3] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[4] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[5] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[6] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
+                xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
+                
+                int i = 0;
+                int j = 0;
+                for(i=0;i<1000000;i++){
+                    j =i;
+                    i = j;
+                }
+                
+                
                 if(brainsData.receivedMessage[0] == 0x83){ // from raspi to pic 3
                     //Storing destination information 
                     brainsData.initMagnitude = (brainsData.receivedMessage[2] << 8) | brainsData.receivedMessage[1];
                     brainsData.initDirection = brainsData.receivedMessage[3];
-
+                    /*
                     // sending Start command to PIC 2
                     brainsData.sendMessage[0] = 0x9A;
                     brainsData.sendMessage[1] = 0xFF;
@@ -177,18 +197,18 @@ void BRAINS_Tasks ( void )
                     brainsData.sendMessage[6] = 0xFF;
                     brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
                     xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-
                     // Blocking portion 
                     while(wait_on_ack){};
-
+                     */
+                    
                     // Send initial set of movement commands to PIC 1
                     brainsData.sendMessage[0] = 0x99;
-                    brainsData.sendMessage[1] = 0xFF;
-                    brainsData.sendMessage[2] = 0xFF;
-                    brainsData.sendMessage[3] = 0xFF;
-                    brainsData.sendMessage[4] = 0xFF;
-                    brainsData.sendMessage[5] = 0xFF;
-                    brainsData.sendMessage[6] = 0xFF;
+                    brainsData.sendMessage[1] = 0x99;
+                    brainsData.sendMessage[2] = 0x99;
+                    brainsData.sendMessage[3] = 0x99;
+                    brainsData.sendMessage[4] = 0x99;
+                    brainsData.sendMessage[5] = 0x99;
+                    brainsData.sendMessage[6] = 0x99;
                     brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
                     xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
 
@@ -203,7 +223,27 @@ void BRAINS_Tasks ( void )
         {
             if (uxQueueMessagesWaiting(MessageQueueWin)) {
                 xQueueReceive(MessageQueueWin, brainsData.receivedMessage, portMAX_DELAY);
-                if(crcMatches(brainsData.receivedMessage,7)){                           
+                
+                if(crcMatches(brainsData.receivedMessage,7)){   
+                    
+                    
+                    brainsData.sendMessage[0] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[1] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[2] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[3] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[4] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[5] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[6] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
+                    brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
+                    xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
+                    
+                    int i = 0;
+                    int j = 0;
+                    for(i=0;i<1000000;i++){
+                        j =i;
+                        i = j;
+                    }
+                    
                     /*
                      * If destination is to PIC 3 
                      * then message is relevant
@@ -240,12 +280,12 @@ void BRAINS_Tasks ( void )
             }
             // sending data to PIC 1
             brainsData.sendMessage[0] = 0x99;
-            brainsData.sendMessage[1] = 0xAA;
-            brainsData.sendMessage[2] = 0xAA;
-            brainsData.sendMessage[3] = 0xAA;
-            brainsData.sendMessage[4] = 0xBB;
-            brainsData.sendMessage[5] = 0xBB;
-            brainsData.sendMessage[6] = 0xBB;
+            brainsData.sendMessage[1] = 0x99;
+            brainsData.sendMessage[2] = 0x99;
+            brainsData.sendMessage[3] = 0x99;
+            brainsData.sendMessage[4] = 0x99;
+            brainsData.sendMessage[5] = 0x99;
+            brainsData.sendMessage[6] = 0x99;
             brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
             xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
             while(wait_on_ack){};

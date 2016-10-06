@@ -1,0 +1,6 @@
+firmware/Embedded_Project.X/*
+!firmware/Embedded_Project.X/nbproject/
+
+
+firmware/Embedded_Project.X/nbproject/*
+!firmware/Embedded_Project.X/nbproject/configurations.xml
