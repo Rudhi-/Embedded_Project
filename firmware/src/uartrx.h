@@ -59,8 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "queue.h"
-#include "header.h"
-
+#include "uartrx_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -116,7 +115,7 @@ typedef struct
     /* The application's current state */
     UARTRX_STATES state;
     uint8_t rx_data [8];
-    uint8_t tx_data;
+    uint8_t tx_data [8];
 
     /* TODO: Define any additional data used by the application. */
 

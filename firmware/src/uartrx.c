@@ -160,6 +160,14 @@ void SendToTheQueue()
             switch (receiveState) {
                 case WAIT_ON_MESSAGE:
                     if (crcMatches(uartrxData.rx_data, 7)) {
+                        //send ack
+                        uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
+                        int i;
+                        for (i = 1; i < 7; i++) {
+                            uartrxData.tx_data[i] = 0x00;
+                        }
+                        xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
+                        //pass data in
                         xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
                     }
                     break;

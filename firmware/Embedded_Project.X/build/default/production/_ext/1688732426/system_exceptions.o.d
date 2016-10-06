@@ -261,14 +261,14 @@ build/default/production/_ext/1688732426/system_exceptions.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
 ../src/system_config/default/system_definitions.h  \
- ../src/header.h  \
-../src/uartrx_public.h  \
-../src/uarttx_public.h  \
- ../src/debug.h  \
+ ../src/uartrx_public.h  \
+../src/uarttx.h  \
+../src/uartrx.h  \
+../src/header.h  \
+ ../src/uarttx_public.h  \
+../src/debug.h  \
 ../src/main_task.h  \
 ../src/crc.h  \
-../src/uarttx.h  \
- ../src/uartrx.h  \
-../src/reflectance.h  \
+ ../src/reflectance.h  \
 ../src/ultrasonic.h  \
- ../src/main_task.h 
+../src/main_task.h 

@@ -156,7 +156,10 @@ void MAIN_TASK_Tasks ( void )
 
         case MAIN_TASK_STATE_SERVICE_TASKS:
         {
-        
+            if (uxQueueMessagesWaiting(MessageQueueWout)) 
+            {
+                xQueueReceive(MessageQueueWout, main_taskData.rx_data, portMAX_DELAY);
+            }
             break;
         }
 

@@ -260,14 +260,14 @@ build/default/production/_ext/1360937237/reflectance.o:  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../src/uartrx.h  \
-../src/header.h  \
 ../src/uartrx_public.h  \
- ../src/uarttx_public.h  \
+../src/uarttx.h  \
+../src/uartrx.h  \
+ ../src/header.h  \
+../src/uarttx_public.h  \
 ../src/debug.h  \
 ../src/main_task.h  \
-../src/crc.h  \
- ../src/uarttx.h  \
-../src/uartrx.h  \
+ ../src/crc.h  \
 ../src/reflectance.h  \
 ../src/ultrasonic.h  \
- ../src/main_task.h 
+../src/main_task.h 

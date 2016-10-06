@@ -117,7 +117,7 @@ void UARTTX_Initialize ( void )
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
-    //DRV_TMR0_Start();
+    DRV_TMR0_Start();
     wait_on_ack = false;
     //PLIB_TMR_Start(TMR_ID_2);
     //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
