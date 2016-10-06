@@ -54,7 +54,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "system_config.h"
 #include "system_definitions.h"
-#include "maintask.h"
+#include "uartrx.h"
+#include "uarttx.h"
+#include "brains.h"
 
 
 // *****************************************************************************
@@ -66,7 +68,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
  
 static void _SYS_Tasks ( void );
-static void _MAINTASK_Tasks(void);
+static void _UARTRX_Tasks(void);
+static void _UARTTX_Tasks(void);
+static void _BRAINS_Tasks(void);
 
 
 // *****************************************************************************
@@ -88,11 +92,21 @@ void SYS_Tasks ( void )
     /* Create OS Thread for Sys Tasks. */
     xTaskCreate((TaskFunction_t) _SYS_Tasks,
                 "Sys Tasks",
+                1024, NULL, 0, NULL);
+
+    /* Create OS Thread for UARTRX Tasks. */
+    xTaskCreate((TaskFunction_t) _UARTRX_Tasks,
+                "UARTRX Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for MAINTASK Tasks. */
-    xTaskCreate((TaskFunction_t) _MAINTASK_Tasks,
-                "MAINTASK Tasks",
+    /* Create OS Thread for UARTTX Tasks. */
+    xTaskCreate((TaskFunction_t) _UARTTX_Tasks,
+                "UARTTX Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for BRAINS Tasks. */
+    xTaskCreate((TaskFunction_t) _BRAINS_Tasks,
+                "BRAINS Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -127,17 +141,51 @@ static void _SYS_Tasks ( void)
 
 /*******************************************************************************
   Function:
-    void _MAINTASK_Tasks ( void )
+    void _UARTRX_Tasks ( void )
 
   Summary:
-    Maintains state machine of MAINTASK.
+    Maintains state machine of UARTRX.
 */
 
-static void _MAINTASK_Tasks(void)
+static void _UARTRX_Tasks(void)
 {
     while(1)
     {
-        MAINTASK_Tasks();
+        UARTRX_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _UARTTX_Tasks ( void )
+
+  Summary:
+    Maintains state machine of UARTTX.
+*/
+
+static void _UARTTX_Tasks(void)
+{
+    while(1)
+    {
+        UARTTX_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _BRAINS_Tasks ( void )
+
+  Summary:
+    Maintains state machine of BRAINS.
+*/
+
+static void _BRAINS_Tasks(void)
+{
+    while(1)
+    {
+        BRAINS_Tasks();
     }
 }
 

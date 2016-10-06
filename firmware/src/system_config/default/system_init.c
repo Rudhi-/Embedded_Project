@@ -101,6 +101,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // <editor-fold defaultstate="collapsed" desc="DRV_Timer Initialization Data">
 // </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="DRV_USART Initialization Data">
+// </editor-fold>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -171,7 +173,10 @@ void SYS_Initialize ( void* data )
     /*Initialize TMR0 */
     DRV_TMR0_Initialize();
  
- 
+     sysObj.drvUsart0 = DRV_USART_Initialize(DRV_USART_INDEX_0, (SYS_MODULE_INIT *)NULL);
+    SYS_INT_VectorPrioritySet(INT_VECTOR_UART1, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_UART1, INT_SUBPRIORITY_LEVEL0);
+
     /* Initialize System Services */
 
     /*** Interrupt Service Initialization Code ***/
@@ -181,7 +186,9 @@ void SYS_Initialize ( void* data )
 
 
     /* Initialize the Application */
-    MAINTASK_Initialize();
+    UARTRX_Initialize();
+    UARTTX_Initialize();
+    BRAINS_Initialize();
 }
 
 

@@ -94,9 +94,9 @@ extern "C" {
 #define SYS_PORT_CNPUE          0x0
 #define SYS_PORT_CNEN           0x0
 
-#define SYS_PORT_E_TRIS         0x300
-#define SYS_PORT_E_LAT          0x0
-#define SYS_PORT_E_ODC          0x0
+#define SYS_PORT_C_TRIS         0xf01c
+#define SYS_PORT_C_LAT          0x0
+#define SYS_PORT_C_ODC          0x0
 
 
 // *****************************************************************************
@@ -108,10 +108,10 @@ extern "C" {
 #define DRV_TMR_INTERRUPT_MODE             true
 
 /*** Timer Driver 0 Configuration ***/
-#define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_2
-#define DRV_TMR_INTERRUPT_SOURCE_IDX0       INT_SOURCE_TIMER_2
-#define DRV_TMR_INTERRUPT_VECTOR_IDX0       INT_VECTOR_T2
-#define DRV_TMR_ISR_VECTOR_IDX0             _TIMER_2_VECTOR
+#define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_5
+#define DRV_TMR_INTERRUPT_SOURCE_IDX0       INT_SOURCE_TIMER_5
+#define DRV_TMR_INTERRUPT_VECTOR_IDX0       INT_VECTOR_T5
+#define DRV_TMR_ISR_VECTOR_IDX0             _TIMER_5_VECTOR
 #define DRV_TMR_INTERRUPT_PRIORITY_IDX0     INT_PRIORITY_LEVEL1
 #define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX0 INT_SUBPRIORITY_LEVEL0
 #define DRV_TMR_CLOCK_SOURCE_IDX0           DRV_TMR_CLKSOURCE_INTERNAL
@@ -120,7 +120,18 @@ extern "C" {
 #define DRV_TMR_ASYNC_WRITE_ENABLE_IDX0     false
 #define DRV_TMR_POWER_STATE_IDX0            
 
- 
+ // *****************************************************************************
+/* USART Driver Configuration Options
+*/
+#define DRV_USART_INSTANCES_NUMBER                  1
+#define DRV_USART_CLIENTS_NUMBER                    1
+#define DRV_USART_INTERRUPT_MODE                    true
+#define DRV_USART_BYTE_MODEL_SUPPORT                true
+#define DRV_USART_READ_WRITE_MODEL_SUPPORT          false
+#define DRV_USART_BUFFER_QUEUE_SUPPORT              false
+#define DRV_USART_SUPPORT_TRANSMIT_DMA              false
+#define DRV_USART_SUPPORT_RECEIVE_DMA               false
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Middleware & Other Library Configuration
@@ -138,6 +149,10 @@ extern "C" {
 // *****************************************************************************
 
 /*** Application Instance 0 Configuration ***/
+
+/*** Application Instance 1 Configuration ***/
+
+/*** Application Instance 2 Configuration ***/
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus
