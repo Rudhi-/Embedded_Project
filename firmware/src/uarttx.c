@@ -117,6 +117,7 @@ void UARTTX_Initialize ( void )
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
+    //DRV_TMR0_Start();
     
     /* TODO: Initialize your application's state machine and other
      * parameters.

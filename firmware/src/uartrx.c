@@ -120,7 +120,7 @@ void UARTRX_Initialize ( void )
     MessageQueueWin = xQueueCreate(2, 8*sizeof(char));
     makeCRCTable();
     
-    
+    DRV_TMR0_Start();
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */

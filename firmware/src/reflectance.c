@@ -160,7 +160,6 @@ void REFLECTANCE_Tasks ( void )
         case REFLECTANCE_STATE_LED_ON:
         {   
             if (start_LED_ON) {
-                
                 start_LED_ON = 0;
                 
                 /* set LEDs as outputs
@@ -196,7 +195,6 @@ void REFLECTANCE_Tasks ( void )
         case REFLECTANCE_STATE_LED_OFF:
         {
             if (start_LED_OFF) {
-                
                 start_LED_OFF = 0;
                 /* disable timer
                  * turn LEDs off
@@ -225,7 +223,6 @@ void REFLECTANCE_Tasks ( void )
                 TRISBbits.TRISB14 = 1;
                 TRISBbits.TRISB15 = 1;
                 
-                dbgOutputVal(0x04);
                 DRV_TMR3_CounterClear();
                 DRV_TMR3_Start();
                 reflectanceData.state = REFLECTANCE_STATE_LED_INPUT;
@@ -235,12 +232,13 @@ void REFLECTANCE_Tasks ( void )
         case REFLECTANCE_STATE_LED_INPUT:
         {
             if (start_LED_INPUT) {
-                
                 start_LED_INPUT = 0;
                 /* disable timer
                  * take reading of LEDs
                  * change state to REFLECTANCE_STATE_LED_ON
                  *  */
+                
+                // wait a little less for this one
                 
                 DRV_TMR3_Stop();
                 
@@ -254,7 +252,8 @@ void REFLECTANCE_Tasks ( void )
                      (PORTBbits.RB9 << 1) +
                      (PORTBbits.RB8));
                 
-                dbgOutputVal(a);
+                a = a;
+                //dbgOutputVal(a);
                 
                 reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }

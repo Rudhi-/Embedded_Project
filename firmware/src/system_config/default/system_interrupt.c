@@ -77,8 +77,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 void IntHandlerDrvTmrInstance0(void)
 {
-    ReSendMessage();
+    dbgOutputVal(0x01);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+    ReSendMessage();
+    dbgOutputVal(0x10);
 }
 void IntHandlerDrvTmrInstance1(void)
 {
