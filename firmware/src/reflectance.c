@@ -259,7 +259,7 @@ void REFLECTANCE_Tasks ( void )
                 {
                     PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     
-                    reflectanceData.tx_data[0] = 0x91;
+                    reflectanceData.tx_data[0] = 0x93;
                     reflectanceData.tx_data[1] = reflectance_output;
                     int i = 2;
                     for (i = 2; i < 7; i++)
