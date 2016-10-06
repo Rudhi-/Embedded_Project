@@ -70,7 +70,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #pragma config FNOSC =      FRCPLL
 #pragma config FSOSCEN =    OFF
 #pragma config IESO =       ON
-#pragma config POSCMOD =    OFF
+#pragma config POSCMOD =    EC
 #pragma config OSCIOFNC =   OFF
 #pragma config FPBDIV =     DIV_1
 #pragma config FCKSM =      CSECMD

@@ -119,8 +119,8 @@ void init_motors() {
     PLIB_OC_Enable(OC_ID_1);
     PLIB_OC_Enable(OC_ID_2);
     
-    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);    
+    //PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);    
     
     //start timer
     DRV_TMR0_Start();
@@ -196,14 +196,14 @@ void move_forward() {
 
 //function to move backwards
 void move_backward() {
-    int placeholder1, placeholder2;
+    //int placeholder1, placeholder2;
     //right motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder1 = 200); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0); //placeholder
     
     //left motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder2 = 200); //placeholder        
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0); //placeholder        
 }
 
 
@@ -263,7 +263,7 @@ void MOTORS_Tasks ( void )
 
         case MOTORS_STATE_SERVICE_TASKS:
         {
-            move_forward();
+            move_backward();
             
             break;
         }

@@ -304,7 +304,7 @@
       <Template>
         <Name>drv_oc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/oc/src</Path>
-        <Checksum>0F6C196DB5AE5418A9F63A22DC4E4B76</Checksum>
+        <Checksum>39285CEAB23882E7C9F87DF3E470111B</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static.c</Name>
@@ -314,7 +314,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>5E8438CCFBCFDD15416A2F09C1DBE496</Checksum>
+        <Checksum>BC02D18F458D9099051386739B41AB1A</Checksum>
       </Template>
       <Template>
         <Name>drv_oc_static.h</Name>
