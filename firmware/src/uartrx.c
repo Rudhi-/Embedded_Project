@@ -163,7 +163,7 @@ void SendToTheQueue()
                         //send ack
                         uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
                         int i;
-                        for (i =0; i < 7; i++) {
+                        for (i = 1; i < 7; i++) {
                             uartrxData.tx_data[i] = 0x00;
                         }
                         xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
