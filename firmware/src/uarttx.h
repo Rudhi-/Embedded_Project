@@ -59,7 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "uartrx.h"
-#include "headers.h"
+#include "uarttx_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -91,6 +91,7 @@ typedef enum
 	/* Application's state machine's initial state. */
 	UARTTX_STATE_INIT=0,
 	UARTTX_STATE_SERVICE_TASKS,
+            UARTTX_STATE_WAIT,
 
 	/* TODO: Define states used by the application state machine. */
 

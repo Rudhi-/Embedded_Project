@@ -13,7 +13,6 @@
 enum RECEIVE_STATES {WAIT_ON_MESSAGE = 0, WAIT_ON_ACK} receiveState; 
 QueueHandle_t MessageQueueWin;
 
-
 void SendToTheQueue();
 void Transmit2();
 
