@@ -354,12 +354,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>9208457C6D62760F9A9A7057CCA52026</Checksum>
+        <Checksum>B279B736F42092B4AF3E85175E21E649</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>53B6FCAB2B7EB2980FE524E04020028B</Checksum>
+        <Checksum>BE154C36B535249FEB453893229F6D77</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
