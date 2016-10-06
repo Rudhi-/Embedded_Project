@@ -90,7 +90,7 @@ extern "C" {
 #define SYS_INT                     true
 
 /*** Ports System Service Configuration ***/
-#define SYS_PORT_AD1PCFG        ~0xff00
+#define SYS_PORT_AD1PCFG        ~0xff
 #define SYS_PORT_CNPUE          0x0
 #define SYS_PORT_CNEN           0x0
 
@@ -136,6 +136,32 @@ extern "C" {
 #define DRV_TMR_OPERATION_MODE_IDX1         DRV_TMR_OPERATION_MODE_16_BIT
 #define DRV_TMR_ASYNC_WRITE_ENABLE_IDX1     false
 #define DRV_TMR_POWER_STATE_IDX1            
+
+/*** Timer Driver 2 Configuration ***/
+#define DRV_TMR_PERIPHERAL_ID_IDX2          TMR_ID_3
+#define DRV_TMR_INTERRUPT_SOURCE_IDX2       INT_SOURCE_TIMER_3
+#define DRV_TMR_INTERRUPT_VECTOR_IDX2       INT_VECTOR_T3
+#define DRV_TMR_ISR_VECTOR_IDX2             _TIMER_3_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX2     INT_PRIORITY_LEVEL1
+#define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX2 INT_SUBPRIORITY_LEVEL0
+#define DRV_TMR_CLOCK_SOURCE_IDX2           DRV_TMR_CLKSOURCE_INTERNAL
+#define DRV_TMR_PRESCALE_IDX2               TMR_PRESCALE_VALUE_32
+#define DRV_TMR_OPERATION_MODE_IDX2         DRV_TMR_OPERATION_MODE_16_BIT
+#define DRV_TMR_ASYNC_WRITE_ENABLE_IDX2     false
+#define DRV_TMR_POWER_STATE_IDX2            
+
+/*** Timer Driver 3 Configuration ***/
+#define DRV_TMR_PERIPHERAL_ID_IDX3          TMR_ID_4
+#define DRV_TMR_INTERRUPT_SOURCE_IDX3       INT_SOURCE_TIMER_4
+#define DRV_TMR_INTERRUPT_VECTOR_IDX3       INT_VECTOR_T4
+#define DRV_TMR_ISR_VECTOR_IDX3             _TIMER_4_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX3     INT_PRIORITY_LEVEL1
+#define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX3 INT_SUBPRIORITY_LEVEL0
+#define DRV_TMR_CLOCK_SOURCE_IDX3           DRV_TMR_CLKSOURCE_INTERNAL
+#define DRV_TMR_PRESCALE_IDX3               TMR_PRESCALE_VALUE_64
+#define DRV_TMR_OPERATION_MODE_IDX3         DRV_TMR_OPERATION_MODE_16_BIT
+#define DRV_TMR_ASYNC_WRITE_ENABLE_IDX3     false
+#define DRV_TMR_POWER_STATE_IDX3            
 
  // *****************************************************************************
 /* USART Driver Configuration Options

@@ -268,4 +268,5 @@ build/default/production/_ext/1360937237/main_task.o:  \
 ../src/reflectance.h  \
  ../src/ultrasonic.h  \
 ../src/main_task.h  \
-../src/debug.h 
+../src/debug.h  \
+ ../../../../framework/driver/tmr/drv_tmr_mapping.h 

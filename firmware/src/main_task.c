@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "main_task.h"
+#include "driver/tmr/drv_tmr_mapping.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -142,7 +143,8 @@ void MAIN_TASK_Tasks ( void )
         case MAIN_TASK_STATE_INIT:
         {
             bool appInitialized = true;
-       
+            
+            DRV_TMR1_Start();
         
             if (appInitialized)
             {

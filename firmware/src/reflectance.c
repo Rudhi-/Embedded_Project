@@ -144,23 +144,123 @@ void REFLECTANCE_Tasks ( void )
         case REFLECTANCE_STATE_INIT:
         {
             bool appInitialized = true;
-       
+            
+            start_LED_ON = 0;
+            start_LED_OFF = 0;
+            start_LED_INPUT = 0;
         
             if (appInitialized)
             {
             
-                reflectanceData.state = REFLECTANCE_STATE_SERVICE_TASKS;
+                reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }
             break;
         }
 
-        case REFLECTANCE_STATE_SERVICE_TASKS:
+        case REFLECTANCE_STATE_LED_ON:
         {   
-            /*
-            if (flag) {
-                do reflectance stuff
+            if (start_LED_ON) {
+                
+                start_LED_ON = 0;
+                
+                /* set LEDs as outputs
+                 * turn LEDs on
+                 * start timer id 3, instance 2
+                 * change state to REFLECTANCE_STATE_LED_OFF
+                 *  */
+                
+                TRISBbits.TRISB8 = 0;
+                TRISBbits.TRISB9 = 0;
+                TRISBbits.TRISB10 = 0;
+                TRISBbits.TRISB11 = 0;
+                TRISBbits.TRISB12 = 0;
+                TRISBbits.TRISB13 = 0;
+                TRISBbits.TRISB14 = 0;
+                TRISBbits.TRISB15 = 0;
+
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_8, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_10, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_11, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_12, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_13, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_14, 1);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_15, 1);
+                
+                DRV_TMR2_CounterClear();
+                DRV_TMR2_Start();
+                reflectanceData.state = REFLECTANCE_STATE_LED_OFF;
             }
-            */
+        }
+        
+        case REFLECTANCE_STATE_LED_OFF:
+        {
+            if (start_LED_OFF) {
+                
+                start_LED_OFF = 0;
+                /* disable timer
+                 * turn LEDs off
+                 * set LEDs as inputs
+                 * start timer id 4, instance 3
+                 * change state to REFLECTANCE_STATE_LED_INPUT
+                 *  */
+                
+                DRV_TMR2_Stop();
+                
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_8, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_10, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_11, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_12, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_13, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_14, 0);
+                PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_15, 0);
+                
+                TRISBbits.TRISB8 = 1;
+                TRISBbits.TRISB9 = 1;
+                TRISBbits.TRISB10 = 1;
+                TRISBbits.TRISB11 = 1;
+                TRISBbits.TRISB12 = 1;
+                TRISBbits.TRISB13 = 1;
+                TRISBbits.TRISB14 = 1;
+                TRISBbits.TRISB15 = 1;
+                
+                dbgOutputVal(0x04);
+                DRV_TMR3_CounterClear();
+                DRV_TMR3_Start();
+                reflectanceData.state = REFLECTANCE_STATE_LED_INPUT;
+            }
+        }
+        
+        case REFLECTANCE_STATE_LED_INPUT:
+        {
+            if (start_LED_INPUT) {
+                
+                start_LED_INPUT = 0;
+                /* disable timer
+                 * take reading of LEDs
+                 * change state to REFLECTANCE_STATE_LED_ON
+                 *  */
+                
+                DRV_TMR3_Stop();
+                
+                char a;
+                a = ((PORTBbits.RB15 << 7) +
+                     (PORTBbits.RB14 << 6) +
+                     (PORTBbits.RB13 << 5) +
+                     (PORTBbits.RB12 << 4) +
+                     (PORTBbits.RB11 << 3) +
+                     (PORTBbits.RB10 << 2) +
+                     (PORTBbits.RB9 << 1) +
+                     (PORTBbits.RB8));
+                
+                dbgOutputVal(a);
+                
+                reflectanceData.state = REFLECTANCE_STATE_LED_ON;
+            }
+        }
+        
+        /*
             PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1, 1);
             counter = 0;
             while(counter < 10000) {counter++;}
@@ -168,7 +268,7 @@ void REFLECTANCE_Tasks ( void )
             counter = 0;
             while(counter < 10000) {counter++;}
             break;
-        }
+        */
 
         /* TODO: implement your application state machine.*/
         

@@ -80,10 +80,22 @@ void IntHandlerDrvTmrInstance0(void)
     ReSendMessage();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
-
 void IntHandlerDrvTmrInstance1(void)
 {
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    start_LED_ON = 1;
+}
+
+void IntHandlerDrvTmrInstance2(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+    start_LED_OFF = 1;
+}
+    
+void IntHandlerDrvTmrInstance3(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
+    start_LED_INPUT = 1;
 }
 
 void IntHandlerDrvUsartInstance0(void)

@@ -89,7 +89,9 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	REFLECTANCE_STATE_INIT=0,
-	REFLECTANCE_STATE_SERVICE_TASKS,
+	REFLECTANCE_STATE_LED_ON,
+	REFLECTANCE_STATE_LED_OFF,
+	REFLECTANCE_STATE_LED_INPUT,
 
 	/* TODO: Define states used by the application state machine. */
 

@@ -109,7 +109,10 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
-int counter;
+bool start_LED_ON;
+bool start_LED_OFF;
+bool start_LED_INPUT;
+
 
 typedef struct
 {
