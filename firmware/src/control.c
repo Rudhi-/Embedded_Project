@@ -168,7 +168,7 @@ void CONTROL_Tasks ( void )
                         controlData.tx_data[i] = controlData.rx_data[i];
                     }
                     controlData.tx_data[0] = (0x80 | (PIC_ID << 3) | 0x00);
-                                            //cmd,   dst,            src
+                                            //cmd,   src,            dst
 
                     xQueueSend(MessageQueueWout, controlData.tx_data, portMAX_DELAY);
                 }
