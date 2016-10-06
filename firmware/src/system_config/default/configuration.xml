@@ -237,7 +237,7 @@
       <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
-        <Checksum>5220A49E29CE78BDA761E7EAC8FFC0A4</Checksum>
+        <Checksum>BBA108262A754FA2117433A224D3810A</Checksum>
       </Template>
       <Template>
         <Name>motors.h</Name>
@@ -354,7 +354,7 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>CE006D0A5A3FE4A173397ACD60722C4B</Checksum>
+        <Checksum>9208457C6D62760F9A9A7057CCA52026</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>

@@ -113,6 +113,8 @@ typedef struct
 {
     /* The application's current state */
     CONTROL_STATES state;
+    uint8_t rx_data[8];
+    uint8_t tx_data[8];
 
     /* TODO: Define any additional data used by the application. */
 

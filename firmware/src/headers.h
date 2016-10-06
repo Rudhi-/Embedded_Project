@@ -17,7 +17,7 @@
 #include "debug.h"
 #include "queue.h"
 
-#define PIC_ID 1 //set to your pic
+#define PIC_ID 4 //set to your pic
 
 #endif	/* HEADERS_H */
 
