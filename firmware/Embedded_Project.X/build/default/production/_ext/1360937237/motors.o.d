@@ -266,4 +266,8 @@ build/default/production/_ext/1360937237/motors.o:  \
  ../src/uartrx.h  \
 ../src/uarttx_public.h  \
 ../src/motors.h  \
- ../src/magnetometer.h 
+ ../src/magnetometer.h  \
+../src/header.h  \
+../src/motors_public.h  \
+ ../src/debug.h  \
+../src/MainTask.h 

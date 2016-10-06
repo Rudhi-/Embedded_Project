@@ -54,8 +54,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "motors.h"
-#include "uartrx_public.h"
-#include "uarttx_public.h"
+#include "header.h"
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -118,6 +118,7 @@ void MOTORS_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     motorsData.state = MOTORS_STATE_INIT;
+    dbgOutputVal(IN_TASK_ONE);
 
     
     /* TODO: Initialize your application's state machine and other
@@ -161,12 +162,24 @@ void MOTORS_Tasks ( void )
             // Next state
             if (uxQueueMessagesWaiting(MessageQueueWin))
             {
+                
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
-                char ack [8] = "ACKNOWLG";
+                
+                uint8_t ack [8];
+                ack [0] = 'A';
+                ack [1] = 'C';
+                ack [2] = 'K';
+                ack [3] = 'N';
+                ack [4] = 'O';
+                ack [5] = 'W';
+                ack [6] = 'L';
+                ack [7] = 'G';
                 //Send the acknowledge message
                 xQueueSend( MessageQueueWout, ack, pdFAIL );
+                
+                
                 
                 // Go to the work on data state
                 motorsData.state = MOTORS_STATE_WORK_ON_DATA;
@@ -179,13 +192,21 @@ void MOTORS_Tasks ( void )
         /* TODO: implement your application state machine.*/
         case MOTORS_STATE_WORK_ON_DATA:
         {
-            strcpy(motorsData.tx_data, motorsData.rx_data);
+            motorsData.tx_data[0] = motorsData.rx_data[0];
+        motorsData.tx_data[1] = 'A';
+            motorsData.tx_data[2] = motorsData.rx_data[2];
+            motorsData.tx_data[3] = motorsData.rx_data[3];
+            motorsData.tx_data[4] = motorsData.rx_data[4];
+            motorsData.tx_data[5] = motorsData.rx_data[5];
+            motorsData.tx_data[6] = motorsData.rx_data[6];
+            motorsData.tx_data[7] = motorsData.rx_data[7];
             motorsData.state = MOTORS_STATE_TRANSMIT_DATA;
             break;
         }
         
         case MOTORS_STATE_TRANSMIT_DATA:
         {
+            
             xQueueSend( MessageQueueWout, motorsData.tx_data, pdFAIL );
             //StoreMessage(motorsData.tx_data);
             motorsData.state = MOTORS_STATE_WAIT_ACK;
@@ -194,15 +215,15 @@ void MOTORS_Tasks ( void )
         
         case MOTORS_STATE_WAIT_ACK:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWin))
+            dbgOutputVal(IN_TASK_THREE);
+            if (!wait_on_ack)
             {
                 // Receive the message from the receiver thread
-                xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
+                // xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
                 //Do some sort of check
                 
                 //Go back to waiting for data
-                PLIB_TMR_Stop(TMR_ID_5);
                 motorsData.state = MOTORS_STATE_RECEIVE_MESSAGE;
             }
         }

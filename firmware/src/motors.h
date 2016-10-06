@@ -116,8 +116,8 @@ typedef struct
 {
     /* The application's current state */
     MOTORS_STATES state;
-    char rx_data [8];
-    char tx_data [8];
+    uint8_t rx_data [8];
+    uint8_t tx_data [8];
 
     /* TODO: Define any additional data used by the application. */
 

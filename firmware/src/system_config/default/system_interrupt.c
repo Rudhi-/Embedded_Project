@@ -63,10 +63,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <sys/attribs.h>
 #include "uartrx.h"
 #include "uarttx.h"
-#include "motors_public.h"
 #include "magnetometer.h"
 #include "system_definitions.h"
-#include "uartrx_public.h"
+#include "header.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -75,7 +74,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 void IntHandlerDrvTmrInstance0(void)
 {
-    ReSendMessage();
+    if (wait_on_ack)
+        ReSendMessage();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 

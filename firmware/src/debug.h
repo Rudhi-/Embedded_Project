@@ -23,6 +23,10 @@
 #define SENT_TO_ISR_QUEUE 'B'
 #define LEAVING_ISR_QUEUE 'C'
 #define ERROR_HAS_OCCURED 'D'
+#define INIT_FUNCTION 1
+#define IN_TASK_ONE 2
+#define IN_TASK_TWO 3
+#define IN_TASK_THREE 4
 
 void dbgOutputVal(unsigned char outVal);
 void dbgOutputLocReset();

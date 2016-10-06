@@ -237,7 +237,7 @@
       <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
-        <Checksum>5220A49E29CE78BDA761E7EAC8FFC0A4</Checksum>
+        <Checksum>BBA108262A754FA2117433A224D3810A</Checksum>
       </Template>
       <Template>
         <Name>motors.h</Name>
@@ -286,7 +286,7 @@
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>1CA93EF51F33C16124BD42C7FD344B93</Checksum>
-        <ProjectFileChecksum>B48512F7E372A807B0BE40B28E405A88</ProjectFileChecksum>
+        <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>sys_clk_static.c</Name>
@@ -342,12 +342,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>4001987578A82F1617E40482A0D7FA41</Checksum>
+        <Checksum>8F5FD484BCED1678E5CF7C8D16AD4077</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>FF6D85289CC799148419226E8626CF1A</Checksum>
+        <Checksum>53B6FCAB2B7EB2980FE524E04020028B</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -379,11 +379,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\system_config\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
         <Include value="C:\microchip\harmony\v1_08_01\framework"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project-Milestone_2_WiFly\firmware\src\system_config\default\framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

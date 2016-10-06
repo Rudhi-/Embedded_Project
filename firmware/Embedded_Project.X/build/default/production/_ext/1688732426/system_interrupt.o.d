@@ -266,6 +266,8 @@ build/default/production/_ext/1688732426/system_interrupt.o:  \
  ../src/magnetometer.h  \
 ../src/uartrx_public.h  \
 ../src/crc.h  \
+ ../src/system_config/default/system_definitions.h  \
+../src/header.h  \
  ../src/motors_public.h  \
-../src/system_config/default/system_definitions.h  \
- ../src/uartrx_public.h 
+../src/debug.h  \
+../src/MainTask.h 

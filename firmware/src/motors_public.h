@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-void ReSendMessage();
-
 
 #ifdef	__cplusplus
 }
