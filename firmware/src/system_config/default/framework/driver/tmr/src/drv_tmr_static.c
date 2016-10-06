@@ -152,7 +152,7 @@ void DRV_TMR0_Initialize(void)
     /* Select clock source */
     PLIB_TMR_ClockSourceSelect(TMR_ID_5, DRV_TMR_CLKSOURCE_INTERNAL);
     /* Select prescalar value */
-    PLIB_TMR_PrescaleSelect(TMR_ID_5, TMR_PRESCALE_VALUE_64);
+    PLIB_TMR_PrescaleSelect(TMR_ID_5, TMR_PRESCALE_VALUE_256);
     /* Enable 16 bit mode */
     PLIB_TMR_Mode16BitEnable(TMR_ID_5);
     /* Clear counter */ 

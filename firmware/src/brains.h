@@ -89,12 +89,11 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	BRAINS_STATE_INIT=0,
-	BRAINS_STATE_SERVICE_TASKS,
-    WAIT_ON_START,
-    WAIT_ON_DATA,
-    COMPUTING_DATA,
-    ACK,
-    STOP
+	BRAINS_STATE_RECEIVE_MESSAGE,
+            BRAINS_STATE_SEND_ACK,
+            BRAINS_STATE_WORK_ON_DATA,
+            BRAINS_STATE_TRANSMIT_DATA,
+            BRAINS_STATE_WAIT_ACK
 
 	/* TODO: Define states used by the application state machine. */
 
@@ -118,16 +117,9 @@ typedef struct
 {
     /* The application's current state */
     BRAINS_STATES state;
-    uint8_t receivedMessage[8];
-    uint8_t sendMessage[8];
-
-    unsigned short initMagnitude; // How far destinaiton is intitally
-    uint8_t initDirection; // the intial angle at which the destinaiotn is
-
-    unsigned short magnitude; // How far destinaiton is currently 
-    uint8_t direction; // the current angle at which the destinaiotn is
-    /* TODO: Define any additional data used by the application. */
-
+    uint8_t rx_data [8];
+    uint8_t tx_data [8];
+    
 } BRAINS_DATA;
 
 

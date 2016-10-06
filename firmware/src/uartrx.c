@@ -159,7 +159,7 @@ void SendToTheQueue()
         if ((uartrxData.rx_data[0] & 0x07) == PIC_ID) {
             switch (receiveState) {
                 case WAIT_ON_MESSAGE:
-                    if (crcMatches(uartrxData.rx_data, 7)) {
+                    if (crcMatches(uartrxData.rx_data, 7) && (uartrxData.rx_data[0] & 0x80)) {
                         //send ack
                         uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
                         int i;

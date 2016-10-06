@@ -115,8 +115,6 @@ void BRAINS_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     brainsData.state = BRAINS_STATE_INIT;
-    brainsData.initMagnitude = 0; 
-    brainsData.initDirection = 0; 
 
     
     /* TODO: Initialize your application's state machine and other
@@ -148,176 +146,79 @@ void BRAINS_Tasks ( void )
             if (appInitialized)
             {
             
-                brainsData.state = BRAINS_STATE_SERVICE_TASKS;
+                brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
             }
             break;
         }
-        case BRAINS_STATE_SERVICE_TASKS:
+        case BRAINS_STATE_RECEIVE_MESSAGE:
         {
-           brainsData.state = WAIT_ON_START;
-            break;
-        }
-        case WAIT_ON_START:
-        {
-            if (uxQueueMessagesWaiting(MessageQueueWin)){
+           // Wait till the message has been received before moving to the 
+            // Next state
+            if (uxQueueMessagesWaiting(MessageQueueWin))
+            {
+                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 
-                xQueueReceive(MessageQueueWin, brainsData.receivedMessage, portMAX_DELAY);
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
                 
-                /*Sending ACK*/
-                brainsData.sendMessage[0] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[1] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[2] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[3] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[4] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[5] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[6] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-                xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-                
-                int i = 0;
-                int j = 0;
-                for(i=0;i<1000000;i++){
-                    j =i;
+                /*
+                uint8_t ack [8];
+                ack [0] = 0x4b;
+                ack [1] = 0xcc;
+                ack [2] = 0xcc;
+                ack [3] = 0xcc;
+                ack [4] = 0xcc;
+                ack [5] = 0xcc;
+                ack [6] = 0xcc;
+                //Send the acknowledge message
+                xQueueSend( MessageQueueWout, ack, pdFAIL );
+                 */
+                int i;
+                for (i = 0; i < 40000000; i++)
+                {
+                    int j = i;
                     i = j;
                 }
                 
-                
-                if(brainsData.receivedMessage[0] == 0x83){ // from raspi to pic 3
-                    //Storing destination information 
-                    brainsData.initMagnitude = (brainsData.receivedMessage[2] << 8) | brainsData.receivedMessage[1];
-                    brainsData.initDirection = brainsData.receivedMessage[3];
-                    /*
-                    // sending Start command to PIC 2
-                    brainsData.sendMessage[0] = 0x9A;
-                    brainsData.sendMessage[1] = 0xFF;
-                    brainsData.sendMessage[2] = 0xFF;
-                    brainsData.sendMessage[3] = 0xFF;
-                    brainsData.sendMessage[4] = 0xFF;
-                    brainsData.sendMessage[5] = 0xFF;
-                    brainsData.sendMessage[6] = 0xFF;
-                    brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-                    xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-                    // Blocking portion 
-                    while(wait_on_ack){};
-                     */
-                    
-                    // Send initial set of movement commands to PIC 1
-                    brainsData.sendMessage[0] = 0x99;
-                    brainsData.sendMessage[1] = 0x99;
-                    brainsData.sendMessage[2] = 0x99;
-                    brainsData.sendMessage[3] = 0x99;
-                    brainsData.sendMessage[4] = 0x99;
-                    brainsData.sendMessage[5] = 0x99;
-                    brainsData.sendMessage[6] = 0x99;
-                    brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-                    xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-
-                    // advance to next state 
-                    brainsData.state=WAIT_ON_DATA;
-                }
+                // Go to the work on data state
+                brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                //PLIB_TMR_Counter16BitClear(TMR_ID_5);
+                //PLIB_TMR_Start(TMR_ID_5);
             }
-
             break;
         }
-        case WAIT_ON_DATA:
+        case BRAINS_STATE_WORK_ON_DATA:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWin)) {
-                xQueueReceive(MessageQueueWin, brainsData.receivedMessage, portMAX_DELAY);
+            brainsData.tx_data[0] = 0x99;
+            brainsData.tx_data[1] = 0xaa;
+            brainsData.tx_data[2] = 0xaa;
+            brainsData.tx_data[3] = 0xaa;
+            brainsData.tx_data[4] = 0xaa;
+            brainsData.tx_data[5] = 0xaa;
+            brainsData.tx_data[6] = 0xaa;
+            brainsData.tx_data[7] = 0xaa;
+            brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
+            break;
+        }
+        case BRAINS_STATE_TRANSMIT_DATA:
+        {
+            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            //StoreMessage(motorsData.tx_data);
+            brainsData.state = BRAINS_STATE_WAIT_ACK;
+            break;
+        }
+        case BRAINS_STATE_WAIT_ACK:
+        {
+            if (!wait_on_ack)
+            {
+                // Receive the message from the receiver thread
+                // xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
-                if(crcMatches(brainsData.receivedMessage,7)){   
-                    
-                    
-                    brainsData.sendMessage[0] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[1] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[2] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[3] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[4] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[5] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[6] = 0x58|((brainsData.receivedMessage[0]&0x38)>>3);
-                    brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-                    xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-                    
-                    int i = 0;
-                    int j = 0;
-                    for(i=0;i<1000000;i++){
-                        j =i;
-                        i = j;
-                    }
-                    
-                    /*
-                     * If destination is to PIC 3 
-                     * then message is relevant
-                     * in which case move onto next state                            
-                     */
-                   // if((brainsData.receivedMessage[0]&) == 0x43){
-                        if(brainsData.receivedMessage[1] == 0x00 &&
-                           brainsData.receivedMessage[2] == 0x00 &&
-                           brainsData.receivedMessage[3] == 0x00 &&
-                           brainsData.receivedMessage[4] == 0x00 &&
-                           brainsData.receivedMessage[5] == 0x00 &&
-                           brainsData.receivedMessage[6] == 0x00){ // was stop signal received? 
-                           brainsData.state=STOP;
-                        }
-                        else{ // stop signal not received
-                            brainsData.state=COMPUTING_DATA;
-                        }                                
-                    //}
-                }
-                else{
-                    // Response needs to be sent again
-                }
-            }   
-            break;
-        }
-        case COMPUTING_DATA:
-        {
-            /*TODO Implement some sort of calculations*/
-            int i = 0;
-            int j = 0;
-            for(i=0;i<1000000;i++){
-                j =i;
-                i = j;
+                //Do some sort of check
+                
+                //Go back to waiting for data
+                brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
             }
-            // sending data to PIC 1
-            brainsData.sendMessage[0] = 0x99;
-            brainsData.sendMessage[1] = 0x99;
-            brainsData.sendMessage[2] = 0x99;
-            brainsData.sendMessage[3] = 0x99;
-            brainsData.sendMessage[4] = 0x99;
-            brainsData.sendMessage[5] = 0x99;
-            brainsData.sendMessage[6] = 0x99;
-            brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-            xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-            while(wait_on_ack){};
-            brainsData.state=WAIT_ON_DATA;
-            break;
-        }
-        case ACK:
-        {
-            // literally does nothing, simply stay in this state until 
-            // we get switched to a different state
-            break;
-        }
-        case STOP:
-        {
-            // Send STOP signal to PIC 1
-            brainsData.sendMessage[0] = 0x99;
-            brainsData.sendMessage[1] = 0x00;
-            brainsData.sendMessage[2] = 0x00;
-            brainsData.sendMessage[3] = 0x00;
-            brainsData.sendMessage[4] = 0x00;
-            brainsData.sendMessage[5] = 0x00;
-            brainsData.sendMessage[6] = 0x00;
-            brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-            xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-            while(wait_on_ack){};
-
-            //sending signal to raspi
-            brainsData.sendMessage[0] = 0x98;
-            brainsData.sendMessage[7] = checksumCreator(brainsData.sendMessage,7);
-            xQueueSendToBack(MessageQueueWout,brainsData.sendMessage,pdFAIL);
-            while(wait_on_ack){};
-            break;
         }
 
         /* TODO: implement your application state machine.*/
