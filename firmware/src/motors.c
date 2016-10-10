@@ -101,10 +101,6 @@ MOTORS_DATA motorsData;
 // Helper functions
 //initialize motors to be able to run
 void init_motors() {
-    //keep motors off during init
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
-    
     //right motor enable
     PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_0);
     //right motor direction
@@ -118,6 +114,10 @@ void init_motors() {
     //Start OC drivers    
     PLIB_OC_Enable(OC_ID_1);
     PLIB_OC_Enable(OC_ID_2);
+    
+    //keep motors off during init
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
     
     //PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);
     //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);    
@@ -199,11 +199,11 @@ void move_backward() {
     //int placeholder1, placeholder2;
     //right motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 200); //placeholder
     
     //left motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0); //placeholder        
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 200); //placeholder        
 }
 
 

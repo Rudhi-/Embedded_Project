@@ -290,6 +290,7 @@
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>2DDAE8B47744023D00C137731DAB9B7D</Checksum>
+        <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>drv_oc_mapping.c</Name>
@@ -304,7 +305,7 @@
       <Template>
         <Name>drv_oc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/oc/src</Path>
-        <Checksum>39285CEAB23882E7C9F87DF3E470111B</Checksum>
+        <Checksum>DAF551C1F21DD8A30396795BC4A44A8D</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static.c</Name>
