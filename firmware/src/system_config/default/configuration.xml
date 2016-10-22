@@ -254,17 +254,17 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>B6CBE423647A8929F1046AB6F68B1BD1</Checksum>
+        <Checksum>571C434B8050160CAEC27D08E527FBAA</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/tmr</Path>
-        <Checksum>5B1227C9C8A50A58EB2DAB66BF09B4E6</Checksum>
+        <Checksum>134C67B5A7E7C805A90542EA12C99256</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_mapping.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>0651845480D5D3E21D8BF17EE68DBEAC</Checksum>
+        <Checksum>9E567837A2D47FE3F8120D943C90DAB9</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_mapping.c</Name>
@@ -289,7 +289,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>2DDAE8B47744023D00C137731DAB9B7D</Checksum>
+        <Checksum>BDEFF354C53C70DA06C8CF00924DB7AF</Checksum>
         <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
@@ -315,7 +315,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>BC02D18F458D9099051386739B41AB1A</Checksum>
+        <Checksum>83563C876E0CB9F9764EDDEF9B0095E1</Checksum>
       </Template>
       <Template>
         <Name>drv_oc_static.h</Name>
@@ -337,7 +337,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>7CA65EEDE4D808467FDC56022B4C83CC</Checksum>
+        <Checksum>95877EBD09FCC8862A2696BB5E382D57</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -357,12 +357,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>D24F93F161B1A09FA666AAEA62EEE950</Checksum>
+        <Checksum>018EE68410C0B114D0A0094E916B5C18</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>8D8D6BCE6266CF0340B5A0E3D187B04B</Checksum>
+        <Checksum>25F64E30EE2B22146ACBD10391242DE5</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -390,11 +390,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/default"/>
+        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default/framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

@@ -115,15 +115,19 @@ void init_motors() {
     PLIB_OC_Enable(OC_ID_1);
     PLIB_OC_Enable(OC_ID_2);
     
-    //keep motors off during init
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    set_speed(500,500);
+    move_stop();
+    
+    R_encoder = 0;
+    L_encoder = 0;
     
     //PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);
     //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_3);    
     
     //start timer
     DRV_TMR0_Start();
+    DRV_TMR1_Start();
+    DRV_TMR2_Start();    
 }
 
 // Follower rover
@@ -137,7 +141,7 @@ void set_speed(int leftSpeed, int rightSpeed) {
     } else {
         PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     }
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed); //placeholder
+    motorsData.rightSpeed = rightSpeed; //placeholder
     
     //left motor
     if (leftSpeed < 0) {
@@ -146,7 +150,9 @@ void set_speed(int leftSpeed, int rightSpeed) {
     } else {
         PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
     }
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed); //placeholder    
+    motorsData.leftSpeed = leftSpeed; //placeholder
+
+    move_start();
 }
 
 //Stops all motors immediately
@@ -158,14 +164,22 @@ void move_stop() {
     
 }
 
+//sets motors to drive at current speed and direction
+void move_start() {
+    //right motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed);
+    //left motor
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed);    
+}
+
+
 // Leader Rover
 
 //turn the rover to the right
 void turn_left() {
-    int placeholder;
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder = 200); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed); 
     
     //stop left motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
@@ -173,37 +187,34 @@ void turn_left() {
 
 //turn the rover to the left
 void turn_right() {
-    int placeholder;
     //stop right motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder = 200); //placeholder 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed);  
 }
 
 //function to move forwards
 void move_forward() {
-    int placeholder1, placeholder2;
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, placeholder1 = 0); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed); 
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, placeholder2 = 0); //placeholder        
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed);         
 }
 
 //function to move backwards
 void move_backward() {
-    //int placeholder1, placeholder2;
     //right motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 200); //placeholder
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed); //placeholder
     
     //left motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 200); //placeholder        
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed); //placeholder        
 }
 
 
@@ -258,13 +269,16 @@ void MOTORS_Tasks ( void )
             
                 motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
+            //move_forward();
             break;
         }
 
         case MOTORS_STATE_SERVICE_TASKS:
         {
-            move_backward();
-            
+            //move_stop();
+//            if (R_encoder > 5) {
+//                move_stop();
+//            }
             break;
         }
 

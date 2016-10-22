@@ -116,10 +116,13 @@ typedef struct
 {
     /* The application's current state */
     MOTORS_STATES state;
+    int leftSpeed, rightSpeed;
 
     /* TODO: Define any additional data used by the application. */
 
 } MOTORS_DATA;
+
+int L_encoder, R_encoder;
 
 
 // *****************************************************************************
@@ -207,6 +210,7 @@ void init_motors();
 
 // Follower rover
 void set_speed(int rightSpeed, int leftSpeed);
+void move_start();
 void move_stop();
 
 // Leader Rover
