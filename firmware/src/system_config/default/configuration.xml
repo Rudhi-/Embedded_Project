@@ -362,7 +362,7 @@
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>25F64E30EE2B22146ACBD10391242DE5</Checksum>
+        <Checksum>F3F1B2074DA2B0F17612DA0DD563836E</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -390,11 +390,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default/framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

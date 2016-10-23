@@ -82,14 +82,12 @@ void IntHandlerDrvTmrInstance0(void)
 void IntHandlerDrvTmrInstance1(void)
 {
     R_encoder++;
-    move_forward();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
  
 void IntHandlerDrvTmrInstance2(void)
 {
     L_encoder++;
-    move_backward();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
   

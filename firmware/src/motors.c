@@ -115,7 +115,7 @@ void init_motors() {
     PLIB_OC_Enable(OC_ID_1);
     PLIB_OC_Enable(OC_ID_2);
     
-    set_speed(500,500);
+    set_speed(WALK,WALK);
     move_stop();
     
     R_encoder = 0;
@@ -133,16 +133,7 @@ void init_motors() {
 // Follower rover
 // Clear is forwards, set is backwards
 //set the speeds to given inputs
-void set_speed(int leftSpeed, int rightSpeed) {
-    //right motor
-    if (rightSpeed < 0) {
-        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-        rightSpeed *= -1;
-    } else {
-        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    }
-    motorsData.rightSpeed = rightSpeed; //placeholder
-    
+void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed) {
     //left motor
     if (leftSpeed < 0) {
         PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
@@ -150,9 +141,30 @@ void set_speed(int leftSpeed, int rightSpeed) {
     } else {
         PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
     }
-    motorsData.leftSpeed = leftSpeed; //placeholder
+    motorsData.leftSpeed = leftSpeed;
+    
+    //right motor
+    if (rightSpeed < 0) {
+        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        rightSpeed *= -1;
+    } else {
+        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    }
+    motorsData.rightSpeed = rightSpeed;
 
     move_start();
+}
+
+//get the current speed of one of the motors
+MOTOR_SPEEDS get_speed(SIDE side) {
+    switch (side) {
+        case LEFT:
+            return motorsData.leftSpeed;
+        case RIGHT:
+            return motorsData.rightSpeed;
+        default:
+            return 0;
+    }
 }
 
 //Stops all motors immediately
@@ -174,15 +186,25 @@ void move_start() {
 
 
 // Leader Rover
-
 //turn the rover to the right
 void turn_left() {
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed); 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
     
     //stop left motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+}
+
+//spin the rover clockwise
+void spin_left() {
+    //right motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
+    
+    //left motor
+    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
 }
 
 //turn the rover to the left
@@ -192,7 +214,18 @@ void turn_right() {
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed);  
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
+}
+
+//spin the rover counterclockwise
+void spin_right() {
+    //right motor
+    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
+    
+    //left motor
+    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
 }
 
 //function to move forwards
@@ -269,16 +302,43 @@ void MOTORS_Tasks ( void )
             
                 motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
-            //move_forward();
+            motorsData.moveState = INIT;
             break;
         }
 
         case MOTORS_STATE_SERVICE_TASKS:
         {
-            //move_stop();
-//            if (R_encoder > 5) {
-//                move_stop();
-//            }
+            switch (motorsData.moveState) {
+                case INIT:
+                    set_speed(CRAWL, CRAWL);
+                    R_encoder = L_encoder = 0;
+                    motorsData.moveState = MOVE_F;
+                    break;
+                case MOVE_F:
+                    if (R_encoder > 250) {
+                        move_stop();
+                        R_encoder = L_encoder = 0;
+                        if (get_speed(RIGHT) == CRAWL) {
+                            spin_right();
+                        } else {
+                            spin_left();
+                        }
+                        motorsData.moveState = SPIN;
+                    }
+                    break;
+                case SPIN:
+                    if (R_encoder > 98 && L_encoder > 98) {
+                        move_stop();
+                        R_encoder = L_encoder = 0;
+                        if (get_speed(RIGHT) == CRAWL) {
+                            set_speed(SPRINT, SPRINT);
+                        } else {
+                            set_speed(CRAWL, CRAWL);
+                        }
+                        motorsData.moveState = MOVE_F;
+                    }
+                    break;
+            }
             break;
         }
 
