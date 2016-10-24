@@ -89,6 +89,7 @@ typedef enum
 	/* Application's state machine's initial state. */
 	MAGNETOMETER_STATE_INIT=0,
 	MAGNETOMETER_STATE_SERVICE_TASKS,
+    MAGNETOMETER_STATE_WAIT,
 
 	/* TODO: Define states used by the application state machine. */
 
@@ -112,6 +113,16 @@ typedef struct
 {
     /* The application's current state */
     MAGNETOMETER_STATES state;
+    DRV_HANDLE          i2c_handle;
+    DRV_I2C_BUFFER_HANDLE txbufferhandle;
+    bool getval;
+    int             rxbufferx;
+    int             rxbuffery;
+    uint8_t dx_data [4];
+    uint8_t txBuffer_2[2];
+    uint8_t txBuffer_3[2];
+    double bearing;
+    int float_val;
 
     /* TODO: Define any additional data used by the application. */
 

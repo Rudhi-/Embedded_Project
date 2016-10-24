@@ -63,7 +63,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <sys/attribs.h>
 #include "uartrx.h"
 #include "uarttx.h"
-#include "magnetometer.h"
 #include "system_definitions.h"
 #include "header.h"
 
@@ -76,6 +75,12 @@ void IntHandlerDrvTmrInstance0(void)
 {
     if (wait_on_ack)
         ReSendMessage();
+    magcounter = magcounter  + 1;
+    if (magcounter == 5)
+    {
+        magflag = true;
+        magcounter = 0;
+    }
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 
@@ -98,6 +103,12 @@ void IntHandlerDrvUsartInstance0(void)
     }
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_ERROR);
 }
+
+ void IntHandlerDrvI2CInstance0(void)
+{
+    DRV_I2C_Tasks(sysObj.drvI2C0);
+ 
+}
  
  
  
@@ -110,8 +121,6 @@ void IntHandlerDrvUsartInstance0(void)
 
  
 
- 
-  
 /*******************************************************************************
  End of File
 */

@@ -12,10 +12,14 @@
 #include "uarttx_public.h"
 #include "motors_public.h"
 #include "motors_public.h"
+#include "magnetometer_public.h"
 
 #include "debug.h"
 #include "queue.h"
 
 #define PIC_ID 1 //set to your pic
+
+uint8_t rx_counter;
+uint8_t tx_counter;
 
 #endif	/* HEADERS_H */

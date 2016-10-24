@@ -118,6 +118,7 @@ typedef struct
     MOTORS_STATES state;
     uint8_t rx_data [8];
     uint8_t tx_data [8];
+    uint8_t dx_data [4];
 
     /* TODO: Define any additional data used by the application. */
 

@@ -163,25 +163,18 @@ void MOTORS_Tasks ( void )
             if (uxQueueMessagesWaiting(MessageQueueWin))
             {
                 
+                
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
-                
-                uint8_t ack [8];
-                ack [0] = 'A';
-                ack [1] = 'C';
-                ack [2] = 'K';
-                ack [3] = 'N';
-                ack [4] = 'O';
-                ack [5] = 'W';
-                ack [6] = 'L';
-                ack [7] = 'G';
-                //Send the acknowledge message
-                xQueueSend( MessageQueueWout, ack, pdFAIL );
-                
-                
-                
+                int i;
+                for (i = 0; i < 40000000; i++)
+                {
+                    int j = i;
+                    i = j;
+                }
                 // Go to the work on data state
+                GetMagnetometerData();
                 motorsData.state = MOTORS_STATE_WORK_ON_DATA;
                 //PLIB_TMR_Counter16BitClear(TMR_ID_5);
                 //PLIB_TMR_Start(TMR_ID_5);
@@ -192,21 +185,25 @@ void MOTORS_Tasks ( void )
         /* TODO: implement your application state machine.*/
         case MOTORS_STATE_WORK_ON_DATA:
         {
-            motorsData.tx_data[0] = motorsData.rx_data[0];
-        motorsData.tx_data[1] = 'A';
-            motorsData.tx_data[2] = motorsData.rx_data[2];
-            motorsData.tx_data[3] = motorsData.rx_data[3];
-            motorsData.tx_data[4] = motorsData.rx_data[4];
-            motorsData.tx_data[5] = motorsData.rx_data[5];
-            motorsData.tx_data[6] = motorsData.rx_data[6];
-            motorsData.tx_data[7] = motorsData.rx_data[7];
-            motorsData.state = MOTORS_STATE_TRANSMIT_DATA;
+            if (uxQueueMessagesWaiting(MessageQueueDin)) 
+            {
+                xQueueReceive(MessageQueueDin, motorsData.dx_data, portMAX_DELAY);
+                motorsData.tx_data[0] = 0x8b;
+                motorsData.tx_data[1] = motorsData.dx_data[0];
+                motorsData.tx_data[2] = motorsData.dx_data[1];
+                motorsData.tx_data[3] = motorsData.dx_data[2];
+                motorsData.tx_data[4] = motorsData.dx_data[3];
+                motorsData.tx_data[5] = 0xaa;
+                motorsData.tx_data[6] = 0xaa;
+                motorsData.tx_data[7] = 0xaa;
+                motorsData.state = MOTORS_STATE_TRANSMIT_DATA;
+            }
             break;
         }
         
         case MOTORS_STATE_TRANSMIT_DATA:
         {
-            
+            //wait_on_ack = true;
             xQueueSend( MessageQueueWout, motorsData.tx_data, pdFAIL );
             //StoreMessage(motorsData.tx_data);
             motorsData.state = MOTORS_STATE_WAIT_ACK;
@@ -218,8 +215,6 @@ void MOTORS_Tasks ( void )
             dbgOutputVal(IN_TASK_THREE);
             if (!wait_on_ack)
             {
-                // Receive the message from the receiver thread
-                // xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 
                 //Do some sort of check
                 
