@@ -41,6 +41,10 @@
         <Path>Source Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
+        <Name>drv_i2c.c</Name>
+        <Path>Source Files/framework/driver/i2c/src/dynamic</Path>
+      </File>
+      <File>
         <Name>list.h</Name>
         <Path>Header Files/FreeRTOS</Path>
       </File>
@@ -75,6 +79,10 @@
       <File>
         <Name>system.h</Name>
         <Path>Header Files/framework/system</Path>
+      </File>
+      <File>
+        <Name>drv_i2c.h</Name>
+        <Path>Header Files/framework/driver/i2c</Path>
       </File>
       <File>
         <Name>timers.h</Name>
@@ -153,6 +161,10 @@
         <Path>Header Files/FreeRTOS</Path>
       </File>
       <File>
+        <Name>drv_i2c_compatibility.h</Name>
+        <Path>Header Files/framework/driver/i2c</Path>
+      </File>
+      <File>
         <Name>sys_common.h</Name>
         <Path>Header Files/framework/system/common</Path>
       </File>
@@ -167,6 +179,10 @@
       <File>
         <Name>osal_impl_none.h</Name>
         <Path>Header Files/framework/osal/src</Path>
+      </File>
+      <File>
+        <Name>drv_i2c_variant_mapping.h</Name>
+        <Path>Header Files/framework/driver/i2c/src</Path>
       </File>
       <File>
         <Name>sys_clk_mapping.h</Name>
@@ -189,6 +205,10 @@
         <Path>Header Files/framework/gfx</Path>
       </File>
       <File>
+        <Name>drv_i2c_local.h</Name>
+        <Path>Header Files/framework/driver/i2c/src</Path>
+      </File>
+      <File>
         <Name>sys_devcon.h</Name>
         <Path>Header Files/framework/system/devcon</Path>
       </File>
@@ -203,6 +223,10 @@
       <File>
         <Name>sys_module.h</Name>
         <Path>Header Files/framework/system/common</Path>
+      </File>
+      <File>
+        <Name>drv_i2c_mapping.h</Name>
+        <Path>Header Files/framework/driver/i2c</Path>
       </File>
       <File>
         <Name>sys_devcon_pic32mx.c</Name>
@@ -246,7 +270,7 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>4C6BDAA2CA4F98F817BEE182E3C01F05</Checksum>
+        <Checksum>C608C7EA4A646CBF612625B5E0F22856</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.h</Name>
@@ -285,7 +309,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>CF1BFF2301FE369DDB71889125D3C485</Checksum>
+        <Checksum>8B856D9C32626362EB5E56642D87F126</Checksum>
         <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
@@ -305,7 +329,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>E680B5E7727E966C2C96F85355A6FEFA</Checksum>
+        <Checksum>45C5B2857C6667F562ED4741E06B31C6</Checksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -322,7 +346,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>EFDB81658D730F2C509ED5C1B47F3A4A</Checksum>
+        <Checksum>ED9E6E2D73310DD57CFF20067143C086</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -354,12 +378,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>C3D5AD0ACD62502833BACD329C120990</Checksum>
+        <Checksum>9D5DB7142A4D94429E059EADE68F1096</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>16F2ED4E5AC6A04AAAC51E28E5C16FE2</Checksum>
+        <Checksum>1C72E320E491612F775E93B55D89E05F</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>

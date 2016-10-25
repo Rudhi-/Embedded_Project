@@ -145,10 +145,8 @@ void ULTRASONIC_Tasks ( void )
         {
             bool appInitialized = true;
        
-        
             if (appInitialized)
             {
-            
                 ultrasonicData.state = ULTRASONIC_STATE_SERVICE_TASKS;
             }
             break;
@@ -161,6 +159,25 @@ void ULTRASONIC_Tasks ( void )
                 do ultrasonic stuff
             }
             */
+            
+            if (start_LED_ON) {
+                ultrasonicData.i2c_handle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_READWRITE); 
+                if (DRV_HANDLE_INVALID == ultrasonicData.i2c_handle)
+                {
+                    PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                }
+                
+                uint8_t range_command = 0x51;
+                uint8_t range[2];
+                
+                DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x04, &range, sizeof(range), NULL);
+                DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x04, &range_command, sizeof(range_command), NULL);
+                
+                DRV_I2C_Close(ultrasonicData.i2c_handle);
+                
+                
+            }
+            
             break;
         }
 

@@ -267,7 +267,7 @@ void REFLECTANCE_Tasks ( void )
                         reflectanceData.tx_data[i] = 0x00;
                     }
                     
-                    xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
+                    //xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
                 }
                 
                 reflectanceData.state = REFLECTANCE_STATE_LED_ON;

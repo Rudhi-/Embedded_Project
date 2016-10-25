@@ -121,19 +121,13 @@ void IntHandlerDrvUsartInstance0(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_ERROR);
 }
  
-
+void IntHandlerDrvI2CInstance0(void)
+{
+    DRV_I2C_Tasks(sysObj.drvI2C0);
+ 
+}
  
 
- 
-
- 
-
- 
-
- 
-
- 
-  
 /*******************************************************************************
  End of File
 */
