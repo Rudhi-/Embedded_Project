@@ -190,7 +190,7 @@ void move_start() {
 void turn_left() {
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK); 
     
     //stop left motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
@@ -200,11 +200,11 @@ void turn_left() {
 void spin_left() {
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK); 
     
     //left motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK);  
 }
 
 //turn the rover to the left
@@ -214,18 +214,18 @@ void turn_right() {
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK);  
 }
 
 //spin the rover counterclockwise
 void spin_right() {
     //right motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, JOG); 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK); 
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, JOG);  
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK);  
 }
 
 //function to move forwards
@@ -327,7 +327,7 @@ void MOTORS_Tasks ( void )
                     }
                     break;
                 case SPIN:
-                    if (R_encoder > 98 && L_encoder > 98) {
+                    if (R_encoder > 98 || L_encoder > 98) {
                         move_stop();
                         R_encoder = L_encoder = 0;
                         if (get_speed(RIGHT) == CRAWL) {
