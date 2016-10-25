@@ -112,6 +112,13 @@ typedef enum
 bool start_LED_ON;
 bool start_LED_OFF;
 bool start_LED_INPUT;
+bool start_ultrasonic;
+bool start_senddata;
+
+bool reflectance_finished;
+bool ultrasonic_finished;
+
+uint8_t packet_tx_data[8];
 
 
 typedef struct

@@ -151,7 +151,6 @@ void REFLECTANCE_Tasks ( void )
         
             if (appInitialized)
             {
-            
                 reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }
             break;
@@ -161,6 +160,7 @@ void REFLECTANCE_Tasks ( void )
         {   
             if (start_LED_ON) {
                 start_LED_ON = 0;
+                reflectance_finished = 0;
                 
                 /* set LEDs as outputs
                  * turn LEDs on
@@ -253,8 +253,13 @@ void REFLECTANCE_Tasks ( void )
                      (PORTBbits.RB8));
                 
                 reflectance_output = reflectance_output ^ 0xFF;
-                dbgOutputVal(reflectance_output);
+                packet_tx_data[1] = reflectance_output;
                 
+                reflectance_finished = 1;
+                
+                //dbgOutputVal(reflectance_output);
+                
+                /*
                 if (reflectance_output) 
                 {
                     PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
@@ -269,6 +274,7 @@ void REFLECTANCE_Tasks ( void )
                     
                     //xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
                 }
+                */
                 
                 reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }

@@ -87,6 +87,8 @@ void IntHandlerDrvTmrInstance1(void)
 {
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
     start_LED_ON = 1;
+    start_ultrasonic = 1;
+    start_senddata = 1;
 }
 
 void IntHandlerDrvTmrInstance2(void)
@@ -124,7 +126,6 @@ void IntHandlerDrvUsartInstance0(void)
 void IntHandlerDrvI2CInstance0(void)
 {
     DRV_I2C_Tasks(sysObj.drvI2C0);
- 
 }
  
 

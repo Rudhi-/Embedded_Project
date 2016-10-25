@@ -115,6 +115,8 @@ typedef struct
     /* The application's current state */
     ULTRASONIC_STATES state;
     DRV_HANDLE i2c_handle;
+    DRV_I2C_BUFFER_HANDLE rxbufferhandle;
+    DRV_I2C_BUFFER_HANDLE txbufferhandle;
 
     /* TODO: Define any additional data used by the application. */
 

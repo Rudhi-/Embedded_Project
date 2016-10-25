@@ -316,8 +316,9 @@ build/default/debug/_ext/1360937237/uarttx.o:  \
  ../src/main_task.h  \
 ../src/header.h  \
 ../src/uarttx_public.h  \
+ ../src/main_task_public.h  \
 ../src/debug.h  \
- ../src/crc.h  \
-../src/ultrasonic.h  \
+../src/crc.h  \
+ ../src/ultrasonic.h  \
 ../src/main_task.h  \
 ../src/uartrx.h 

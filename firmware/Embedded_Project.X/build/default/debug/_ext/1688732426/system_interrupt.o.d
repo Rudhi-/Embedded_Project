@@ -314,12 +314,13 @@ build/default/debug/_ext/1688732426/system_interrupt.o:  \
 ../src/header.h  \
 ../src/uartrx_public.h  \
  ../src/uarttx_public.h  \
+../src/main_task_public.h  \
 ../src/debug.h  \
-../src/main_task.h  \
+ ../src/main_task.h  \
 ../src/crc.h  \
- ../src/reflectance.h  \
+../src/reflectance.h  \
 ../src/ultrasonic.h  \
-../src/main_task.h  \
- ../src/system_config/default/system_definitions.h  \
-../src/uartrx_public.h  \
- ../src/uarttx_public.h 
+ ../src/main_task.h  \
+../src/system_config/default/system_definitions.h  \
+ ../src/uartrx_public.h  \
+../src/uarttx_public.h 

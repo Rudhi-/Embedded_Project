@@ -144,7 +144,11 @@ void MAIN_TASK_Tasks ( void )
         {
             bool appInitialized = true;
             
-            DRV_TMR1_Start();
+            //DRV_TMR1_Start();
+            ultrasonic_finished = 0;
+            reflectance_finished = 0;
+            
+            packet_tx_data[0] = 0x93;
         
             if (appInitialized)
             {
@@ -156,6 +160,31 @@ void MAIN_TASK_Tasks ( void )
 
         case MAIN_TASK_STATE_SERVICE_TASKS:
         {
+            /*
+            if(ultrasonic_finished == 1 && reflectance_finished == 1){
+                dbgOutputVal(0x45);
+            }
+            else{
+                dbgOutputVal(0x44);
+            }
+            */
+            
+            if(start_senddata){
+                start_senddata = 0;
+                
+                /*
+                int i = 0;
+                for(i = 0; i < 7; i++){
+                    dbgOutputVal(packet_tx_data[4]);
+                    dbgOutputVal(0x00);
+                    dbgOutputVal(0x00);
+                }
+                */
+                
+                xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+            }
+            
             if (uxQueueMessagesWaiting(MessageQueueWout)) 
             {
                 xQueueReceive(MessageQueueWin, main_taskData.rx_data, portMAX_DELAY);

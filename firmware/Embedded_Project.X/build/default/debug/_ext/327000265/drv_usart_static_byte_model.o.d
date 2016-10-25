@@ -314,9 +314,10 @@ build/default/debug/_ext/327000265/drv_usart_static_byte_model.o:  \
 ../src/uartrx.h  \
 ../src/header.h  \
  ../src/uarttx_public.h  \
+../src/main_task_public.h  \
 ../src/debug.h  \
-../src/main_task.h  \
+ ../src/main_task.h  \
 ../src/crc.h  \
- ../src/reflectance.h  \
+../src/reflectance.h  \
 ../src/ultrasonic.h  \
-../src/main_task.h 
+ ../src/main_task.h 

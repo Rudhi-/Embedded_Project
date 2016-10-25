@@ -11,6 +11,8 @@
 #include "uartrx_public.h"
 #include "uarttx_public.h"
 
+#include "main_task_public.h"
+
 #include "debug.h"
 #include "queue.h"
 
