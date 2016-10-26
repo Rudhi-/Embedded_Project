@@ -116,6 +116,7 @@ void UARTRX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uartrxData.state = UARTRX_STATE_INIT;
+    rx_counter = 100;
     receiveState = WAIT_ON_MESSAGE;
     MessageQueueWin = xQueueCreate(2, 8*sizeof(char));
     makeCRCTable();
@@ -156,14 +157,16 @@ void SendToTheQueue()
         while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
         uartrxData.rx_data[7] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
         
-        if ((uartrxData.rx_data[0] & 0x07) == PIC_ID) {
+        if ((uartrxData.rx_data[0] & 0x07) == PIC_ID)
+        {
             switch (receiveState) {
                 case WAIT_ON_MESSAGE:
-                    if (crcMatches(uartrxData.rx_data, 7)) {
+                    if (crcMatches(uartrxData.rx_data, 7) && (uartrxData.rx_data[0] & 0x80) && (uartrxData.rx_data[6] != rx_counter)) {
+                        rx_counter = uartrxData.rx_data[6];
                         //send ack
                         uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
                         int i;
-                        for (i = 1; i < 7; i++) {
+                        for (i =1; i < 7; i++) {
                             uartrxData.tx_data[i] = 0x00;
                         }
                         xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
@@ -172,7 +175,6 @@ void SendToTheQueue()
                     }
                     break;
                 case WAIT_ON_ACK:
-                    
                     if ((uartrxData.rx_data[0] & 0x80)) {
                         break;
                     }

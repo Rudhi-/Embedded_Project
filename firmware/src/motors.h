@@ -58,7 +58,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "headers.h"
+
+#include "peripheral/ports/plib_ports.h"
+#include "peripheral/tmr/plib_tmr.h"
+#include "peripheral/oc/plib_oc.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -95,6 +98,28 @@ typedef enum
 
 } MOTORS_STATES;
 
+typedef enum
+{     
+    NEGATIVE=-1, //unused value to ensure enum is signed
+    CRAWL=200,
+    WALK=400,
+    JOG=600,
+    RUN=800,
+    SPRINT=1000,            
+} MOTOR_SPEEDS;
+
+typedef enum
+{
+    LEFT=0,
+    RIGHT=1,
+} SIDE;
+
+typedef enum
+{
+    INIT=0,
+    MOVE_F,
+    SPIN
+} MOVE_STATE;
 
 // *****************************************************************************
 /* Application Data
@@ -113,10 +138,14 @@ typedef struct
 {
     /* The application's current state */
     MOTORS_STATES state;
+    MOTOR_SPEEDS leftSpeed, rightSpeed;
+    MOVE_STATE moveState;
 
     /* TODO: Define any additional data used by the application. */
 
 } MOTORS_DATA;
+
+int L_encoder, R_encoder;
 
 
 // *****************************************************************************
@@ -199,6 +228,22 @@ void MOTORS_Initialize ( void );
 
 void MOTORS_Tasks( void );
 
+// Helper functions
+void init_motors();
+
+// Follower rover
+void set_speed(MOTOR_SPEEDS rightSpeed, MOTOR_SPEEDS leftSpeed);
+MOTOR_SPEEDS get_speed(SIDE side);
+void move_start();
+void move_stop();
+
+// Leader Rover
+void turn_right();
+void spin_right();
+void turn_left();
+void spin_left();
+void move_forward();
+void move_backward();
 
 #endif /* _MOTORS_H */
 

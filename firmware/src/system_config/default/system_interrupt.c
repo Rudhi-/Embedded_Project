@@ -67,7 +67,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "sensor.h"
 #include "control.h"
 #include "system_definitions.h"
-#include "uartrx_public.h"
+#include "headers.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -82,6 +82,23 @@ void IntHandlerDrvTmrInstance0(void)
         ReSendMessage();
     }
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+}
+
+void IntHandlerDrvTmrInstance1(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+}
+    
+void IntHandlerDrvTmrInstance2(void)
+{
+    R_encoder++;
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+}
+    
+void IntHandlerDrvTmrInstance3(void)
+{
+    L_encoder++;
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
 void IntHandlerDrvUsartInstance0(void)
@@ -118,6 +135,7 @@ void IntHandlerDrvUsartInstance0(void)
 
  
   
+ 
 /*******************************************************************************
  End of File
 */

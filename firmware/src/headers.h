@@ -19,5 +19,8 @@
 
 #define PIC_ID 4 //set to your pic
 
+uint8_t rx_counter;
+uint8_t tx_counter;
+
 #endif	/* HEADERS_H */
 

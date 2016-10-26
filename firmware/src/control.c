@@ -154,26 +154,7 @@ void CONTROL_Tasks ( void )
 
         case CONTROL_STATE_SERVICE_TASKS:
         {
-            if (uxQueueMessagesWaiting(MessageQueueWin)) {
-                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-                if (!wait_on_ack) {
-                    xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
-                    int i;
-                    for (i = 0; i < 10000000; i++) 
-                    {
-                        int j = i;
-                        i = j;
-                    }
-                    for (i = 1; i < 6; i++) {
-                        controlData.tx_data[i] = controlData.rx_data[i];
-                    }
-                    controlData.tx_data[0] = (0x80 | (PIC_ID << 3) | 0x00);
-                                            //cmd,   src,            dst
-
-                    xQueueSend(MessageQueueWout, controlData.tx_data, portMAX_DELAY);
-                }
-                
-            }
+            
             break;
         }
 
