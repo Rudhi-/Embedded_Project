@@ -118,7 +118,11 @@ void MAIN_TASK_Initialize ( void )
     /* Place the App state machine in its initial state. */
     main_taskData.state = MAIN_TASK_STATE_INIT;
 
-    
+    int i = 0;
+    for(i = 0; i < 7; i++){
+        packet_tx_data[i] = 0;
+    }
+
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -181,14 +185,17 @@ void MAIN_TASK_Tasks ( void )
                 }
                 */
                 
-                xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                if(!wait_on_ack){
+                    xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                }
                 PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             }
-            
+            /*
             if (uxQueueMessagesWaiting(MessageQueueWout)) 
             {
                 xQueueReceive(MessageQueueWin, main_taskData.rx_data, portMAX_DELAY);
             }
+            */
             break;
         }
 
