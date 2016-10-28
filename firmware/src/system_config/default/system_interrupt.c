@@ -91,13 +91,13 @@ void IntHandlerDrvTmrInstance1(void)
     
 void IntHandlerDrvTmrInstance2(void)
 {
-    R_encoder++;
+    rightEncoder++;
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
     
 void IntHandlerDrvTmrInstance3(void)
 {
-    L_encoder++;
+    leftEncoder++;
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 

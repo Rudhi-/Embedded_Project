@@ -132,6 +132,8 @@ void CONTROL_Initialize ( void )
     See prototype in control.h.
  */
 
+uint8_t temp[8];
+
 void CONTROL_Tasks ( void )
 {
 
@@ -154,7 +156,18 @@ void CONTROL_Tasks ( void )
 
         case CONTROL_STATE_SERVICE_TASKS:
         {
+            int i, j;
+            for (i = 0; i < 500000000; i++) {
+                j = i;
+                i = j;
+            }
+            temp[0] = 0xA0 | (0x02 << 4) | 0x00 | 0x01;
+            temp[1] = 40;
+            temp[2] = 40;
+            temp[3] = -128;
+            temp[4] = -128;
             
+            xQueueSend(MessageQueueM, temp, pdFAIL);
             break;
         }
 
