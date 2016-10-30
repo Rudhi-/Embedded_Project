@@ -117,7 +117,7 @@ void init_motors() {
     
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
-    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 40;
+    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 8;
     set_dist(60,60); 
     
     set_speed(WALK,WALK);
@@ -137,8 +137,8 @@ void init_motors() {
 
 //set the distance for the rover to stop after in cm
 void set_dist(int leftDist, int rightDist) {
-    motorsData.leftDist = (leftDist * motorsData.leftEncoder_Conv) / 10;
-    motorsData.rightDist = (rightDist * motorsData.rightEncoder_Conv) / 10;
+    motorsData.leftDist = (leftDist * motorsData.leftEncoder_Conv);
+    motorsData.rightDist = (rightDist * motorsData.rightEncoder_Conv);
 }
 
 // Follower rover

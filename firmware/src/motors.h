@@ -128,7 +128,7 @@ typedef struct
     MOVE_STATE moveState;
     TEST_STATES testState;
     int rightDist, leftDist;
-    int leftEncoder_Conv, rightEncoder_Conv; //10 * # of timer interrupts to cm
+    int leftEncoder_Conv, rightEncoder_Conv; //# of timer interrupts to cm
     int leftSpeed_Offset, rightSpeed_Offset;
     uint8_t motor_msg[8];
 
