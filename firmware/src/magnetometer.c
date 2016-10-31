@@ -153,6 +153,8 @@ void MAGNETOMETER_Initialize ( void )
     /* Place the App state machine in its initial state. */
     magnetometerData.state = MAGNETOMETER_STATE_INIT;
     magnetometerData.getval = false;
+    magnetometerData.rxbufferx = 0;
+    magnetometerData.rxbuffery = 0;
     MessageQueueDin = xQueueCreate(2, 4*sizeof(uint8_t));
     
     /* TODO: Initialize your application's state machine and other
@@ -272,30 +274,52 @@ void MAGNETOMETER_Tasks ( void )
 
         case MAGNETOMETER_STATE_SERVICE_TASKS:
         {   
+            int i;
             magnetometerData.i2c_handle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_READWRITE); 
             if (DRV_HANDLE_INVALID == magnetometerData.i2c_handle)
             {
-                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                
             }
-            while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( magnetometerData.i2c_handle, magnetometerData.txbufferhandle ));
-            DRV_I2C_TransmitThenReceive ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), rx_buffer, 6, NULL);
-            
-            DRV_I2C_Close( magnetometerData.i2c_handle );
-            
-            magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
-            magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
-            
-            
-            dbgOutputVal(rx_buffer[1]);
-            magnetometerData.dx_data[0] = rx_buffer[0];
-            magnetometerData.dx_data[1] = rx_buffer[1];
-            magnetometerData.dx_data[2] = rx_buffer[4];
-            magnetometerData.dx_data[3] = rx_buffer[5];
-            
+            for (i = 0; i < 100; i++)
+            {
+                while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( magnetometerData.i2c_handle, magnetometerData.txbufferhandle ));
+                DRV_I2C_TransmitThenReceive ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), rx_buffer, 6, NULL);
+
+                DRV_I2C_Close( magnetometerData.i2c_handle );
+
+                magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
+                magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
+
+                magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
+                magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
+
+                if (magnetometerData.rxbufferx == 0)
+                    magnetometerData.rxbufferx = 1;
+                magnetometerData.float_val = magnetometerData.rxbuffery/(double)magnetometerData.rxbufferx;
+                
+                magnetometerData.bearing[i] = atan(magnetometerData.float_val) * 360/ (2*3.14);
+            }
+            magnetometerData.bearingAvg = magnetometerData.bearing[0];
+            for (i = 1; i < 100; i++)
+            {
+                magnetometerData.bearingAvg = magnetometerData.bearingAvg + magnetometerData.bearing[i];
+            }
+            magnetometerData.bearingAvg = magnetometerData.bearingAvg/20;
+            if (magnetometerData.rxbufferx < 0 && magnetometerData.rxbuffery > 0)
+                magnetometerData.bearingAvg = 180 + magnetometerData.bearingAvg;
+            else if (magnetometerData.rxbufferx < 0 && magnetometerData.rxbuffery < 0)
+                magnetometerData.bearingAvg = 180 +  magnetometerData.bearingAvg;
+            else if (magnetometerData.rxbufferx > 0 && magnetometerData.rxbuffery < 0)
+                magnetometerData.bearingAvg = 360 + magnetometerData.bearingAvg;
+
+            dbgOutputVal(magnetometerData.bearingAvg);
+            magnetometerData.dx_data[0] = (magnetometerData.bearingAvg & 0xFF00) >> 8;
+            magnetometerData.dx_data[1] = magnetometerData.bearingAvg & 0xFF;            
             
             xQueueSend( MessageQueueDin, magnetometerData.dx_data, pdFAIL );
-
+            
             //magnetometerData.float_val = magnetometerData.rxbuffery/magnetometerData.rxbufferx;
+            
             
             
             magnetometerData.state = MAGNETOMETER_STATE_WAIT;

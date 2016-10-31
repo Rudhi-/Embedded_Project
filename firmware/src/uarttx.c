@@ -181,6 +181,16 @@ void UARTTX_Tasks ( void )
         {
             if (uxQueueMessagesWaiting(MessageQueueWout)) {
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
+                if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
+                {
+                    int i = 0;
+                    for (i = 4; i >= 0; i--)
+                    {
+                        uarttxData.tx_data[i + 1] = uarttxData.tx_data[i];
+                    }
+                    uarttxData.tx_data[0] = 0x00 | (PIC_ID << 3) | 0x00;
+                    //                      debug     SRC          DST
+                }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
                 if (uarttxData.tx_data[0] & 0x80)
                 {

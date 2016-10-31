@@ -89,6 +89,8 @@ typedef enum
 	/* Application's state machine's initial state. */
 	UARTRX_STATE_INIT=0,
 	UARTRX_STATE_SERVICE_TASKS,
+            UARTRX_STATE_WAIT_FOR_MESSAGE,
+            UARTRX_STATE_GET_MESSAGE
 
 	/* TODO: Define states used by the application state machine. */
 

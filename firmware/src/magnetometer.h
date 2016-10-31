@@ -116,13 +116,14 @@ typedef struct
     DRV_HANDLE          i2c_handle;
     DRV_I2C_BUFFER_HANDLE txbufferhandle;
     bool getval;
-    int             rxbufferx;
-    int             rxbuffery;
-    uint8_t dx_data [4];
+    int16_t             rxbufferx;
+    int16_t             rxbuffery;
+    uint8_t dx_data [2];
     uint8_t txBuffer_2[2];
     uint8_t txBuffer_3[2];
-    double bearing;
-    int float_val;
+    int bearing[100];
+    int bearingAvg;
+    double float_val;
 
     /* TODO: Define any additional data used by the application. */
 

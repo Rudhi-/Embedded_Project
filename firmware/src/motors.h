@@ -58,6 +58,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
+#include "header.h"
+
+#include "peripheral/ports/plib_ports.h"
+#include "peripheral/tmr/plib_tmr.h"
+#include "peripheral/oc/plib_oc.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -88,17 +93,20 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	MOTORS_STATE_INIT=0,
-	MOTORS_STATE_RECEIVE_MESSAGE,
-            MOTORS_STATE_SEND_ACK,
-            MOTORS_STATE_WORK_ON_DATA,
-            MOTORS_STATE_TRANSMIT_DATA,
-            MOTORS_STATE_WAIT_ACK
+	MOTORS_STATE_SERVICE_TASKS,
 
 	/* TODO: Define states used by the application state machine. */
 
 } MOTORS_STATES;
 
 
+typedef enum
+{
+    MOVE1 = 0,
+    SPIN1,
+    MOVE2,
+    SPIN2
+} TEST_STATES;
 // *****************************************************************************
 /* Application Data
 
@@ -116,13 +124,18 @@ typedef struct
 {
     /* The application's current state */
     MOTORS_STATES state;
-    uint8_t rx_data [8];
-    uint8_t tx_data [8];
-    uint8_t dx_data [4];
+    MOTOR_SPEEDS leftSpeed, rightSpeed;
+    MOVE_STATE moveState;
+    TEST_STATES testState;
+    int rightDist, leftDist;
+    int leftEncoder_Conv, rightEncoder_Conv; //# of timer interrupts to cm
+    int leftSpeed_Offset, rightSpeed_Offset;
+    uint8_t motor_msg[8];
 
     /* TODO: Define any additional data used by the application. */
 
 } MOTORS_DATA;
+
 
 
 // *****************************************************************************
@@ -205,6 +218,10 @@ void MOTORS_Initialize ( void );
 
 void MOTORS_Tasks( void );
 
+// Helper functions
+void init_motors();
+
+int leftEncoder, rightEncoder;
 
 #endif /* _MOTORS_H */
 
@@ -217,4 +234,3 @@ void MOTORS_Tasks( void );
 /*******************************************************************************
  End of File
  */
-

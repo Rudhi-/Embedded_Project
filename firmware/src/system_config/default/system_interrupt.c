@@ -63,6 +63,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <sys/attribs.h>
 #include "uartrx.h"
 #include "uarttx.h"
+#include "motors.h"
+#include "control.h"
 #include "system_definitions.h"
 #include "header.h"
 
@@ -71,17 +73,31 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
+
+    
 void IntHandlerDrvTmrInstance0(void)
 {
-    if (wait_on_ack)
+    if(wait_on_ack) {
         ReSendMessage();
-    magcounter = magcounter  + 1;
-    if (magcounter == 5)
-    {
-        magflag = true;
-        magcounter = 0;
     }
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+}
+
+void IntHandlerDrvTmrInstance1(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+}
+    
+void IntHandlerDrvTmrInstance2(void)
+{
+    rightEncoder++;
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+}
+    
+void IntHandlerDrvTmrInstance3(void)
+{
+    leftEncoder++;
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
 void IntHandlerDrvUsartInstance0(void)
@@ -91,37 +107,26 @@ void IntHandlerDrvUsartInstance0(void)
         /* Make sure receive buffer has data availible */
         if (PLIB_USART_ReceiverDataIsAvailable(USART_ID_1))
         {
+            /* Get the data from the buffer */
             SendToTheQueue();
         }
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_RECEIVE);
     }
     else if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
     {
-        TransmitTheMessage ();
+        TransmitTheMessage();
         PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
         PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
     }
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_ERROR);
 }
-
- void IntHandlerDrvI2CInstance0(void)
+ 
+  void IntHandlerDrvI2CInstance0(void)
 {
     DRV_I2C_Tasks(sysObj.drvI2C0);
  
 }
  
- 
- 
-
- 
-
- 
-
- 
-
- 
-
 /*******************************************************************************
  End of File
 */
-
