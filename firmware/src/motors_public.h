@@ -33,18 +33,20 @@ typedef enum
 
 QueueHandle_t MessageQueueM;
 
+#define MOTOR_THREAD_ID 0x01
+
 // Follower rover
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed);
 void set_dist(int leftDist, int rightDist);
 MOTOR_SPEEDS get_speed(SIDE side);
 void move_start();
 void move_stop();
+void spin_right();
+void spin_left();
 
 // Leader Rover
 void turn_right();
-void spin_right();
 void turn_left();
-void spin_left();
 void move_forward();
 void move_backward();
 

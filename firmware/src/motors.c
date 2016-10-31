@@ -378,6 +378,9 @@ void MOTORS_Tasks ( void )
                         move_stop();
                         int temp[4], i; //temps for set and get values, iterator
                         xQueueReceive(MessageQueueM, motorsData.motor_msg, portMAX_DELAY);
+                        if ((motorsData.motor_msg[0] & 0x03) != MOTOR_THREAD_ID) {
+                            break;
+                        }
                         if (motorsData.motor_msg[0] & 0x20){ //if set command
                             for (i = 0; i < 3; i++) {
                                 if (motorsData.motor_msg[i+1] & 0x80) {
@@ -390,7 +393,14 @@ void MOTORS_Tasks ( void )
                             motorsData.rightEncoder_Conv += temp[1];
                             motorsData.leftSpeed_Offset += temp[2];
                             motorsData.rightSpeed_Offset += temp[3];
-                        } else {    //else get command
+                            //now test
+                            
+                            motorsData.moveState = TEST;
+                            set_dist(50,50);
+                            set_speed(RUN, RUN);
+                            move_start();
+                            
+                        } else if (motorsData.motor_msg[0] & 0x10) {    //else if get command
                             if (motorsData.motor_msg[1] & 0x01) { //check if getting encoders
                                 motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv >> 8);
                                 motorsData.motor_msg[2] = (char)(motorsData.leftEncoder_Conv);
@@ -404,14 +414,10 @@ void MOTORS_Tasks ( void )
                             } else {
                                 break;
                             }
-                            motorsData.motor_msg[0] = 0xA0 | (0x01 << 4) | (0x01 << 2) | 0x00 ;
-                            //info                   int         get           SRC       DST
+                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4) | (MOTOR_THREAD_ID << 2) | 0x00 ;
+                            //info                   int         get           SRC                   DST
                             xQueueSend(MessageQueueWout, motorsData.motor_msg, pdFAIL);
                         }
-                        motorsData.moveState = TEST;
-                        set_dist(50,50);
-                        set_speed(RUN, RUN);
-                        move_start();
                     }
                     break;
                 case MOVE:
