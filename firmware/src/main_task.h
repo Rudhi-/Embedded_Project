@@ -109,10 +109,6 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
-bool start_LED_ON;
-bool start_LED_OFF;
-bool start_LED_INPUT;
-bool start_ultrasonic;
 bool start_senddata;
 
 bool reflectance_finished;

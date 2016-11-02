@@ -121,6 +121,8 @@ void REFLECTANCE_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+       
+    startReflectance(); 
     
     /* init stuff, configure devices*/
 }
@@ -186,8 +188,9 @@ void REFLECTANCE_Tasks ( void )
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_14, 1);
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_15, 1);
                 
-                DRV_TMR2_CounterClear();
-                DRV_TMR2_Start();
+                //DRV_TMR2_CounterClear();
+                //DRV_TMR2_Start();
+                xTimerReset(timer_LED_OFF, 0);
                 reflectanceData.state = REFLECTANCE_STATE_LED_OFF;
             }
         }
@@ -203,7 +206,8 @@ void REFLECTANCE_Tasks ( void )
                  * change state to REFLECTANCE_STATE_LED_INPUT
                  *  */
                 
-                DRV_TMR2_Stop();
+                //DRV_TMR2_Stop();
+                xTimerStop(timer_LED_OFF, 0);
                 
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_8, 0);
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, 0);
@@ -223,60 +227,65 @@ void REFLECTANCE_Tasks ( void )
                 TRISBbits.TRISB14 = 1;
                 TRISBbits.TRISB15 = 1;
                 
-                DRV_TMR3_CounterClear();
-                DRV_TMR3_Start();
+                //DRV_TMR3_CounterClear();
+                //DRV_TMR3_Start();
+                xTimerReset(timer_LED_INPUT, 0);
                 reflectanceData.state = REFLECTANCE_STATE_LED_INPUT;
             }
         }
         
         case REFLECTANCE_STATE_LED_INPUT:
         {
-            if (start_LED_INPUT) {
-                start_LED_INPUT = 0;
-                /* disable timer
-                 * take reading of LEDs
-                 * change state to REFLECTANCE_STATE_LED_ON
-                 *  */
-                
-                // wait a little less for this one
-                
-                DRV_TMR3_Stop();
-                
-                uint8_t reflectance_output;
-                reflectance_output = ((PORTBbits.RB15 << 7) +
-                     (PORTBbits.RB14 << 6) +
-                     (PORTBbits.RB13 << 5) +
-                     (PORTBbits.RB12 << 4) +
-                     (PORTBbits.RB11 << 3) +
-                     (PORTBbits.RB10 << 2) +
-                     (PORTBbits.RB9 << 1) +
-                     (PORTBbits.RB8));
-                
-                reflectance_output = reflectance_output ^ 0xFF;
-                packet_tx_data[1] = reflectance_output;
-                
-                reflectance_finished = 1;
-                
-                //dbgOutputVal(reflectance_output);
-                
-                /*
-                if (reflectance_output) 
-                {
-                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-                    
-                    reflectanceData.tx_data[0] = 0x93;
-                    reflectanceData.tx_data[1] = reflectance_output;
-                    int i = 2;
-                    for (i = 2; i < 7; i++)
+            if(start){
+                if (start_LED_INPUT) {
+                    start_LED_INPUT = 0;
+                    /* disable timer
+                     * take reading of LEDs
+                     * change state to REFLECTANCE_STATE_LED_ON
+                     *  */
+
+                    // wait a little less for this one
+
+                    //DRV_TMR3_Stop();
+                    xTimerStop(timer_LED_INPUT, 0);
+
+
+                    uint8_t reflectance_output;
+                    reflectance_output = ((PORTBbits.RB15 << 7) +
+                         (PORTBbits.RB14 << 6) +
+                         (PORTBbits.RB13 << 5) +
+                         (PORTBbits.RB12 << 4) +
+                         (PORTBbits.RB11 << 3) +
+                         (PORTBbits.RB10 << 2) +
+                         (PORTBbits.RB9 << 1) +
+                         (PORTBbits.RB8));
+
+                    reflectance_output = reflectance_output ^ 0xFF;
+                    packet_tx_data[1] = reflectance_output;
+
+                    reflectance_finished = 1;
+
+                    dbgOutputVal(reflectance_output);
+
+                    /*
+                    if (reflectance_output) 
                     {
-                        reflectanceData.tx_data[i] = 0x00;
+                        PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+
+                        reflectanceData.tx_data[0] = 0x93;
+                        reflectanceData.tx_data[1] = reflectance_output;
+                        int i = 2;
+                        for (i = 2; i < 7; i++)
+                        {
+                            reflectanceData.tx_data[i] = 0x00;
+                        }
+
+                        //xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
                     }
-                    
-                    //xQueueSend( MessageQueueWout, reflectanceData.tx_data, pdFAIL );
+                    */
+
+                    reflectanceData.state = REFLECTANCE_STATE_LED_ON;
                 }
-                */
-                
-                reflectanceData.state = REFLECTANCE_STATE_LED_ON;
             }
         }
         
@@ -302,7 +311,10 @@ void REFLECTANCE_Tasks ( void )
     }
 }
 
- 
+void startReflectance(){
+    start = true;
+}
+
 
 /*******************************************************************************
  End of File

@@ -110,6 +110,8 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
+bool start_ultrasonic;
+
 typedef struct
 {
     /* The application's current state */

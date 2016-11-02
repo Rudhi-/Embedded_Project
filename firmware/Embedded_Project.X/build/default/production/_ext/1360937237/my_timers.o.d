@@ -315,12 +315,12 @@ build/default/production/_ext/1360937237/my_timers.o:  \
 ../src/uartrx.h  \
 ../src/header.h  \
  ../src/uarttx_public.h  \
-../src/main_task_public.h  \
 ../src/debug.h  \
- ../src/main_task.h  \
+../src/main_task.h  \
 ../src/crc.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
- ../src/reflectance.h  \
+ ../src/reflectance_public.h  \
+../src/reflectance.h  \
 ../src/ultrasonic.h  \
-../src/main_task.h 
+ ../src/main_task.h 

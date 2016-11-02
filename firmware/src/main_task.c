@@ -123,13 +123,12 @@ void MAIN_TASK_Initialize ( void )
         packet_tx_data[i] = 0;
     }
     
-    TimerHandle_t timer_100ms;
-    timer_100ms = xTimerCreate("timer_100ms", pdMS_TO_TICKS( 100 ), pdTRUE, ( void * ) 0, callback_100ms);
-    xTimerStart(timer_100ms, 0);
+    timer_LED_ON = xTimerCreate("timer_LED_ON", pdMS_TO_TICKS( 100 ), pdTRUE, ( void * ) 0, callback_LED_ON);
+    xTimerStart(timer_LED_ON, 0);
     
-    TimerHandle_t timer_4ms;
-    timer_4ms = xTimerCreate("timer_4ms", pdMS_TO_TICKS( 4 ), pdTRUE, ( void * ) 0, callback_4ms);
-    xTimerStart(timer_4ms, 0);
+    timer_LED_OFF = xTimerCreate("timer_LED_OFF", pdMS_TO_TICKS( 4 ), pdTRUE, ( void * ) 0, callback_LED_OFF);
+    
+    timer_LED_INPUT = xTimerCreate("timer_LED_INPUT", pdMS_TO_TICKS( 4 ), pdTRUE, ( void * ) 0, callback_LED_INPUT);
 
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -197,7 +196,7 @@ void MAIN_TASK_Tasks ( void )
                     //xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
                 }
                 PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-                PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_0);
+                //PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_0);
             }
             if (uxQueueMessagesWaiting(MessageQueueWout)) 
             {

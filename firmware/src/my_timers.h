@@ -21,8 +21,9 @@ extern "C" {
 #include "main_task.h"
 #include "header.h"
     
-void callback_100ms( TimerHandle_t xTimer );
-void callback_4ms( TimerHandle_t xTimer );
+void callback_LED_ON( TimerHandle_t xTimer );
+void callback_LED_OFF( TimerHandle_t xTimer );
+void callback_LED_INPUT( TimerHandle_t xTimer );
 
 
 #ifdef	__cplusplus
