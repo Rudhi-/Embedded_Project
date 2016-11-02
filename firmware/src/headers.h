@@ -8,14 +8,16 @@
 #ifndef HEADERS_H
 #define	HEADERS_H
 
+#include "debug.h"
+#include "queue.h"
+#include "timers.h"
+#include "my_timers.h"
+
 #include "uartrx_public.h"
 #include "uarttx_public.h"
 #include "control_public.h"
-#include "sensor_public.h"
+#include "reflectance_public.h"
 #include "motors_public.h"
-
-#include "debug.h"
-#include "queue.h"
 
 #define PIC_ID 4 //set to your pic
 #define DBG_MSG       0x00

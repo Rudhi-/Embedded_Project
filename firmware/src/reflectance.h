@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
+#include "headers.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -88,7 +89,9 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	REFLECTANCE_STATE_INIT=0,
-	REFLECTANCE_STATE_SERVICE_TASKS,
+	REFLECTANCE_STATE_LED_ON,
+	REFLECTANCE_STATE_LED_OFF,
+	REFLECTANCE_STATE_LED_INPUT,
 
 	/* TODO: Define states used by the application state machine. */
 
@@ -108,10 +111,17 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
+bool start_LED_ON;
+bool start_LED_OFF;
+bool start_LED_INPUT;
+
+bool start;
+
 typedef struct
 {
     /* The application's current state */
     REFLECTANCE_STATES state;
+    uint8_t tx_data[8];
 
     /* TODO: Define any additional data used by the application. */
 

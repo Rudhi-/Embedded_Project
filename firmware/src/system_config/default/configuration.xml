@@ -279,6 +279,7 @@
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
         <Checksum>9DDBED97A2EC7C203259C27CF97B3E70</Checksum>
+        <ProjectFileChecksum>C5A342DEF299DF078855448769BD6A65</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>drv_usart_static_byte_model.c</Name>
@@ -373,7 +374,7 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>A4F200DEA498590AB85D8DFDDFF9B65E</Checksum>
+        <Checksum>07A092702149954B5E3EB864988A2C43</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>

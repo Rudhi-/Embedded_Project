@@ -8,8 +8,7 @@
 #ifndef CONTROL_PUBLIC_H
 #define	CONTROL_PUBLIC_H
 
-QueueHandle_t MessageQueueMotor;
-QueueHandle_t MessageQueueSensor;
+QueueHandle_t MessageQueueControl;
 
 #endif	/* CONTROL_PUBLIC_H */
 

@@ -121,6 +121,7 @@ void CONTROL_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+    MessageQueueControl = xQueueCreate(2, 8*sizeof(char));
 }
 
 
