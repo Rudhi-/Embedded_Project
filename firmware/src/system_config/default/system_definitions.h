@@ -69,7 +69,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrx.h"
 #include "uarttx.h"
 #include "motors.h"
-#include "sensor.h"
+#include "reflectance.h"
 #include "control.h"
 
 

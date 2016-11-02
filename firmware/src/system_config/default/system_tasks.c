@@ -57,7 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrx.h"
 #include "uarttx.h"
 #include "motors.h"
-#include "sensor.h"
+#include "reflectance.h"
 #include "control.h"
 
 
@@ -73,7 +73,7 @@ static void _SYS_Tasks ( void );
 static void _UARTRX_Tasks(void);
 static void _UARTTX_Tasks(void);
 static void _MOTORS_Tasks(void);
-static void _SENSOR_Tasks(void);
+static void _REFLECTANCE_Tasks(void);
 static void _CONTROL_Tasks(void);
 
 
@@ -113,9 +113,9 @@ void SYS_Tasks ( void )
                 "MOTORS Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for SENSOR Tasks. */
-    xTaskCreate((TaskFunction_t) _SENSOR_Tasks,
-                "SENSOR Tasks",
+    /* Create OS Thread for REFLECTANCE Tasks. */
+    xTaskCreate((TaskFunction_t) _REFLECTANCE_Tasks,
+                "REFLECTANCE Tasks",
                 1024, NULL, 1, NULL);
 
     /* Create OS Thread for CONTROL Tasks. */
@@ -206,17 +206,17 @@ static void _MOTORS_Tasks(void)
 
 /*******************************************************************************
   Function:
-    void _SENSOR_Tasks ( void )
+    void _REFLECTANCE_Tasks ( void )
 
   Summary:
-    Maintains state machine of SENSOR.
+    Maintains state machine of REFLECTANCE.
 */
 
-static void _SENSOR_Tasks(void)
+static void _REFLECTANCE_Tasks(void)
 {
     while(1)
     {
-        SENSOR_Tasks();
+        REFLECTANCE_Tasks();
     }
 }
 

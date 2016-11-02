@@ -198,7 +198,7 @@ void SYS_Initialize ( void* data )
     UARTRX_Initialize();
     UARTTX_Initialize();
     MOTORS_Initialize();
-    SENSOR_Initialize();
+    REFLECTANCE_Initialize();
     CONTROL_Initialize();
 }
 

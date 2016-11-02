@@ -293,7 +293,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>50BD4FA5636402973215EEA6F93030DB</Checksum>
+        <Checksum>32FE2FB244367397F1C3EFCA7E1A5421</Checksum>
         <ProjectFileChecksum>042D04AFEE0EB05A0113F54C3E8C2864</ProjectFileChecksum>
       </Template>
       <Template>
@@ -319,7 +319,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>9458A967C795F44F5A093E86B919CB5B</Checksum>
+        <Checksum>57F0653AF9A163B276138AEF32AEA7DF</Checksum>
       </Template>
       <Template>
         <Name>drv_oc_static.h</Name>
@@ -335,17 +335,13 @@
         <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>sensor.c</Name>
-        <Path>Source Files/app</Path>
-      </Template>
-      <Template>
         <Name>uarttx.h</Name>
         <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>9A9F3F9B1EFB7DE034FFD97C2BCFB61E</Checksum>
+        <Checksum>F751A52AF9514E8D838050A3673A6E21</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -353,18 +349,22 @@
         <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
       </Template>
       <Template>
+        <Name>reflectance.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
         <Name>drv_usart_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/usart</Path>
         <Checksum>AE37BD63B6EC9F6ADD6B8006CE192FCB</Checksum>
       </Template>
       <Template>
-        <Name>system_tasks.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>F8EAF2FEAAC66A9E44FD56DE7320DA9D</Checksum>
+        <Name>reflectance.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>sensor.h</Name>
-        <Path>Header Files/app</Path>
+        <Name>system_tasks.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>0BBC1D6719A614F8B19218F4C84F26E6</Checksum>
       </Template>
       <Template>
         <Name>control.h</Name>
@@ -406,11 +406,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/microchip/harmony/v1_08_01/apps/Embedded_Project/firmware/src/system_config/default/framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
+        <Include value="C:\microchip\harmony\v1_08_01\apps\Embedded_Project\firmware\src\system_config\default\framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>
