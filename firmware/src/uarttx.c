@@ -119,8 +119,7 @@ void UARTTX_Initialize ( void )
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     DRV_TMR0_Start();
     wait_on_ack = false;
-    //PLIB_TMR_Start(TMR_ID_2);
-    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+    tx_counter = 10;
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -143,6 +142,7 @@ void ReSendMessage()
 
 void TransmitTheMessage ()
 {
+    //PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
     if (uarttxData.tx_data[0] != 'm') 
     {
         PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
@@ -154,8 +154,7 @@ void TransmitTheMessage ()
         PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
         PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
     }
-    else
-        PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
+        
 }
 
 void UARTTX_Tasks ( void )
@@ -182,10 +181,23 @@ void UARTTX_Tasks ( void )
         {
             if (uxQueueMessagesWaiting(MessageQueueWout)) {
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
+                if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
+                {
+                    int i = 0;
+                    for (i = 4; i >= 0; i--)
+                    {
+                        uarttxData.tx_data[i + 1] = uarttxData.tx_data[i];
+                    }
+                    uarttxData.tx_data[0] = 0x00 | (PIC_ID << 3) | 0x00;
+                    //                      debug     SRC          DST
+                }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
                 if (uarttxData.tx_data[0] & 0x80)
                 {
-                    PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                    uarttxData.tx_data[6] = tx_counter;
+                    tx_counter = tx_counter + 1;
+                    if (tx_counter == 20)
+                        tx_counter = 0;
                     receiveState = WAIT_ON_ACK;
                     wait_on_ack = true;
                     uarttxData.state = UARTTX_STATE_WAIT;

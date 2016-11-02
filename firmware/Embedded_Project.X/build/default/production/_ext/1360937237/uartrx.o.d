@@ -311,16 +311,16 @@ build/default/production/_ext/1360937237/uartrx.o:  \
  ../../../../framework/driver/i2c/drv_i2c_mapping.h  \
 ../src/uartrx.h  \
  ../src/uarttx.h  \
+../src/uarttx_public.h  \
+../src/reflectance.h  \
+ ../src/main_task.h  \
 ../src/header.h  \
 ../src/uartrx_public.h  \
- ../src/uarttx_public.h  \
-../src/debug.h  \
-../src/main_task.h  \
 ../src/crc.h  \
+ ../src/debug.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
  ../src/my_timers.h  \
 ../src/reflectance_public.h  \
-../src/reflectance.h  \
- ../src/ultrasonic.h  \
-../src/main_task.h 
+../src/ultrasonic.h  \
+ ../src/main_task.h 

@@ -309,18 +309,18 @@ build/default/production/_ext/327000265/drv_usart_mapping.o:  \
  ../../../../framework/driver/i2c/drv_i2c_compatibility.h  \
  ../../../../framework/driver/i2c/drv_i2c_mapping.h  \
 ../src/uartrx.h  \
- ../src/uartrx_public.h  \
-../src/uarttx.h  \
-../src/uartrx.h  \
-../src/header.h  \
+ ../src/header.h  \
+../src/uartrx_public.h  \
+../src/crc.h  \
  ../src/uarttx_public.h  \
 ../src/debug.h  \
 ../src/main_task.h  \
-../src/crc.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
  ../src/my_timers.h  \
 ../src/reflectance_public.h  \
+../src/uarttx.h  \
+ ../src/uartrx.h  \
 ../src/reflectance.h  \
- ../src/ultrasonic.h  \
-../src/main_task.h 
+../src/ultrasonic.h  \
+ ../src/main_task.h 
