@@ -1,6 +1,7 @@
-build/default/production/_ext/327000265/drv_usart_mapping.o:  \
- ../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c  \
- ../src/system_config/default/system_config.h  \
+build/default/production/_ext/1360937237/my_timers.o:  \
+../src/my_timers.c  \
+ ../src/my_timers.h  \
+../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../framework/system/common/sys_common.h  \
  ../../../../framework/system/common/sys_module.h  \
@@ -320,7 +321,6 @@ build/default/production/_ext/327000265/drv_usart_mapping.o:  \
 ../src/crc.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
  ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
- ../src/my_timers.h  \
-../src/reflectance.h  \
+ ../src/reflectance.h  \
 ../src/ultrasonic.h  \
- ../src/main_task.h 
+../src/main_task.h 

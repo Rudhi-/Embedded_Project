@@ -156,6 +156,7 @@ void ULTRASONIC_Tasks ( void )
                 PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             }
             
+            /*
             uint8_t range_command = 0x51;
             
             ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x08, &range_command, sizeof(range_command), NULL);
@@ -166,7 +167,7 @@ void ULTRASONIC_Tasks ( void )
             
             ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x20, &range_command, sizeof(range_command), NULL);
             while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.txbufferhandle ));
-            
+            */
             DRV_I2C_Close(ultrasonicData.i2c_handle);
             
             DRV_TMR1_Start();
@@ -191,11 +192,12 @@ void ULTRASONIC_Tasks ( void )
                 {
                     PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 }
-                
+                /*
                 uint8_t range_command = 0x51;
                 uint8_t range_0[2];
                 uint8_t range_1[2];
                 uint8_t range_2[2];
+                
                 
                 ultrasonicData.rxbufferhandle = DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x08, range_0, 2, NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.rxbufferhandle ));
@@ -215,7 +217,8 @@ void ULTRASONIC_Tasks ( void )
 
                 ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x20, &range_command, sizeof(range_command), NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.txbufferhandle ));
- 
+                */
+                
                 //dbgOutputVal(range_0[1]);                
                 //dbgOutputVal(range_1[1]); 
                 //dbgOutputVal(range_2[1]);
@@ -225,9 +228,11 @@ void ULTRASONIC_Tasks ( void )
                 //if(range[0] != 0) range[1] = 254;
                 //dbgOutputVal(range[1]);
                 
+                /*
                 packet_tx_data[2] = range_0[1];
                 packet_tx_data[3] = range_1[1];
                 packet_tx_data[4] = range_2[1];
+                */
                 ultrasonic_finished = 1;
             }
             

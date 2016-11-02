@@ -318,6 +318,9 @@ build/default/production/_ext/639803181/sys_clk_static.o:  \
 ../src/debug.h  \
  ../src/main_task.h  \
 ../src/crc.h  \
+ ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
+ ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
+ ../src/my_timers.h  \
 ../src/reflectance.h  \
 ../src/ultrasonic.h  \
  ../src/main_task.h 

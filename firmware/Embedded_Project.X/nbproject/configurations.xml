@@ -40,6 +40,7 @@
         <itemPath>../src/uarttx.h</itemPath>
         <itemPath>../src/reflectance.h</itemPath>
         <itemPath>../src/header.h</itemPath>
+        <itemPath>../src/my_timers.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -191,6 +192,7 @@
         <itemPath>../src/reflectance.c</itemPath>
         <itemPath>../src/uarttx.c</itemPath>
         <itemPath>../src/uartrx.c</itemPath>
+        <itemPath>../src/my_timers.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -253,6 +255,7 @@
     <Elem>..\src</Elem>
     <Elem>..\src\default</Elem>
     <Elem>..\src\system_config\default</Elem>
+    <Elem>../../../../third_party/rtos/FreeRTOS/Source</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

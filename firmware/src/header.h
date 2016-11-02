@@ -18,6 +18,9 @@
 
 #include "crc.h"
 
+#include "timers.h"
+#include "my_timers.h"
+
 #define PIC_ID 2 //set to your pic
 
 #endif	/* HEADERS_H */

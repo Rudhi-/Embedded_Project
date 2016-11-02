@@ -318,6 +318,9 @@ build/default/production/_ext/1360937237/debug.o:  \
  ../src/uarttx_public.h  \
 ../src/main_task_public.h  \
 ../src/crc.h  \
- ../src/reflectance.h  \
+ ../../../../third_party/rtos/FreeRTOS/Source/include/timers.h  \
+ ../../../../third_party/rtos/FreeRTOS/Source/include/task.h  \
+ ../src/my_timers.h  \
+../src/reflectance.h  \
 ../src/ultrasonic.h  \
-../src/main_task.h 
+ ../src/main_task.h 
