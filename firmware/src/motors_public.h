@@ -44,11 +44,15 @@ void move_stop();
 void spin_right();
 void spin_left();
 
+MOVE_STATE getMoveState();
+
 // Leader Rover
 void turn_right();
 void turn_left();
 void move_forward();
 void move_backward();
+int get_distance(SIDE side);
+
 
 #endif	/* MOTORS_PUBLIC_H */
 

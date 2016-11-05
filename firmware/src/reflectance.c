@@ -194,8 +194,6 @@ void REFLECTANCE_Tasks ( void )
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_14, 1);
                 PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_15, 1);
                 
-                //DRV_TMR2_CounterClear();
-                //DRV_TMR2_Start();
                 xTimerReset(timer_LED_OFF, 0);
                 reflectanceData.state = REFLECTANCE_STATE_LED_OFF;
             }
@@ -251,8 +249,6 @@ void REFLECTANCE_Tasks ( void )
                      *  */
 
                     // wait a little less for this one
-
-                    //DRV_TMR3_Stop();
                     xTimerStop(timer_LED_INPUT, 0);
 
 

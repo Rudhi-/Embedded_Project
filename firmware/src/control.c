@@ -133,7 +133,6 @@ void CONTROL_Initialize ( void )
     See prototype in control.h.
  */
 
-//uint8_t temp[8];
 
 void CONTROL_Tasks ( void )
 {
@@ -157,18 +156,20 @@ void CONTROL_Tasks ( void )
 
         case CONTROL_STATE_SERVICE_TASKS:
         {
-//            int i, j;
-//            for (i = 0; i < 500000000; i++) {
-//                j = i;
-//                i = j;
-//            }
-//            temp[0] = 0xA0 | (0x02 << 4) | 0x00 | 0x01;
-//            temp[1] = 40;
-//            temp[2] = 40;
-//            temp[3] = -128;
-//            temp[4] = -128;
-//            
-//            xQueueSend(MessageQueueM, temp, pdFAIL);
+            if (getMoveState() == WAIT) {
+                startReflectance();
+                if (uxQueueMessagesWaiting(MessageQueueControl)) {
+                    //PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
+                    xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
+                    if (controlData.rx_data[1]) {
+                        move_start();
+                    } else {
+                        move_stop();
+                    }
+                }
+            } else {
+                //do nothing
+            }
             break;
         }
 

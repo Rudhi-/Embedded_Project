@@ -273,6 +273,20 @@ void move_backward() {
     move_start();
 }
 
+int get_distance(SIDE side) {
+    switch (side) {
+        case LEFT:
+            return leftEncoder * motorsData.leftEncoder_Conv;
+        case RIGHT:
+            return rightEncoder * motorsData.rightEncoder_Conv;
+        default:
+            return 0;
+    }
+}
+
+MOVE_STATE getMoveState() {
+    return motorsData.moveState;
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -325,7 +339,7 @@ void MOTORS_Tasks ( void )
             
                 motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
-            motorsData.moveState = INIT;
+            motorsData.moveState = WAIT;
             break;
         }
 
@@ -414,7 +428,7 @@ void MOTORS_Tasks ( void )
                             } else {
                                 break;
                             }
-                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4) | (MOTOR_THREAD_ID << 2) | 0x00 ;
+                            motorsData.motor_msg[0] = INT_MSG | (0x01 << 4) | (MOTOR_THREAD_ID << 2) | 0x00 ;
                             //info                   int         get           SRC                   DST
                             xQueueSend(MessageQueueWout, motorsData.motor_msg, pdFAIL);
                         }
