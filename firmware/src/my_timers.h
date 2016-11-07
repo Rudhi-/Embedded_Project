@@ -24,6 +24,8 @@ void callback_LED_ON( TimerHandle_t xTimer );
 void callback_LED_OFF( TimerHandle_t xTimer );
 void callback_LED_INPUT( TimerHandle_t xTimer );
 
+bool data_ready;
+
 
 #ifdef	__cplusplus
 }

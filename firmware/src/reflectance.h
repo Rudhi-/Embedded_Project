@@ -88,11 +88,9 @@ extern "C" {
 typedef enum
 {
 	/* Application's state machine's initial state. */
-	REFLECTANCE_STATE_INIT=0,
-	REFLECTANCE_STATE_LED_ON,
-	REFLECTANCE_STATE_LED_OFF,
-	REFLECTANCE_STATE_LED_INPUT,
-
+    REFLECTANCE_STATE_INIT=0,
+    REFLECTANCE_STATE_OFF,
+    REFLECTANCE_STATE_ON,
 	/* TODO: Define states used by the application state machine. */
 
 } REFLECTANCE_STATES;
@@ -114,6 +112,8 @@ typedef enum
 bool start_LED_ON;
 bool start_LED_OFF;
 bool start_LED_INPUT;
+
+uint8_t reflectance_output;
 
 bool start;
 

@@ -159,9 +159,9 @@ void CONTROL_Tasks ( void )
             if (getMoveState() == WAIT) {
                 startReflectance();
                 if (uxQueueMessagesWaiting(MessageQueueControl)) {
-                    //PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
+                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
-                    if (controlData.rx_data[1]) {
+                    if (!controlData.rx_data[0]) {
                         move_start();
                     } else {
                         move_stop();
