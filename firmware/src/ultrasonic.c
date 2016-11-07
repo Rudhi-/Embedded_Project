@@ -170,8 +170,6 @@ void ULTRASONIC_Tasks ( void )
             */
             DRV_I2C_Close(ultrasonicData.i2c_handle);
             
-            DRV_TMR1_Start();
-            
             break;
         }
 
