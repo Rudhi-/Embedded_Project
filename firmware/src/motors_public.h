@@ -11,6 +11,7 @@
 typedef enum
 {     
     NEGATIVE=-1, //unused value to ensure enum is signed
+    CRAWL=300,
     WALK=400,
     JOG=600,
     RUN=800,

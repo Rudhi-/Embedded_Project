@@ -165,6 +165,7 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_RUN:
         {
+#ifdef DEBUGGING
             if (uxQueueMessagesWaiting(MessageQueueControl)) {
                     PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
@@ -173,15 +174,16 @@ void CONTROL_Tasks ( void )
                             set_speed(JOG, JOG);
                         } 
                         if (controlData.rx_data[0] & 0x03) {
-                            set_speed(WALK, SPRINT);
-                        } else if (controlData.rx_data[0] & 0xc0) {
                             set_speed(SPRINT, WALK);
+                        } else if (controlData.rx_data[0] & 0xc0) {
+                            set_speed(WALK, SPRINT);
                         }
                         move_start();
                     } else {
                         move_stop();
                     }
                 }
+#endif
             break;
         }
 
