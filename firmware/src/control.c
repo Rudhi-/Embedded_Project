@@ -149,27 +149,39 @@ void CONTROL_Tasks ( void )
             if (appInitialized)
             {
             
-                controlData.state = CONTROL_STATE_SERVICE_TASKS;
+                controlData.state = CONTROL_WAIT;
             }
             break;
         }
 
-        case CONTROL_STATE_SERVICE_TASKS:
+        case CONTROL_WAIT:
         {
             if (getMoveState() == WAIT) {
                 startReflectance();
-                if (uxQueueMessagesWaiting(MessageQueueControl)) {
+                controlData.state = CONTROL_RUN;
+            }
+            break;
+        }
+        
+        case CONTROL_RUN:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueControl)) {
                     PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
-                    if (!controlData.rx_data[0]) {
+                    if (controlData.rx_data[0] && (controlData.rx_data[0] != 0xFF)) {
+                        if (controlData.rx_data[0] & 0x3c) {
+                            set_speed(JOG, JOG);
+                        } 
+                        if (controlData.rx_data[0] & 0x03) {
+                            set_speed(WALK, SPRINT);
+                        } else if (controlData.rx_data[0] & 0xc0) {
+                            set_speed(SPRINT, WALK);
+                        }
                         move_start();
                     } else {
                         move_stop();
                     }
                 }
-            } else {
-                //do nothing
-            }
             break;
         }
 

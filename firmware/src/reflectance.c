@@ -126,9 +126,9 @@ void REFLECTANCE_Initialize ( void )
     timer_LED_ON = xTimerCreate("timer_LED_ON", pdMS_TO_TICKS( 100 ), pdTRUE, ( void * ) 0, callback_LED_ON);
     xTimerStart(timer_LED_ON, 0);
 
-    timer_LED_OFF = xTimerCreate("timer_LED_OFF", pdMS_TO_TICKS( 4 ), pdTRUE, ( void * ) 0, callback_LED_OFF);
+    timer_LED_OFF = xTimerCreate("timer_LED_OFF", pdMS_TO_TICKS( 1 ), pdTRUE, ( void * ) 0, callback_LED_OFF);
 
-    timer_LED_INPUT = xTimerCreate("timer_LED_INPUT", pdMS_TO_TICKS( 4 ), pdTRUE, ( void * ) 0, callback_LED_INPUT);
+    timer_LED_INPUT = xTimerCreate("timer_LED_INPUT", pdMS_TO_TICKS( 1 ), pdTRUE, ( void * ) 0, callback_LED_INPUT);
     
     /* init stuff, configure devices*/
 }

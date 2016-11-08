@@ -89,7 +89,8 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	CONTROL_STATE_INIT=0,
-	CONTROL_STATE_SERVICE_TASKS,
+    CONTROL_WAIT,
+    CONTROL_RUN
 
 	/* TODO: Define states used by the application state machine. */
 

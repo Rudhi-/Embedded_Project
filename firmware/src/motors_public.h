@@ -39,6 +39,8 @@ QueueHandle_t MessageQueueM;
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed);
 void set_dist(int leftDist, int rightDist);
 MOTOR_SPEEDS get_speed(SIDE side);
+void inc_speed(SIDE side);
+void dec_speed(SIDE side);
 void move_start();
 void move_stop();
 void spin_right();
