@@ -116,6 +116,7 @@ void UARTTX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
+    uarttxData.reset_msg[0] = 'm';
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     DRV_TMR0_Start();
     wait_on_ack = false;
@@ -126,6 +127,19 @@ void UARTTX_Initialize ( void )
      */
 }
 
+void SendMessage(uint8_t first, uint8_t second)
+{
+    uarttxData.debug_data[0] = 0x8;
+    uarttxData.debug_data[1] = first;
+    uarttxData.debug_data[2] = second;
+    uarttxData.debug_data[3] = 0x0;
+    uarttxData.debug_data[4] = 0x0;
+    uarttxData.debug_data[5] = 0x0;
+    uarttxData.debug_data[6] = 0x0;
+    uarttxData.debug_data[7] = 0x0;
+    xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
+    
+}
 
 /******************************************************************************
   Function:
@@ -180,7 +194,18 @@ void UARTTX_Tasks ( void )
         case UARTTX_STATE_SERVICE_TASKS:
         {
             if (uxQueueMessagesWaiting(MessageQueueWout)) {
+                
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
+                if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
+                {
+                    int i = 0;
+                    for (i = 4; i >= 0; i--)
+                    {
+                        uarttxData.tx_data[i + 1] = uarttxData.tx_data[i];
+                    }
+                    uarttxData.tx_data[0] = 0x00 | (PIC_ID << 3) | 0x00;
+                    //                      debug     SRC          DST
+                }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
                 if (uarttxData.tx_data[0] & 0x80)
                 {
@@ -192,6 +217,7 @@ void UARTTX_Tasks ( void )
                     wait_on_ack = true;
                     uarttxData.state = UARTTX_STATE_WAIT;
                 }
+                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
                 
                 

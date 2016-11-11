@@ -11,6 +11,7 @@
 QueueHandle_t MessageQueueWout;
 bool wait_on_ack;
 
+void SendMessage(uint8_t first, uint8_t second);
 void ReSendMessage();
 void TransmitTheMessage();
 
