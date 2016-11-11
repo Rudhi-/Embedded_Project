@@ -11,6 +11,7 @@
 typedef enum
 {     
     NEGATIVE=-1, //unused value to ensure enum is signed
+    CRAWL=250,
     WALK=400,
     JOG=600,
     RUN=800,
@@ -39,15 +40,21 @@ QueueHandle_t MessageQueueM;
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed);
 void set_dist(int leftDist, int rightDist);
 MOTOR_SPEEDS get_speed(SIDE side);
+void inc_speed(SIDE side);
+void dec_speed(SIDE side);
 void move_start();
 void move_stop();
 void spin_right();
 void spin_left();
+
+MOVE_STATE getMoveState();
 
 // Leader Rover
 void turn_right();
 void turn_left();
 void move_forward();
 void move_backward();
+int get_distance(SIDE side);
+
 
 #endif	/* MOTORS_PUBLIC_H */

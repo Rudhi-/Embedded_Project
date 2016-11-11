@@ -92,6 +92,9 @@ typedef enum
 	CONTROL_STATE_RECEIVE_MESSAGE,
             CONTROL_STATE_SEND_ACK,
             CONTROL_STATE_WORK_ON_DATA,
+            CONTROL_STATE_GET_CURRENT_DEGREES,
+            CONTROL_STATE_TURN,
+            CONTROL_STATE_MOVE_FORWARD,
             CONTROL_STATE_TRANSMIT_DATA,
             CONTROL_STATE_WAIT_ACK
 
@@ -117,9 +120,16 @@ typedef struct
 {
     /* The application's current state */
     CONTROL_STATES state;
-    uint8_t rx_data [8];
+    int8_t rx_data [8];
     uint8_t tx_data [8];
+    uint8_t debug_data [8];
     uint8_t dx_data [4];
+    int curr_degrees;
+    int new_degrees;
+    int first;
+    int second;
+    int8_t rotation_amount;
+    int8_t distance_amount;
 
     /* TODO: Define any additional data used by the application. */
 

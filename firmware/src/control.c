@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "control.h"
+#include "header.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -133,6 +134,7 @@ void CONTROL_Initialize ( void )
     See prototype in control.h.
  */
 
+
 void CONTROL_Tasks ( void )
 {
 
@@ -152,57 +154,180 @@ void CONTROL_Tasks ( void )
             }
             break;
         }
-
+        /*State used to wait till a valid message has been received from the controller*/
         case CONTROL_STATE_RECEIVE_MESSAGE:
         {
-        // Wait till the message has been received before moving to the 
-            // Next state
+            // Wait till the message has been received before moving to the 
             if (uxQueueMessagesWaiting(MessageQueueWin))
             {
-                
-                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
-                //GetMagnetometerData();
-                move_forward(100, 100);
+                
+                // Reset the transmit bits that will be used to send data
+                controlData.tx_data[1] = 0;
+                controlData.tx_data[2] = 0;
+                
+                // Check to see if the angle needs to be altered
+                if (controlData.rx_data[1] != 0)
+                {
+                    //turn_left();
+                    xQueueReset(MessageQueueDin);                           // Clear the magnetometer register
+                    GetMagnetometerAq();                                  // Send a message to get initial angle
+                    controlData.state = CONTROL_STATE_GET_CURRENT_DEGREES;  // Go to the wait on degree state
+                }
+                // If it deosnt have to be altered then just go to the move state
+                else
+                {
+                    move_forward(controlData.rx_data[2], controlData.rx_data[2]);   // Set the distance that needs to be moved
+                    controlData.state = CONTROL_STATE_MOVE_FORWARD;                 // Go to the move forward state
+                }
+            }
+            break;
+        }
+        /*State used to get the current*/
+        case CONTROL_STATE_GET_CURRENT_DEGREES:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueDin)) 
+            {
+                xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
+                controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
+                controlData.new_degrees = controlData.curr_degrees + controlData.rx_data[1];
+                controlData.first = controlData.curr_degrees;
+                
+                SendMessage(controlData.first/2,0);
+                dbgOutputVal(controlData.curr_degrees/2);
+                if (controlData.rx_data[1] < 0)
+                {
+                    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                    turn_right();
+                }
+                else
+                {
+                    turn_left();
+                }
+                controlData.state = CONTROL_STATE_TURN;
+            }
+            break;
+        }
+        
+        case CONTROL_STATE_TURN:
+        {
+            if ( controlData.rx_data[1] < 0)
+            {
+                if (controlData.new_degrees < 0)
+                {
+                    controlData.new_degrees = 360 + controlData.new_degrees;
+                    while (!(controlData.curr_degrees < controlData.new_degrees) || !(controlData.curr_degrees > controlData.new_degrees - 20))
+                    {
+                        GetMagnetometerData();
+                        while (!uxQueueMessagesWaiting(MessageQueueDin));
+                        xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
+                        controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
+                        SendMessage(controlData.curr_degrees/2,1);
+                        dbgOutputVal(controlData.curr_degrees/2);
+                    }
+                    controlData.tx_data[1] = controlData.first - (360 - controlData.curr_degrees);
+                    SendMessage(controlData.curr_degrees/2,1);
+                }
+                else
+                {
+                    while (controlData.curr_degrees > controlData.new_degrees)
+                    {
+                        GetMagnetometerData();
+                        while (!uxQueueMessagesWaiting(MessageQueueDin));
+                        xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
+                        controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
+                        SendMessage(controlData.curr_degrees/2,1);
+                        dbgOutputVal(controlData.curr_degrees/2);
+                    }
+                    controlData.tx_data[1] = controlData.curr_degrees - controlData.first;
+                    SendMessage(controlData.curr_degrees/2,1);
+                }
+                StopGettingMagData();
+                move_stop();
+            }
+            else
+            {
+                if ( controlData.new_degrees > 360)
+                {
+                    
+                    controlData.new_degrees = controlData.new_degrees - 360;
+                    //dbgOutputVal(controlData.new_degrees/2);
+                    while (!(controlData.curr_degrees >= controlData.new_degrees) || !(controlData.curr_degrees <= controlData.new_degrees + 20))
+                    {
+                        
+                        GetMagnetometerData();
+                        while (!uxQueueMessagesWaiting(MessageQueueDin));
+                        xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
+                        controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
+                        SendMessage(controlData.curr_degrees/2,1);
+                        dbgOutputVal(controlData.curr_degrees/2);
+                    }
+                    controlData.tx_data[1] = (360 - controlData.first) + controlData.curr_degrees;
+                    SendMessage(controlData.curr_degrees/2,1);
+                }
+                else
+                {
+                    while (controlData.curr_degrees < controlData.new_degrees)
+                    {  
+                        GetMagnetometerData();
+                        while (!uxQueueMessagesWaiting(MessageQueueDin));
+                        xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
+                        controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
+                        SendMessage(controlData.curr_degrees/2,1);
+                        dbgOutputVal(controlData.curr_degrees/2);
+                    }
+                    controlData.tx_data[1] = controlData.curr_degrees - controlData.first;
+                    SendMessage(controlData.curr_degrees/2,1);
+                }
+                StopGettingMagData();
+                move_stop();
+                
+                //dbgOutputVal(controlData.tx_data[1]);
+            }
+            if (controlData.rx_data[2] != 0)
+            {
+                move_forward(controlData.rx_data[2], controlData.rx_data[2]);
+                controlData.state = CONTROL_STATE_MOVE_FORWARD;
+            }
+            else
+                controlData.state = CONTROL_STATE_WORK_ON_DATA;
+            break;
+        }
+        
+        case CONTROL_STATE_MOVE_FORWARD:
+        {
+            
+            if (getMoveState() == WAIT)
+            {
+                controlData.tx_data[2] = get_distance(LEFT);
                 controlData.state = CONTROL_STATE_WORK_ON_DATA;
             }
             break;
         }
         
-        /* TODO: implement your application state machine.*/
         case CONTROL_STATE_WORK_ON_DATA:
         {
             
-            
-            if (uxQueueMessagesWaiting(MessageQueueDin)) 
-            {
-                xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
-                controlData.tx_data[0] = 0x8b;
-                controlData.tx_data[1] = controlData.dx_data[0];
-                controlData.tx_data[2] = controlData.dx_data[1];
-                controlData.tx_data[3] = 0xaa;
-                controlData.tx_data[4] = 0xaa;
-                controlData.tx_data[5] = 0xaa;
-                controlData.tx_data[6] = 0xaa;
-                controlData.tx_data[7] = 0xaa;
-                controlData.state = CONTROL_STATE_TRANSMIT_DATA;
-            }
+            controlData.tx_data[0] = 0x8b;
+            controlData.tx_data[3] = 0xaa;
+            controlData.tx_data[4] = 0xaa;
+            controlData.tx_data[5] = 0xaa;
+            controlData.tx_data[6] = 0xaa;
+            controlData.tx_data[7] = 0xaa;
+            controlData.state = CONTROL_STATE_TRANSMIT_DATA;
             break;
         }
         
         case CONTROL_STATE_TRANSMIT_DATA:
         {
-            //wait_on_ack = true;
             xQueueSend( MessageQueueWout, controlData.tx_data, pdFAIL );
-            //StoreMessage(controlData.tx_data);
             controlData.state = CONTROL_STATE_WAIT_ACK;
             break;
         }
         
         case CONTROL_STATE_WAIT_ACK:
         {
-            dbgOutputVal(IN_TASK_THREE);
             if (!wait_on_ack)
             {
                 

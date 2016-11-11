@@ -117,7 +117,7 @@ void init_motors() {
     
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
-    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 8;
+    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 6;
     set_dist(60,60); 
     
     set_speed(WALK,WALK);
@@ -164,6 +164,7 @@ void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed) {
     motorsData.rightSpeed = rightSpeed;
 }
 
+
 //get the current speed of one of the motors
 MOTOR_SPEEDS get_speed(SIDE side) {
     switch (side) {
@@ -202,7 +203,7 @@ void turn_left() {
     rightEncoder = leftEncoder = 0;
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK + motorsData.rightSpeed_Offset); 
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, CRAWL + motorsData.rightSpeed_Offset); 
     
     //stop left motor
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
@@ -210,7 +211,7 @@ void turn_left() {
 
 //spin the rover clockwise
 void spin_left() {
-    set_dist(22,22);
+    set_dist(35,35);
     rightEncoder = leftEncoder = 0;
     //right motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
@@ -230,12 +231,12 @@ void turn_right() {
     
     //left motor
     PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK + motorsData.leftSpeed_Offset);  
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, CRAWL + motorsData.leftSpeed_Offset);  
 }
 
 //spin the rover counterclockwise
 void spin_right() {
-    set_dist(22,22);
+    set_dist(35,35);
     rightEncoder = leftEncoder = 0;
     //right motor
     PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
@@ -273,7 +274,27 @@ void move_backward() {
     move_start();
 }
 
+bool forward_movement_done() {
+    if (motorsData.moveState == WAIT)
+        return true;
+    else
+        return false;
+}
 
+int get_distance(SIDE side) {
+    switch (side) {
+        case LEFT:
+            return leftEncoder * motorsData.leftEncoder_Conv;
+        case RIGHT:
+            return rightEncoder * motorsData.rightEncoder_Conv;
+        default:
+            return 0;
+    }
+}
+
+MOVE_STATE getMoveState() {
+    return motorsData.moveState;
+}
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
@@ -300,6 +321,7 @@ void MOTORS_Initialize ( void )
      */
 }
 
+int x = 0;
 
 /******************************************************************************
   Function:
@@ -335,9 +357,9 @@ void MOTORS_Tasks ( void )
                 case INIT:
                     move_stop();
                     set_speed(RUN, RUN);
-                    set_dist(50,50);
+                    set_dist(30,30);
                     move_start();
-                    motorsData.moveState = TEST;
+                    motorsData.moveState = WAIT;
                     motorsData.testState = MOVE1;
                 case TEST:
                     switch (motorsData.testState) {
@@ -352,7 +374,7 @@ void MOTORS_Tasks ( void )
                             if (rightEncoder > motorsData.rightDist) {
                                 move_stop();
                                 set_speed(RUN, RUN);
-                                set_dist(50,50);
+                                set_dist(30,30);
                                 move_start();
                                 motorsData.testState = MOVE2;
                             }
@@ -374,6 +396,11 @@ void MOTORS_Tasks ( void )
                     }
                     break;                    
                 case WAIT:
+                    if (x==0)
+                    {
+                        move_stop();
+                        x = 1;
+                    }
                     if (uxQueueMessagesWaiting(MessageQueueM)) {
                         move_stop();
                         int temp[4], i; //temps for set and get values, iterator
@@ -400,7 +427,7 @@ void MOTORS_Tasks ( void )
                             set_speed(RUN, RUN);
                             move_start();
                             
-                        } else if (motorsData.motor_msg[0] & 0x10) {    //else if get command
+                        } else {    //else if get command
                             if (motorsData.motor_msg[1] & 0x01) { //check if getting encoders
                                 motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv >> 8);
                                 motorsData.motor_msg[2] = (char)(motorsData.leftEncoder_Conv);
