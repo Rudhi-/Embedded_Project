@@ -139,56 +139,62 @@ void UARTRX_Initialize ( void )
 void SendToTheQueue()
 {
     uartrxData.rx_data[0] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-    if (uartrxData.rx_data[0] != 'm')
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[1] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[2] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[3] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[4] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[5] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[6] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
+    uartrxData.rx_data[7] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
+    
+    if ((uartrxData.rx_data[0] & 0x07) == PIC_ID)
     {
-        
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[1] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[2] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[3] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[4] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[5] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[6] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        while (!PLIB_USART_ReceiverDataIsAvailable(USART_ID_1)){};
-        uartrxData.rx_data[7] = PLIB_USART_ReceiverByteReceive(USART_ID_1);
-        
-        if ((uartrxData.rx_data[0] & 0x07) == PIC_ID)
-        {
-            switch (receiveState) {
-                case WAIT_ON_MESSAGE:
-                    if (crcMatches(uartrxData.rx_data, 7) && (uartrxData.rx_data[0] & 0x80) && (uartrxData.rx_data[6] != rx_counter)) {
-                        rx_counter = uartrxData.rx_data[6];
-                        //send ack
-                        uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
-                        int i;
-                        for (i =1; i < 7; i++) {
-                            uartrxData.tx_data[i] = 0x00;
+        switch (receiveState) {
+            case WAIT_ON_MESSAGE:
+                if (crcMatches(uartrxData.rx_data, 7) && (uartrxData.rx_data[0] & 0x80) && (uartrxData.rx_data[6] != rx_counter)) {
+                    rx_counter = uartrxData.rx_data[6];
+                    //send ack
+                    uartrxData.tx_data[0] = (0x40 | (PIC_ID << 3) | ((uartrxData.rx_data[0] & 0x38) >> 3));
+                    int i;
+                    for (i =1; i < 7; i++) {
+                        uartrxData.tx_data[i] = 0x00;
+                    }
+                    xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
+                    //pass data in
+                    xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                }
+                else if (crcMatches(uartrxData.rx_data, 7) && ((uartrxData.rx_data[0] & 0xC0) == 0x00) && (uartrxData.rx_data[6] != rx_counter))
+                {
+#ifdef MOTOR_THREAD_ID
+                    if ((uartrxData.rx_data[1] & 0x03) == MOTOR_THREAD_ID)
+                    {
+                        int i = 0;
+                        for (i = 0; i < 5; i++)
+                        {
+                            uartrxData.rx_data[i] = uartrxData.rx_data[i + 1];
                         }
-                        xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
-                        //pass data in
-                        xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                        xQueueSendFromISR(MessageQueueM, uartrxData.rx_data, pdFAIL);
                     }
+#endif
+                }
+                break;
+            case WAIT_ON_ACK:
+                if ((uartrxData.rx_data[0] & 0x80)) {
                     break;
-                case WAIT_ON_ACK:
-                    if ((uartrxData.rx_data[0] & 0x80)) {
-                        break;
-                    }
-                    // xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
-                    wait_on_ack = false;
-                    receiveState = WAIT_ON_MESSAGE;
-                    break;
-            }
+                }
+                // xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                wait_on_ack = false;
+                receiveState = WAIT_ON_MESSAGE;
+                break;
         }
                 
-    }
-    else
-    {
-        xQueueSendFromISR( MessageQueueWout, uartrxData.rx_data, pdFAIL );
     }
 }
 
@@ -211,7 +217,6 @@ void UARTRX_Tasks ( void )
 
         case UARTRX_STATE_SERVICE_TASKS:
         {
-            
             break;
         }
 

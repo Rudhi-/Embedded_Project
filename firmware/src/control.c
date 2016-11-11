@@ -157,8 +157,10 @@ void CONTROL_Tasks ( void )
         case CONTROL_WAIT:
         {
             if (getMoveState() == WAIT) {
+#ifdef DEBUGGING
                 startReflectance();
                 controlData.state = CONTROL_RUN;
+#endif
             }
             break;
         }
@@ -166,8 +168,9 @@ void CONTROL_Tasks ( void )
         case CONTROL_RUN:
         {
 #ifdef DEBUGGING
-            if (uxQueueMessagesWaiting(MessageQueueControl)) {
-                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);   
+            if (uxQueueMessagesWaiting(MessageQueueControl)) {   
+                
+                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
                     if (controlData.rx_data[0] && (controlData.rx_data[0] != 0xFF)) {
                         if (controlData.rx_data[0] & 0x3c) {
