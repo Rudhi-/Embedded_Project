@@ -116,10 +116,13 @@ typedef enum
 typedef struct
 {
     /* The application's current state */
-    BRAINS_STATES state;
-    uint8_t rx_data [8];
-    uint8_t tx_data [8];
-    
+    BRAINS_STATES state; // the state of the brains task 
+    uint8_t rx_data [8]; // receive buffer 
+    uint8_t tx_data [8]; // transmit buffer 
+    ALGORITHM_DATA algData; // struct containing algorithm's internal data 
+    BRAINS_STATES prevBrainState; // the previous brain state, used when jumping between states 
+    ALGORITHM_STATES algStateSentFrom; // algorithm state that a transmit is being sent from or a receive being received in
+    int notifyPicNum; // number representing which pic should be notified next about end condition
 } BRAINS_DATA;
 
 

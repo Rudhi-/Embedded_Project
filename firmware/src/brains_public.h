@@ -33,34 +33,32 @@ void algoInit();
 // gets how far the rover has traveled since its last local origin point 
 float getCurrentTravelDistance();
 // set new local origin by messaging the motors that they should remeasure the distance traveled so far from the current point
-void setLocalOrigin();
+    //void setLocalOrigin();
 
 
 // States for ALgorithm State machine 
 typedef enum {
 	FINDING_PATH = 0,
-	ROTATING,
-	TRAVELING_PATH,
+	ROTATE_AND_MOVE,
 	OBSTACLE_ENCOUNTERED,
 	FOUND_LINE,
 	FOUND_ENDPOINT,
-	OBSTACLE_ENCOUNTERED_ROTATE,
-	OBSTACLE_ENCOUNTERED_MOVE
+	OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE
 } ALGORITHM_STATES;
 
 
 // Struct containing all of the algorithm's data 
 typedef struct {
 	// typically will be distToGo - <THE DISTANCE THE ROVER HAS TRAVELED SO FAR>
-	float legA; 
+	int legA; 
 	// typically will be the distance the rover traveled after moving around an obstacle  
-	float legB;
+	int legB;
 	// Typically the angle between legA and legB
-	float angC;
+	int angC;
 	// distance rover is supposed to go to reach endpoint assuming no obstacles in way
-	float distToGo;
+	int distToGo;
 	// Angle rover should be at in order to be able to go straight and reach the endpoint
-	float angToTurn;
+	int angToTurn;
 	// number of object the rover has collided with so far
 	float numObjsCollide;
 	// should rotate by turning right (true) or rotate by turning left (false) 
