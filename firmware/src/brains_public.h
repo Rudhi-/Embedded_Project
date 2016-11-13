@@ -18,8 +18,8 @@ extern "C" {
     
 // Definitions of Values used in code 
 #define MIN_ROTATION_INCREMENT 30 // the angle increment that the rover can rotate by
-#define OBSACLE_AVOIDANCE_DISTANCE 25 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
-
+#define OBSACLE_AVOIDANCE_DISTANCE 5 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
+#define ROTATION_AMOUNT 30
 
 
 // Main algorithm function what will be called in the lead rover's loop
@@ -27,11 +27,11 @@ void algorithm();
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler(); 
 // calculation function to get a third leg (leg C) when doing law of cosines 
-float getLegC();
+int getLegC();
 // algorithm initializer function 
 void algoInit();
 // gets how far the rover has traveled since its last local origin point 
-float getCurrentTravelDistance();
+int getCurrentTravelDistance();
 // set new local origin by messaging the motors that they should remeasure the distance traveled so far from the current point
     //void setLocalOrigin();
 
@@ -60,12 +60,14 @@ typedef struct {
 	// Angle rover should be at in order to be able to go straight and reach the endpoint
 	int angToTurn;
 	// number of object the rover has collided with so far
-	float numObjsCollide;
+	int numObjsCollide;
 	// should rotate by turning right (true) or rotate by turning left (false) 
-	float turnRight;
+	bool turnRight;
 	// current angular rotation of rover
-	float currRotAng;
-
+	int currRotAng;
+    // current distance traveled
+    int currDistTrav;
+    
 	int side;
 	ALGORITHM_STATES states;
 	
