@@ -159,7 +159,7 @@ void MAIN_TASK_Tasks ( void )
             ultrasonic_finished = 0;
             reflectance_finished = 0;
             
-            packet_tx_data[0] = 0x93;
+            packet_tx_data[0] = 0x13;
         
             if (appInitialized)
             {
@@ -192,16 +192,19 @@ void MAIN_TASK_Tasks ( void )
                 }
                 */
                 
-                if(!wait_on_ack){
-                    //xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                //if(!wait_on_ack){
+                if(1){
+                    xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
                 }
                 PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 //PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_0);
             }
+            /*
             if (uxQueueMessagesWaiting(MessageQueueWout)) 
             {
                 xQueueReceive(MessageQueueWin, main_taskData.rx_data, portMAX_DELAY);
             }
+            */
             break;
         }
 

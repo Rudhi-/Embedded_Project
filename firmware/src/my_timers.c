@@ -72,7 +72,7 @@ void callback_LED_INPUT( TimerHandle_t xTimer ){
          (PORTBbits.RB9 << 1) +
          (PORTBbits.RB8));
 
-    reflectance_output = reflectance_output ^ 0xFF;
+    //reflectance_output = reflectance_output ^ 0xFF;
     packet_tx_data[1] = reflectance_output;
 
     reflectance_finished = 1;
