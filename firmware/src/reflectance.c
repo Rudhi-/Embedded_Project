@@ -126,7 +126,7 @@ void REFLECTANCE_Initialize ( void )
     timer_LED_ON = xTimerCreate("timer_LED_ON", pdMS_TO_TICKS( 100 ), pdTRUE, ( void * ) 0, callback_LED_ON);
     xTimerStart(timer_LED_ON, 0);
 
-    timer_LED_OFF = xTimerCreate("timer_LED_OFF", pdMS_TO_TICKS( 1 ), pdTRUE, ( void * ) 0, callback_LED_OFF);
+    timer_LED_OFF = xTimerCreate("timer_LED_OFF", pdMS_TO_TICKS( 2 ), pdTRUE, ( void * ) 0, callback_LED_OFF);
 
     timer_LED_INPUT = xTimerCreate("timer_LED_INPUT", pdMS_TO_TICKS( 1 ), pdTRUE, ( void * ) 0, callback_LED_INPUT);
     
@@ -177,10 +177,12 @@ void REFLECTANCE_Tasks ( void )
             if (data_ready) {
                 //dbgOutputVal(reflectance_output);
                 
-                reflectanceData.tx_data[0] = reflectance_output;
-                dbgOutputVal(reflectanceData.tx_data[0]);
+                reflectanceData.tx_data[1] = reflectance_output;
+                reflectanceData.tx_data[0] = INT_MSG | 0x02 << 4 | 0x00 << 2 | 0x01;
+                dbgOutputVal(reflectanceData.tx_data[1]);
                 xQueueSend( MessageQueueControl, reflectanceData.tx_data, pdFAIL );
                 data_ready = false;
+                
             }
             
 
@@ -202,8 +204,12 @@ void REFLECTANCE_Tasks ( void )
     }
 }
 
-void startReflectance(){
+void startReflectance() {
     start = true;
+}
+
+void stopReflectance() {
+    start = false;
 }
 
 

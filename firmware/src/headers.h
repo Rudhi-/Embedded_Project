@@ -29,7 +29,7 @@ uint8_t rx_counter;
 uint8_t tx_counter;
 
 //debugging code
-//#define DEBUGGING
+#define DEBUGGING
 
 #endif	/* HEADERS_H */
 

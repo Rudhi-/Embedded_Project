@@ -196,7 +196,7 @@ void UARTTX_Tasks ( void )
             if (uxQueueMessagesWaiting(MessageQueueWout)) {
                 
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
-                if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
+                if ((uarttxData.tx_data[0] & INT_MSG) == INT_MSG)     //Convert internal messages to debug
                 {
                     int i = 0;
                     for (i = 4; i >= 0; i--)

@@ -20,6 +20,7 @@ TimerHandle_t timer_LED_OFF;
 TimerHandle_t timer_LED_INPUT;
 
 void startReflectance();
+void stopReflectance();
 
 #ifdef	__cplusplus
 }

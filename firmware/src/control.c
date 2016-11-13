@@ -157,6 +157,14 @@ void CONTROL_Tasks ( void )
         case CONTROL_WAIT:
         {
             if (getMoveState() == WAIT) {
+                if (uxQueueMessagesWaiting(MessageQueueWin)) {
+                    //received start message
+                    xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
+                    if ((controlData.rx_data[1] == 0xF0) && (controlData.rx_data[2] == 0xF0)) {
+                        startReflectance();
+                        controlData.state = CONTROL_RUN;
+                    }
+                }
 #ifdef DEBUGGING
                 startReflectance();
                 controlData.state = CONTROL_RUN;
@@ -167,26 +175,49 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_RUN:
         {
-#ifdef DEBUGGING
+            if (uxQueueMessagesWaiting(MessageQueueWin)) {
+                xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
+                //received start message
+                if ((controlData.rx_data[1] == 0x0f) && (controlData.rx_data[2] == 0x0F)) {
+                    stopReflectance();
+                    controlData.state = CONTROL_WAIT;
+                    break;
+                }
+            }
             if (uxQueueMessagesWaiting(MessageQueueControl)) {   
-                
                     PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
-                    if (controlData.rx_data[0] && (controlData.rx_data[0] != 0xFF)) {
-                        if (controlData.rx_data[0] & 0x3c) {
+                    
+                    //send data to server
+                    xQueueSend( MessageQueueWout, controlData.tx_data, pdFAIL );
+                    
+                    if (controlData.rx_data[1] && (controlData.rx_data[1] != 0xFF)) {
+                        if ((controlData.rx_data[1] & 0xc0) && (controlData.rx_data[1] & 0x03)) {
+                            //stop bad state
+                            move_stop();
+                        } else if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
+                            //move straight
                             set_speed(JOG, JOG);
-                        } 
-                        if (controlData.rx_data[0] & 0x03) {
-                            set_speed(SPRINT, WALK);
-                        } else if (controlData.rx_data[0] & 0xc0) {
-                            set_speed(WALK, SPRINT);
+                            move_start();
+                        } else if (controlData.rx_data[1] & 0x03){
+                            //turn sharp left
+                            turn_right();
+                        } else if (controlData.rx_data[1] & 0x0c) {
+                            //turn left
+                            set_speed(SPRINT, CRAWL);
+                            move_start();
+                        } else if (controlData.rx_data[1] & 0xc0) {
+                            //turn sharp right
+                            turn_left();
+                        } else if (controlData.rx_data[1] & 0x30) {
+                            //turn right
+                            set_speed(CRAWL, SPRINT);
+                            move_start();
                         }
-                        move_start();
                     } else {
                         move_stop();
                     }
                 }
-#endif
             break;
         }
 
