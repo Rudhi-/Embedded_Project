@@ -178,7 +178,7 @@ void REFLECTANCE_Tasks ( void )
                 //dbgOutputVal(reflectance_output);
                 
                 reflectanceData.tx_data[1] = reflectance_output;
-                reflectanceData.tx_data[0] = INT_MSG | 0x02 << 4 | 0x00 << 2 | 0x01;
+                reflectanceData.tx_data[0] = (INT_MSG | 0x00 << 4 | REFLECTANCE_THREAD_ID << 2 | CONTROL_THREAD_ID );
                 dbgOutputVal(reflectanceData.tx_data[1]);
                 xQueueSend( MessageQueueControl, reflectanceData.tx_data, pdFAIL );
                 data_ready = false;

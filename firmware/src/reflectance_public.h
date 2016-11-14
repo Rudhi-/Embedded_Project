@@ -12,7 +12,8 @@
 extern "C" {
 #endif
     
-
+#define REFLECTANCE_THREAD_ID 0x02
+    
 #include "headers.h"
 
 TimerHandle_t timer_LED_ON;

@@ -116,6 +116,7 @@ void CONTROL_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     controlData.state = CONTROL_STATE_INIT;
+    controlData.sendData = true;
 
     
     /* TODO: Initialize your application's state machine and other
@@ -160,7 +161,8 @@ void CONTROL_Tasks ( void )
                 if (uxQueueMessagesWaiting(MessageQueueWin)) {
                     //received start message
                     xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
-                    if ((controlData.rx_data[1] == 0xF0) && (controlData.rx_data[2] == 0xF0)) {
+                    if ((controlData.rx_data[1] == 0xF0) && (controlData.rx_data[2] == 0xF0) && (controlData.rx_data[3] == 0xF0)
+                            && (controlData.rx_data[4] == 0xF0) && (controlData.rx_data[5] == 0xF0)) {
                         startReflectance();
                         controlData.state = CONTROL_RUN;
                     }
@@ -168,6 +170,7 @@ void CONTROL_Tasks ( void )
 #ifdef DEBUGGING
                 startReflectance();
                 controlData.state = CONTROL_RUN;
+                //controlData.sendData = false;
 #endif
             }
             break;
@@ -178,44 +181,55 @@ void CONTROL_Tasks ( void )
             if (uxQueueMessagesWaiting(MessageQueueWin)) {
                 xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
                 //received start message
-                if ((controlData.rx_data[1] == 0x0f) && (controlData.rx_data[2] == 0x0F)) {
+                if ((controlData.rx_data[1] == 0x0F) && (controlData.rx_data[2] == 0x0F) && (controlData.rx_data[3] == 0x0F)
+                        && (controlData.rx_data[4] == 0x0F) && (controlData.rx_data[5] == 0x0F)) {
                     stopReflectance();
                     controlData.state = CONTROL_WAIT;
                     break;
                 }
             }
             if (uxQueueMessagesWaiting(MessageQueueControl)) {   
-                    PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
                     
-                    //send data to server
-                    xQueueSend( MessageQueueWout, controlData.tx_data, pdFAIL );
-                    
-                    if (controlData.rx_data[1] && (controlData.rx_data[1] != 0xFF)) {
-                        if ((controlData.rx_data[1] & 0xc0) && (controlData.rx_data[1] & 0x03)) {
-                            //stop bad state
+                    if (controlData.rx_data[0] == (INT_MSG | 0x00 << 4 | REFLECTANCE_THREAD_ID << 2 | CONTROL_THREAD_ID )) {
+                        PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                        if (controlData.rx_data[1] && (controlData.rx_data[1] != 0xFF)) {
+                            if ((controlData.rx_data[1] & 0xc0) && (controlData.rx_data[1] & 0x03)) {
+                                //stop bad state
+                                move_stop();
+                            } else if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
+                                //move straight
+                                set_speed(JOG, JOG);
+                                move_start();
+                            } else if (controlData.rx_data[1] & 0x03){
+                                //turn sharp left
+                                turn_right();
+                            } else if (controlData.rx_data[1] & 0x0c) {
+                                //turn left
+                                set_speed(SPRINT, CRAWL);
+                                move_start();
+                            } else if (controlData.rx_data[1] & 0xc0) {
+                                //turn sharp right
+                                turn_left();
+                            } else if (controlData.rx_data[1] & 0x30) {
+                                //turn right
+                                set_speed(CRAWL, SPRINT);
+                                move_start();
+                            }
+                        } else {
                             move_stop();
-                        } else if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
-                            //move straight
-                            set_speed(JOG, JOG);
-                            move_start();
-                        } else if (controlData.rx_data[1] & 0x03){
-                            //turn sharp left
-                            turn_right();
-                        } else if (controlData.rx_data[1] & 0x0c) {
-                            //turn left
-                            set_speed(SPRINT, CRAWL);
-                            move_start();
-                        } else if (controlData.rx_data[1] & 0xc0) {
-                            //turn sharp right
-                            turn_left();
-                        } else if (controlData.rx_data[1] & 0x30) {
-                            //turn right
-                            set_speed(CRAWL, SPRINT);
-                            move_start();
                         }
-                    } else {
-                        move_stop();
+                        //send data to server
+                        if (controlData.sendData) {
+                            int i;
+                            for (i = 0; i < 8; i++)
+                            {
+                                controlData.tx_data[i] = controlData.tx_data[i];
+                            }
+                            xQueueSend( MessageQueueWout, controlData.rx_data, pdFAIL );
+                        }
+                    } else if (controlData.rx_data[0] == (INT_MSG | 0x02 << 4 | CONTROL_THREAD_ID << 2 | CONTROL_THREAD_ID )) {
+                        controlData.sendData = (bool) controlData.rx_data[1];
                     }
                 }
             break;

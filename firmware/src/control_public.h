@@ -8,6 +8,8 @@
 #ifndef CONTROL_PUBLIC_H
 #define	CONTROL_PUBLIC_H
 
+#define CONTROL_THREAD_ID 0x00
+
 QueueHandle_t MessageQueueControl;
 
 #endif	/* CONTROL_PUBLIC_H */

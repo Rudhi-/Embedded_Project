@@ -170,7 +170,7 @@ void SendToTheQueue()
                     //pass data in
                     xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
                 }
-                else if (crcMatches(uartrxData.rx_data, 7) && ((uartrxData.rx_data[0] & 0xC0) == 0x00) && (uartrxData.rx_data[6] != rx_counter))
+                else if (crcMatches(uartrxData.rx_data, 7) && ((uartrxData.rx_data[0] & 0xC0) == DBG_MSG) && (uartrxData.rx_data[6] != rx_counter))
                 {
 #ifdef MOTOR_THREAD_ID
                     if ((uartrxData.rx_data[1] & 0x03) == MOTOR_THREAD_ID)
@@ -181,6 +181,17 @@ void SendToTheQueue()
                             uartrxData.rx_data[i] = uartrxData.rx_data[i + 1];
                         }
                         xQueueSendFromISR(MessageQueueM, uartrxData.rx_data, pdFAIL);
+                    }
+#endif
+#ifdef CONTROL_THREAD_ID
+                    if ((uartrxData.rx_data[1] & 0x03) == CONTROL_THREAD_ID)
+                    {
+                        int i = 0;
+                        for (i = 0; i < 5; i++)
+                        {
+                            uartrxData.rx_data[i] = uartrxData.rx_data[i + 1];
+                        }
+                        xQueueSendFromISR(MessageQueueControl, uartrxData.rx_data, pdFAIL);
                     }
 #endif
                 }
