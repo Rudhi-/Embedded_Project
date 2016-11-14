@@ -237,7 +237,7 @@
       <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/ports/src</Path>
-        <Checksum>5220A49E29CE78BDA761E7EAC8FFC0A4</Checksum>
+        <Checksum>BBA108262A754FA2117433A224D3810A</Checksum>
       </Template>
       <Template>
         <Name>system_interrupt_a.S</Name>
@@ -338,7 +338,7 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>8C45E2693B94C3603AB950DA52A33B96</Checksum>
+        <Checksum>EABEA33CFC5954437E91744A1A473452</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>

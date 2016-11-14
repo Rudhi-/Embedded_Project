@@ -59,7 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "headers.h"
-
+#include "debug.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -93,7 +93,8 @@ typedef enum
             BRAINS_STATE_SEND_ACK,
             BRAINS_STATE_WORK_ON_DATA,
             BRAINS_STATE_TRANSMIT_DATA,
-            BRAINS_STATE_WAIT_ACK
+            BRAINS_STATE_WAIT_ACK,
+            BRAINS_STATE_DONE
 
 	/* TODO: Define states used by the application state machine. */
 

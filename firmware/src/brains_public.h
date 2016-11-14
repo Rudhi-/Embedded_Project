@@ -20,6 +20,9 @@ extern "C" {
 #define MIN_ROTATION_INCREMENT 30 // the angle increment that the rover can rotate by
 #define OBSACLE_AVOIDANCE_DISTANCE 5 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
 #define ROTATION_AMOUNT 30
+#define DEBUG_START_DIST 25
+#define DEBUG_START_DEGREES_TO_TURN 45
+#define DEBUG_START_CURRENT_ANG_ROT 0
 
 
 // Main algorithm function what will be called in the lead rover's loop
