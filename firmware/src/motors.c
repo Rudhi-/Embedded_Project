@@ -393,7 +393,7 @@ void MOTORS_Tasks ( void )
                             break;
                         }
                         if (motorsData.motor_msg[0] & 0x20){ //if set command
-                            for (i = 0; i < 3; i++) {
+                            for (i = 0; i < 4; i++) {
                                 if (motorsData.motor_msg[i+1] & 0x80) {
                                     temp[i] = 0xFFFFFF00 | motorsData.motor_msg[i+1];
                                 } else {
