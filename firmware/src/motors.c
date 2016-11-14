@@ -117,8 +117,7 @@ void init_motors() {
     
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
-    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 6;
-    set_dist(60,60); 
+    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 6; 
     
     set_speed(WALK,WALK);
     move_stop();
@@ -346,7 +345,11 @@ void MOTORS_Tasks ( void )
             
                 motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
+#ifdef DEBUGGING
+            motorsData.moveState = INIT;
+#else
             motorsData.moveState = WAIT;
+#endif
             break;
         }
 
@@ -355,38 +358,25 @@ void MOTORS_Tasks ( void )
             switch (motorsData.moveState) {
                 case INIT:
                     move_stop();
-                    set_speed(RUN, RUN);
-                    set_dist(30,30);
+                    set_speed(SPRINT, RUN);
+                    set_dist(50,50);
                     move_start();
-                    motorsData.moveState = WAIT;
                     motorsData.testState = MOVE1;
+                    motorsData.moveState = TEST;
+                    break;
                 case TEST:
                     switch (motorsData.testState) {
                         case MOVE1:
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
                                 move_stop();
-                                spin_left();
-                                motorsData.testState = SPIN1;
-                            }
-                            break;
-                        case SPIN1:
-                            if (rightEncoder > motorsData.rightDist) {
-                                move_stop();
-                                set_speed(RUN, RUN);
-                                set_dist(30,30);
+                                set_speed(-RUN, -RUN);
+                                set_dist(50,50);
                                 move_start();
                                 motorsData.testState = MOVE2;
                             }
                             break;
                         case MOVE2:
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
-                                move_stop();
-                                spin_right();
-                                motorsData.testState = SPIN2;
-                            }
-                            break;
-                        case SPIN2:
-                            if (leftEncoder > motorsData.leftDist) {
                                 move_stop();
                                 motorsData.testState = MOVE1;
                                 motorsData.moveState = WAIT;
@@ -435,8 +425,8 @@ void MOTORS_Tasks ( void )
                             } else {
                                 break;
                             }
-                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4) | (MOTOR_THREAD_ID << 2) | 0x00 ;
-                            //info                   int         get           SRC                   DST
+                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4)     | (MOTOR_THREAD_ID << 2) | CONTROL_THREAD_ID ;
+                            //info                   int       get response        SRC                   DST
                             xQueueSend(MessageQueueWout, motorsData.motor_msg, pdFAIL);
                         }
                     }

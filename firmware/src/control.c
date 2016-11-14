@@ -185,6 +185,7 @@ void CONTROL_Tasks ( void )
                         && (controlData.rx_data[4] == 0x0F) && (controlData.rx_data[5] == 0x0F)) {
                     stopReflectance();
                     controlData.state = CONTROL_WAIT;
+                    //move_stop();
                     break;
                 }
             }
@@ -203,14 +204,16 @@ void CONTROL_Tasks ( void )
                                 move_start();
                             } else if (controlData.rx_data[1] & 0x03){
                                 //turn sharp left
-                                turn_right();
+                                set_speed(SPRINT, STOP);
+                                move_start();
                             } else if (controlData.rx_data[1] & 0x0c) {
                                 //turn left
                                 set_speed(SPRINT, CRAWL);
                                 move_start();
                             } else if (controlData.rx_data[1] & 0xc0) {
                                 //turn sharp right
-                                turn_left();
+                                set_speed(STOP, SPRINT);
+                                move_start();
                             } else if (controlData.rx_data[1] & 0x30) {
                                 //turn right
                                 set_speed(CRAWL, SPRINT);

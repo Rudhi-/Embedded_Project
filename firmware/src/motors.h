@@ -103,9 +103,7 @@ typedef enum
 typedef enum
 {
     MOVE1 = 0,
-    SPIN1,
     MOVE2,
-    SPIN2
 } TEST_STATES;
 // *****************************************************************************
 /* Application Data
@@ -221,7 +219,8 @@ void MOTORS_Tasks( void );
 // Helper functions
 void init_motors();
 
-int leftEncoder, rightEncoder;
+volatile int leftEncoder;
+volatile int rightEncoder;
 
 #endif /* _MOTORS_H */
 
