@@ -185,7 +185,7 @@ void CONTROL_Tasks ( void )
                         && (controlData.rx_data[4] == 0x0F) && (controlData.rx_data[5] == 0x0F)) {
                     stopReflectance();
                     controlData.state = CONTROL_WAIT;
-                    //move_stop();
+                    move_stop();
                     break;
                 }
             }
