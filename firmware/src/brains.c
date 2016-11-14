@@ -130,24 +130,25 @@ void algorithm() {
         brainsData.algStateSentFrom = ROTATE_AND_MOVE;
 		break;
 	case OBSTACLE_ENCOUNTERED:
-
-		if (brainsData.algData.numObjsCollide == 1) {
-			
-			
+        brainsData.algData.numObjsCollide++;
+        dbgOutputVal(0xBB);
+		if (brainsData.algData.numObjsCollide == 1) {	
+            dbgOutputVal(0xBA);
 			brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
+            dbgOutputVal(0xBC);
 			turnHandler();
+            dbgOutputVal(0xBD);
 		}
 		else if (brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.legB = getCurrentTravelDistance();
 			brainsData.algData.legA = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angC);
-			
 			turnHandler();
 		}
 		else {
 			// This Should never happen 
 			break;
 		}
-
+        dbgOutputVal(0xCC);
 		brainsData.algData.currRotAng = fmod(brainsData.algData.currRotAng,360);
 		brainsData.algData.angToTurn =	fmod(brainsData.algData.angToTurn,360);
 		// which way to rotate?
@@ -171,9 +172,9 @@ void algorithm() {
 				}
 			}
 		}
-
+        dbgOutputVal(0xEE);
 		// Send message to motors that they need to start rotating and then move after
-		 brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
+		 brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
           brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
         brainsData.algStateSentFrom = OBSTACLE_ENCOUNTERED;
 		break;
@@ -207,6 +208,7 @@ int getCurrentTravelDistance() {
 }*/
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler() {
+    dbgOutputVal(0x11);
 	int leftObjs = 0; // number of obstacles on left  (-60)
 	int rightObjs = 0; // number of obstacles on right (+60)
 	
@@ -218,21 +220,22 @@ void turnHandler() {
 	
 	
 	// "weight" adjustment based upon distance of possible path's endpoint to final endpoint
-	float leftMag;
-	float tempAng = ROTATION_AMOUNT;
+	int leftMag;
+	int tempAng = ROTATION_AMOUNT;
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.legB)) - ROTATION_AMOUNT;
 	}
-
+    dbgOutputVal(0x22);
 	leftMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
-	float rightMag;
+	int rightMag;
 	tempAng = ROTATION_AMOUNT;
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legB * (sin(brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
 	}
-	
+    dbgOutputVal(0x33);
+	tempAng%=360;
 	rightMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
-
+    dbgOutputVal(0x44);
 	if (leftMag < rightMag) {
 		leftObjs -= 3;
 	} else if (rightMag < leftMag) {
@@ -559,7 +562,7 @@ void BRAINS_Tasks ( void )
                 // xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
                 if(brainsData.prevBrainState == BRAINS_STATE_RECEIVE_MESSAGE){
                     // do nothing for now 
-                    brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
+                   brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
                    brainsData.prevBrainState = BRAINS_STATE_WAIT_ACK;   
                 }
                 else if(brainsData.prevBrainState == BRAINS_STATE_WORK_ON_DATA){
