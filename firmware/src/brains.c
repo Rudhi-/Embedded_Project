@@ -131,13 +131,13 @@ void algorithm() {
 		break;
 	case OBSTACLE_ENCOUNTERED:
         brainsData.algData.numObjsCollide++;
-        dbgOutputVal(0xBB);
+        
 		if (brainsData.algData.numObjsCollide == 1) {	
-            dbgOutputVal(0xBA);
+           
 			brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
-            dbgOutputVal(0xBC);
+           
 			turnHandler();
-            dbgOutputVal(0xBD);
+           
 		}
 		else if (brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.legB = getCurrentTravelDistance();
@@ -148,7 +148,7 @@ void algorithm() {
 			// This Should never happen 
 			break;
 		}
-        dbgOutputVal(0xCC);
+        
 		brainsData.algData.currRotAng = fmod(brainsData.algData.currRotAng,360);
 		brainsData.algData.angToTurn =	fmod(brainsData.algData.angToTurn,360);
 		// which way to rotate?
@@ -172,7 +172,7 @@ void algorithm() {
 				}
 			}
 		}
-        dbgOutputVal(0xEE);
+       
 		// Send message to motors that they need to start rotating and then move after
 		 brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
           brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
@@ -208,7 +208,7 @@ int getCurrentTravelDistance() {
 }*/
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler() {
-    dbgOutputVal(0x11);
+   
 	int leftObjs = 0; // number of obstacles on left  (-60)
 	int rightObjs = 0; // number of obstacles on right (+60)
 	
@@ -225,17 +225,17 @@ void turnHandler() {
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.legB)) - ROTATION_AMOUNT;
 	}
-    dbgOutputVal(0x22);
+    
 	leftMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
 	int rightMag;
 	tempAng = ROTATION_AMOUNT;
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legB * (sin(brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
 	}
-    dbgOutputVal(0x33);
+    
 	tempAng%=360;
 	rightMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
-    dbgOutputVal(0x44);
+    
 	if (leftMag < rightMag) {
 		leftObjs -= 3;
 	} else if (rightMag < leftMag) {
