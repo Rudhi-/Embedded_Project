@@ -23,6 +23,7 @@ extern "C" {
 #define DEBUG_START_DIST 25
 #define DEBUG_START_DEGREES_TO_TURN 45
 #define DEBUG_START_CURRENT_ANG_ROT 0
+#define DEBUG_START true 
 
 
 // Main algorithm function what will be called in the lead rover's loop
