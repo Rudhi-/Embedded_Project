@@ -196,7 +196,6 @@ void ULTRASONIC_Tasks ( void )
                 uint8_t range_1[2];
                 uint8_t range_2[2];
                 
-                
                 ultrasonicData.rxbufferhandle = DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x08, range_0, 2, NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.rxbufferhandle ));
 
@@ -226,10 +225,17 @@ void ULTRASONIC_Tasks ( void )
                 //if(range[0] != 0) range[1] = 254;
                 //dbgOutputVal(range[1]);
                 
+                uint16_t range_0_16bit = (range_0[0] << 8) | range_0[1];
+                uint16_t range_1_16bit = (range_1[0] << 8) | range_1[1];
+                uint16_t range_2_16bit = (range_2[0] << 8) | range_2[1];
                 
-                packet_tx_data[2] = range_0[1];
-                packet_tx_data[3] = range_1[1];
-                packet_tx_data[4] = range_2[1];
+                if(range_0_16bit > 255) range_0_16bit = 255;
+                if(range_1_16bit > 255) range_1_16bit = 255;
+                if(range_2_16bit > 255) range_2_16bit = 255;
+                
+                packet_tx_data[2] = range_0_16bit;
+                packet_tx_data[3] = range_1_16bit;
+                packet_tx_data[4] = range_2_16bit;
                 
                 ultrasonic_finished = 1;
             }
