@@ -13,23 +13,28 @@
 #include "timers.h"
 #include "my_timers.h"
 
-#include "uartrx_public.h"
-#include "uarttx_public.h"
-#include "control_public.h"
-#include "reflectance_public.h"
-#include "motors_public.h"
-
 #define PIC_ID 4 //set to your pic
 #define DBG_MSG       0x00
 #define CMD_MSG       0x80
 #define ACK_MSG       0x40
 #define INT_MSG       0xC0
 
+#if (PIC_ID == 4)
+#define FOLLOWER
+#endif
+
+#include "uartrx_public.h"
+#include "uarttx_public.h"
+#include "control_public.h"
+#include "reflectance_public.h"
+#include "motors_public.h"
+
+
 uint8_t rx_counter;
 uint8_t tx_counter;
 
 //debugging code
-//#define DEBUGGING
+#define DEBUGGING
 
 #endif	/* HEADERS_H */
 

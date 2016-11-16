@@ -97,6 +97,10 @@ CONTROL_DATA controlData;
 /* TODO:  Add any necessary local functions.
 */
 
+bool isRunning() {
+    return controlData.running;
+}
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -117,7 +121,7 @@ void CONTROL_Initialize ( void )
     /* Place the App state machine in its initial state. */
     controlData.state = CONTROL_STATE_INIT;
     controlData.sendData = true;
-
+    controlData.running = false;
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -157,6 +161,7 @@ void CONTROL_Tasks ( void )
 
         case CONTROL_WAIT:
         {
+            controlData.running = false;
             if (getMoveState() == WAIT) {
                 if (uxQueueMessagesWaiting(MessageQueueWin)) {
                     //received start message
@@ -178,6 +183,7 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_RUN:
         {
+            controlData.running = true;
             if (uxQueueMessagesWaiting(MessageQueueWin)) {
                 xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
                 //received start message

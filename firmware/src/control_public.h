@@ -11,6 +11,7 @@
 #define CONTROL_THREAD_ID 0x00
 
 QueueHandle_t MessageQueueControl;
+bool isRunning();
 
 #endif	/* CONTROL_PUBLIC_H */
 

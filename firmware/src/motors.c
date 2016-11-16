@@ -107,9 +107,9 @@ void init_motors() {
     PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     
     //left motor enable
-    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_1);
-    //left motor direction
-    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT);
+    //right motor direction
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT);
     
     //Start OC drivers    
     PLIB_OC_Enable(OC_ID_1);
@@ -117,7 +117,7 @@ void init_motors() {
     
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
-    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 6; 
+    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 10; 
     
     set_speed(WALK,WALK);
     move_stop();
@@ -146,19 +146,23 @@ void set_dist(int leftDist, int rightDist) {
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed) {
     //left motor
     if (leftSpeed < 0) {
-        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
         leftSpeed *= -1;
     } else {
-        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
     }
     motorsData.leftSpeed = leftSpeed;
     
     //right motor
     if (rightSpeed < 0) {
-        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
         rightSpeed *= -1;
     } else {
-        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
     }
     motorsData.rightSpeed = rightSpeed;
 }
@@ -178,20 +182,19 @@ MOTOR_SPEEDS get_speed(SIDE side) {
 
 //Stops all motors immediately
 void move_stop() {
-    //right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     //left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
-    
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, 0);
+    //right motor
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, 0);
 }
 
 //sets motors to drive at current speed and direction
 void move_start() {
     rightEncoder = leftEncoder = 0;
     //left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed + motorsData.leftSpeed_Offset);    
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, motorsData.leftSpeed + motorsData.leftSpeed_Offset);    
     //right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed + motorsData.rightSpeed_Offset);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, motorsData.rightSpeed + motorsData.rightSpeed_Offset);
 }
 
 
@@ -200,50 +203,60 @@ void move_start() {
 void turn_left() {
     set_dist(200,200);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, CRAWL + motorsData.rightSpeed_Offset); 
     
     //stop left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, 0);
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, JOG + motorsData.rightSpeed_Offset); 
 }
 
 //spin the rover clockwise
 void spin_left() {
     set_dist(35,35);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK + motorsData.rightSpeed_Offset); 
     
     //left motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, WALK + motorsData.leftSpeed_Offset);  
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, WALK + motorsData.rightSpeed_Offset);
 }
 
 //turn the rover to the left
 void turn_right() {
     set_dist(200,200);
     rightEncoder = leftEncoder = 0;
-    //stop right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, CRAWL + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, JOG + motorsData.leftSpeed_Offset); 
+    
+    //stop right motor
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, 0); 
 }
 
 //spin the rover counterclockwise
 void spin_right() {
     set_dist(35,35);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK + motorsData.rightSpeed_Offset); 
     
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, WALK + motorsData.leftSpeed_Offset);  
+    
+    //right motor
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, WALK + motorsData.rightSpeed_Offset); 
 }
 
 //function to move forwards
@@ -252,11 +265,14 @@ void move_forward(int leftDist, int rightDist) {
     set_dist (leftDist, rightDist);
     motorsData.moveState = MOVE;
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
 
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
 
     move_start();
 }
@@ -264,12 +280,15 @@ void move_forward(int leftDist, int rightDist) {
 //function to move backwards
 void move_backward() {
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     
     //left motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
 
+    //right motor
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
+    
     move_start();
 }
 
@@ -359,7 +378,7 @@ void MOTORS_Tasks ( void )
                 case INIT:
                     move_stop();
                     set_speed(SPRINT, RUN);
-                    set_dist(50,50);
+                    set_dist(30,30);
                     move_start();
                     motorsData.testState = MOVE1;
                     motorsData.moveState = TEST;
@@ -370,7 +389,7 @@ void MOTORS_Tasks ( void )
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
                                 move_stop();
                                 set_speed(-RUN, -RUN);
-                                set_dist(50,50);
+                                set_dist(30,30);
                                 move_start();
                                 motorsData.testState = MOVE2;
                             }
@@ -378,14 +397,37 @@ void MOTORS_Tasks ( void )
                         case MOVE2:
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
                                 move_stop();
+#ifdef DEBUGGING
+                                motorsData.testState = TURNL;
+                                turn_left();
+                                set_dist(5,5);
+#else
+                                motorsData.testState = MOVE1;
+                                motorsData.moveState = WAIT;
+#endif
+                            }
+                            break;
+#ifdef DEBUGGING
+                        case TURNL:
+                            if (rightEncoder > motorsData.rightDist) {
+                                move_stop();
+                                motorsData.testState = TURNR;
+                                turn_right();
+                                set_dist(5,5);
+                            }
+                            break;
+                        case TURNR:
+                            if (leftEncoder > motorsData.leftDist) {
+                                move_stop();
                                 motorsData.testState = MOVE1;
                                 motorsData.moveState = WAIT;
                             }
                             break;
+#endif
                     }
                     break;                    
                 case WAIT:
-                    if (uxQueueMessagesWaiting(MessageQueueM)) {
+                    if (uxQueueMessagesWaiting(MessageQueueM) && !isRunning()) {
                         move_stop();
                         int temp[4], i; //temps for set and get values, iterator
                         xQueueReceive(MessageQueueM, motorsData.motor_msg, portMAX_DELAY);
@@ -407,7 +449,7 @@ void MOTORS_Tasks ( void )
                             //now test
                             
                             motorsData.moveState = TEST;
-                            set_dist(50,50);
+                            set_dist(30,30);
                             set_speed(RUN, RUN);
                             move_start();
                             

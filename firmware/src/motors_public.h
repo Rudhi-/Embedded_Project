@@ -37,6 +37,31 @@ QueueHandle_t MessageQueueM;
 
 #define MOTOR_THREAD_ID 0x01
 
+//motor settings for follower
+#ifdef FOLLOWER
+
+#define FORWARD 0
+#define REVERSE 1
+#define LEFT_CHANNEL PORT_CHANNEL_G 
+#define LEFT_PORT PORTS_BIT_POS_1
+#define LEFT_OC OC_ID_2
+#define RIGHT_CHANNEL PORT_CHANNEL_C
+#define RIGHT_PORT PORTS_BIT_POS_14
+#define RIGHT_OC OC_ID_1
+
+#else //motor settings for leader
+
+#define FORWARD 1
+#define REVERSE 0
+#define LEFT_CHANNEL PORT_CHANNEL_C 
+#define LEFT_PORT PORTS_BIT_POS_14
+#define LEFT_OC OC_ID_1
+#define RIGHT_CHANNEL PORT_CHANNEL_G
+#define RIGHT_PORT PORTS_BIT_POS_1
+#define RIGHT_OC OC_ID_2
+
+#endif
+
 // Follower rover
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed);
 void set_dist(int leftDist, int rightDist);

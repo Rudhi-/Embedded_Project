@@ -90,14 +90,22 @@ void IntHandlerDrvTmrInstance1(void)
 }
     
 void IntHandlerDrvTmrInstance2(void)
-{
+{    
+#ifdef FOLLOWER
     rightEncoder++;
+#else
+    leftEncoder++;
+#endif
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
     
 void IntHandlerDrvTmrInstance3(void)
 {
+#ifdef FOLLOWER
     leftEncoder++;
+#else
+    rightEncoder++;
+#endif
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 

@@ -102,8 +102,12 @@ typedef enum
 
 typedef enum
 {
-    MOVE1 = 0,
-    MOVE2,
+    MOVE1 = 0, //move forward
+    MOVE2,  //move backwards
+#ifdef DEBUGGING
+    TURNL, //turn left
+    TURNR  //turn right
+#endif
 } TEST_STATES;
 // *****************************************************************************
 /* Application Data

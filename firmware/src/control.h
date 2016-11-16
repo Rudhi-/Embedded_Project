@@ -117,6 +117,7 @@ typedef struct
     uint8_t rx_data[8];
     uint8_t tx_data[8];
     bool sendData;
+    bool running;
 
     /* TODO: Define any additional data used by the application. */
 
