@@ -442,31 +442,21 @@ void MOTORS_Tasks ( void )
                                     temp[i] = 0x00000000 | motorsData.motor_msg[i+1];
                                 }
                             }
-                            motorsData.leftEncoder_Conv += temp[0];
-                            motorsData.rightEncoder_Conv += temp[1];
-                            motorsData.leftSpeed_Offset += temp[2];
-                            motorsData.rightSpeed_Offset += temp[3];
+                            motorsData.leftEncoder_Conv = temp[0];
+                            motorsData.rightEncoder_Conv = temp[1];
+                            motorsData.leftSpeed_Offset = temp[2];
+                            motorsData.rightSpeed_Offset = temp[3];
                             //now test
                             
                             motorsData.moveState = TEST;
                             set_dist(30,30);
                             set_speed(RUN, RUN);
                             move_start();
-                            
                         } else {    //else if get command
-                            if (motorsData.motor_msg[1] & 0x01) { //check if getting encoders
-                                motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv >> 8);
-                                motorsData.motor_msg[2] = (char)(motorsData.leftEncoder_Conv);
-                                motorsData.motor_msg[3] = (char)(motorsData.rightEncoder_Conv >> 8);
-                                motorsData.motor_msg[4] = (char)(motorsData.rightEncoder_Conv);
-                            } else if (motorsData.motor_msg[1] & 0x02){ //else sending speeds
-                                motorsData.motor_msg[1] = (char)(motorsData.leftSpeed_Offset >> 8);
-                                motorsData.motor_msg[2] = (char)(motorsData.leftSpeed_Offset);
-                                motorsData.motor_msg[3] = (char)(motorsData.rightSpeed_Offset >> 8);
-                                motorsData.motor_msg[4] = (char)(motorsData.rightSpeed_Offset);
-                            } else {
-                                break;
-                            }
+                            motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv);
+                            motorsData.motor_msg[2] = (char)(motorsData.rightEncoder_Conv);
+                            motorsData.motor_msg[3] = (char)(motorsData.leftSpeed_Offset);
+                            motorsData.motor_msg[4] = (char)(motorsData.rightSpeed_Offset);
                             motorsData.motor_msg[0] = 0xC0 | (0x01 << 4)     | (MOTOR_THREAD_ID << 2) | CONTROL_THREAD_ID ;
                             //info                   int       get response        SRC                   DST
                             xQueueSend(MessageQueueWout, motorsData.motor_msg, pdFAIL);

@@ -122,6 +122,7 @@ void CONTROL_Initialize ( void )
     controlData.state = CONTROL_STATE_INIT;
     controlData.sendData = true;
     controlData.running = false;
+    controlData.prevData = 0x00;
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -229,12 +230,13 @@ void CONTROL_Tasks ( void )
                             move_stop();
                         }
                         //send data to server
-                        if (controlData.sendData) {
+                        if (controlData.sendData && controlData.rx_data[1] != controlData.prevData) {
                             int i;
                             for (i = 0; i < 8; i++)
                             {
                                 controlData.tx_data[i] = controlData.tx_data[i];
                             }
+                            controlData.prevData = controlData.rx_data[1];
                             xQueueSend( MessageQueueWout, controlData.rx_data, pdFAIL );
                         }
                     } else if (controlData.rx_data[0] == (INT_MSG | 0x02 << 4 | CONTROL_THREAD_ID << 2 | CONTROL_THREAD_ID )) {
