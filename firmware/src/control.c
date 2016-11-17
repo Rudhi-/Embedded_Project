@@ -123,6 +123,7 @@ void CONTROL_Initialize ( void )
     controlData.sendData = true;
     controlData.running = false;
     controlData.prevData = 0x00;
+    controlData.testOnce = false;
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -187,7 +188,7 @@ void CONTROL_Tasks ( void )
             controlData.running = true;
             if (uxQueueMessagesWaiting(MessageQueueWin)) {
                 xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
-                //received start message
+                //received stop message
                 if ((controlData.rx_data[1] == 0x0F) && (controlData.rx_data[2] == 0x0F) && (controlData.rx_data[3] == 0x0F)
                         && (controlData.rx_data[4] == 0x0F) && (controlData.rx_data[5] == 0x0F)) {
                     stopReflectance();
@@ -199,13 +200,10 @@ void CONTROL_Tasks ( void )
             if (uxQueueMessagesWaiting(MessageQueueControl)) {   
                     xQueueReceive(MessageQueueControl, controlData.rx_data, portMAX_DELAY);
                     
-                    if (controlData.rx_data[0] == (INT_MSG | 0x00 << 4 | REFLECTANCE_THREAD_ID << 2 | CONTROL_THREAD_ID )) {
+                    if (controlData.rx_data[0] == (INT_MSG | 0x01 << 4 | REFLECTANCE_THREAD_ID << 2 | CONTROL_THREAD_ID )) {
                         PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-                        if (controlData.rx_data[1] && (controlData.rx_data[1] != 0xFF)) {
-                            if ((controlData.rx_data[1] & 0xc0) && (controlData.rx_data[1] & 0x03)) {
-                                //stop bad state
-                                move_stop();
-                            } else if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
+                        if (controlData.rx_data[1] && ((controlData.rx_data[1] & 0xc3) != 0xc3)) {
+                            if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
                                 //move straight
                                 set_speed(JOG, JOG);
                                 move_start();
@@ -226,7 +224,13 @@ void CONTROL_Tasks ( void )
                                 set_speed(CRAWL, SPRINT);
                                 move_start();
                             }
-                        } else {
+                            controlData.testOnce = false;
+                        } else if (!controlData.testOnce) {
+                            move_forward(5, 5);
+                            controlData.testOnce = true;
+                            while(getMoveState() != WAIT);
+                            
+                        } else {  
                             move_stop();
                         }
                         //send data to server

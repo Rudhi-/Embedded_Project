@@ -119,6 +119,7 @@ typedef struct
     bool sendData;
     bool running;
     uint8_t prevData;
+    bool testOnce;
 
     /* TODO: Define any additional data used by the application. */
 

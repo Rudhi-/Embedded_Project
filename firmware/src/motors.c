@@ -292,13 +292,6 @@ void move_backward() {
     move_start();
 }
 
-bool forward_movement_done() {
-    if (motorsData.moveState == WAIT)
-        return true;
-    else
-        return false;
-}
-
 int get_distance(SIDE side) {
     switch (side) {
         case LEFT:
