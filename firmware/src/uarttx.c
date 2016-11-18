@@ -214,7 +214,7 @@ void UARTTX_Tasks ( void )
                     if (tx_counter == 20)
                         tx_counter = 0;
                     receiveState = WAIT_ON_ACK;
-                    wait_on_ack = true;
+                    //wait_on_ack = true;
                     uarttxData.state = UARTTX_STATE_WAIT;
                 }
                 //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
