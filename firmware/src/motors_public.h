@@ -72,6 +72,7 @@ void move_start();
 void move_stop();
 void spin_right();
 void spin_left();
+void continue_moving(int leftDist, int rightDist);
 
 MOVE_STATE getMoveState();
 

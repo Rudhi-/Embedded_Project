@@ -180,6 +180,14 @@ MOTOR_SPEEDS get_speed(SIDE side) {
     }
 }
 
+//continue moving 
+void continue_moving(int leftDist, int rightDist) {
+    rightEncoder = leftEncoder = 0;
+    set_dist(leftDist, rightDist);
+    motorsData.moveState = MOVE;
+    move_start();
+}
+
 //Stops all motors immediately
 void move_stop() {
     //left motor
@@ -457,7 +465,7 @@ void MOTORS_Tasks ( void )
                     }
                     break;
                 case MOVE:
-                    if (rightEncoder > motorsData.rightDist && leftEncoder > motorsData.leftDist) {
+                    if (rightEncoder > motorsData.rightDist || leftEncoder > motorsData.leftDist) {
                         move_stop();
                         rightEncoder = leftEncoder = 0;
                         motorsData.moveState = WAIT;

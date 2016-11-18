@@ -123,7 +123,7 @@ void CONTROL_Initialize ( void )
     controlData.sendData = true;
     controlData.running = false;
     controlData.prevData = 0x00;
-    controlData.testOnce = false;
+    controlData.test[0] = controlData.test[1] = controlData.test[2] = false;
     
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -224,13 +224,18 @@ void CONTROL_Tasks ( void )
                                 set_speed(CRAWL, SPRINT);
                                 move_start();
                             }
-                            controlData.testOnce = false;
-                        } else if (!controlData.testOnce) {
-                            move_forward(5, 5);
-                            controlData.testOnce = true;
+                            controlData.test[0] = controlData.test[1] = controlData.test[2] = false;
+                        } else if (!controlData.test[0] || !controlData.test[1] || !controlData.test[2]) {
+                            if (!controlData.test[0]) {
+                                controlData.test[0] = true;
+                            } else if (!controlData.test[1]) {
+                                controlData.test[1] = true;
+                            } else {
+                                controlData.test[2] = true;
+                            }
+                            continue_moving(2, 2);
                             while(getMoveState() != WAIT);
-                            
-                        } else {  
+                        } else {   
                             move_stop();
                         }
                         //send data to server
