@@ -22,8 +22,9 @@ extern "C" {
 #define ROTATION_AMOUNT 30
 #define DEBUG_START_DIST 25
 #define DEBUG_START_DEGREES_TO_TURN 45
-#define DEBUG_START_CURRENT_ANG_ROT 0
-#define DEBUG_START true 
+#define START_CURRENT_ANG_ROT 0
+#define DEBUG_START true
+#define OBJECT_DETECT_DISTANCE 0x32 // 50 (cm))
 
 
 // Main algorithm function what will be called in the lead rover's loop
@@ -43,11 +44,11 @@ int getCurrentTravelDistance();
 // States for ALgorithm State machine 
 typedef enum {
 	FINDING_PATH = 0,
-	ROTATE_AND_MOVE,
+	//ROTATE_AND_MOVE,
 	OBSTACLE_ENCOUNTERED,
 	FOUND_LINE,
 	FOUND_ENDPOINT,
-	OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE
+	//OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE
 } ALGORITHM_STATES;
 
 

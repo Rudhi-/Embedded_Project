@@ -120,14 +120,7 @@ void algorithm() {
 				}
 			}
 		// switch brain state to send message mode in order to tell muscles to rotate and move
-        brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-        brainsData.algStateSentFrom = FINDING_PATH;
-		break;
-	case ROTATE_AND_MOVE:
-		brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
-        brainsData.algStateSentFrom = ROTATE_AND_MOVE;
+        brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;
 		break;
 	case OBSTACLE_ENCOUNTERED:
         brainsData.algData.numObjsCollide++;
@@ -137,7 +130,6 @@ void algorithm() {
 			brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
            
 			turnHandler();
-           
 		}
 		else if (brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.legB = getCurrentTravelDistance();
@@ -174,24 +166,13 @@ void algorithm() {
 		}
        
 		// Send message to motors that they need to start rotating and then move after
-		 brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-          brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.algStateSentFrom = OBSTACLE_ENCOUNTERED;
-		break;
-	case OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE:
-		brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
-        brainsData.algStateSentFrom = OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE;
+		brainsData.state = BRAINS_STATE_TRANSMIT_OBSTACLE_ENCOUNTERED;
 		break;
 	case FOUND_LINE:
-		brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-        brainsData.algStateSentFrom = FOUND_LINE;
+        brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
 		break;
 	case FOUND_ENDPOINT:
-		brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-        brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-        brainsData.algStateSentFrom = FOUND_ENDPOINT;
+        brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
 		break;
 	default:
 		break;
@@ -309,8 +290,6 @@ void BRAINS_Initialize ( void )
     /* Place the App state machine in its initial state. */
     brainsData.state = BRAINS_STATE_INIT;
     brainsData.notifyPicNum = 0;
-    brainsData.prevBrainState = BRAINS_STATE_INIT;
-    brainsData.algStateSentFrom = FINDING_PATH;
     algoInit();
 }
 
@@ -338,293 +317,273 @@ void BRAINS_Tasks ( void )
             if (appInitialized)
             {
             
-                brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
+                brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_INIT;
             }
             break;
         }
-        case BRAINS_STATE_RECEIVE_MESSAGE:
+        case BRAINS_STATE_RECEIVE_MESSAGE_INIT:
         {
-           // Wait till the message has been received before moving to the 
-            // Next state
-            if (uxQueueMessagesWaiting(MessageQueueWin))
-            {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
                 PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
                 
-                switch(brainsData.prevBrainState){
-                    case BRAINS_STATE_INIT:
-                        if(brainsData.rx_data[0] == 0x83){ // from raspi
-                            brainsData.algData.distToGo = DEBUG_START_DIST;
-                            brainsData.algData.currRotAng = DEBUG_START_CURRENT_ANG_ROT;
-                            brainsData.algData.angToTurn = (brainsData.algData.currRotAng + DEBUG_START_DEGREES_TO_TURN)%360;
-                            brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                            //since we initially will have our data we can 
-                            brainsData.prevBrainState = BRAINS_STATE_WORK_ON_DATA;
-                            brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-                            brainsData.algStateSentFrom = FINDING_PATH;                            
-                        }                      
-                        // handle receiving start information 
-                        break;
-                    case BRAINS_STATE_WORK_ON_DATA:
-                        switch(brainsData.algStateSentFrom){
-                            case ROTATE_AND_MOVE:
-                                // message from sensors that obstacle was encountered 
-                                if(brainsData.rx_data[0] == 0x93){
-                                    // this means that there was an obstacle encountered
-                                    brainsData.algData.states = OBSTACLE_ENCOUNTERED;
-                                    brainsData.prevBrainState = BRAINS_STATE_RECEIVE_MESSAGE;
-                                    brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-                                }
-                                // message from motors of the distance traveled and the angle rotated
-                                else if(brainsData.rx_data[0] == 0x8b){
-                                    // this means that we have reached the end
-                                    brainsData.algData.states = FOUND_ENDPOINT;
-                                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                                }
-                                break;
-                            case OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE:
-                                // message from sensors that obstacle was encountered 
-                                if(brainsData.rx_data[0] == 0x93){
-                                    // this means that there was an obstacle encountered
-                                    brainsData.algData.states = OBSTACLE_ENCOUNTERED;
-                                    brainsData.prevBrainState = BRAINS_STATE_RECEIVE_MESSAGE;
-                                    brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-                                }
-                                // message from motors of the distance traveled and the angle rotated
-                                else if(brainsData.rx_data[0] == 0x8b){
-                                    // this means that we have reached the end
-                                    brainsData.algData.states = FINDING_PATH;
-                                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                                    
-                                }
-                                break;
-                            default:
-                                brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                                break;
-                        }
-                        break;
-                    case BRAINS_STATE_WAIT_ACK:
-                        if(brainsData.rx_data[0] == 0x8b){
-                            brainsData.algData.currDistTrav = (int)brainsData.rx_data[3];
-                            brainsData.algData.currRotAng += ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
-                            brainsData.algData.states = OBSTACLE_ENCOUNTERED;
-                            brainsData.prevBrainState = BRAINS_STATE_RECEIVE_MESSAGE;
-                            brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                        }
-                        break;
-                    default:
-                        break;
-                }               
+                if(brainsData.rx_data[0] == 0x83){ // from raspi
+#if DEBUG_START == true
+                    brainsData.algData.distToGo = DEBUG_START_DIST;
+                    brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
+                    brainsData.algData.angToTurn = (brainsData.algData.currRotAng + DEBUG_START_DEGREES_TO_TURN)%360;
+#else
+                    brainsData.algData.distToGo = (int)brainsData.rx_data[3];
+                    brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
+                    brainsData.algData.angToTurn += (brainsData.algData.currRotAng + ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]))%360;
+#endif                    
+                    brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;                       
+                }  
             }
-            break;
+             
+        }
+        case BRAINS_STATE_RECEIVE_MESSAGE_ROTATE_AND_MOVE:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
+                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
+                // message from sensors that line was encountered 
+                if( (brainsData.rx_data[0] == 0x93) && (brainsData.rx_data[1] > 0x00)){
+					// end condition reached 
+                     brainsData.algData.states = FOUND_LINE;
+                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                }
+                // message from sensors that obstacle was encountered 
+                else if((brainsData.rx_data[0] == 0x93) && 
+                        ( (brainsData.rx_data[2] <= OBJECT_DETECT_DISTANCE) || 
+                        (brainsData.rx_data[3] <= OBJECT_DETECT_DISTANCE) || 
+                        (brainsData.rx_data[4] <= OBJECT_DETECT_DISTANCE) ) ){
+                    brainsData.state = BRAINS_STATE_TRANSMIT_MOTOR_STOP;
+                }
+                // message from motors of the distance traveled and the angle rotated
+                else if(brainsData.rx_data[0] == 0x8b){
+                    // this means that we have reached the end
+                    brainsData.algData.states = FOUND_ENDPOINT;
+                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                }           
+            }
+            
+        }
+        case BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
+                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
+                
+                // message from sensors that line was encountered 
+                if( (brainsData.rx_data[0] == 0x93) && (brainsData.rx_data[1] > 0x00)){
+                     brainsData.algData.states = FOUND_LINE;
+                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                }
+                // message from sensors that obstacle was encountered 
+                else if((brainsData.rx_data[0] == 0x93) && 
+                        ( (brainsData.rx_data[2] <= OBJECT_DETECT_DISTANCE) || 
+                        (brainsData.rx_data[3] <= OBJECT_DETECT_DISTANCE) || 
+                        (brainsData.rx_data[4] <= OBJECT_DETECT_DISTANCE) ) ){
+                    brainsData.state = BRAINS_STATE_TRANSMIT_MOTOR_STOP;
+                }
+                // message from motors that they navigated past the obstacle
+                else if(brainsData.rx_data[0] == 0x8b){
+                    // this means that we have reached the end
+                    brainsData.algData.states = FINDING_PATH;
+                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+
+                }        
+            }
+            
+        }
+        // Message from motors of how far they had gotten until they stopped due to obstacle
+        case BRAINS_STATE_RECEIVE_MESSAGE_WAIT:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
+                PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
+                
+                if(brainsData.rx_data[0] == 0x8b){
+                    brainsData.algData.currDistTrav = (int)brainsData.rx_data[3];
+                    brainsData.algData.currRotAng += ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
+                    
+                    // going to algorithm state obstacle encountered 
+                    brainsData.algData.states = OBSTACLE_ENCOUNTERED;
+                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                }
+            }
         }
         case BRAINS_STATE_WORK_ON_DATA:
         {
             algorithm();
             break;
         }
-        case BRAINS_STATE_TRANSMIT_DATA:
+        case BRAINS_STATE_TRANSMIT_FINDING_PATH:
         {
-            if(brainsData.prevBrainState == BRAINS_STATE_WORK_ON_DATA){
-                switch(brainsData.algStateSentFrom)
-                {
-                    case FINDING_PATH:
-                        brainsData.tx_data[0] =  0x99; // sending message to pic 1 muscles
-                        int16_t degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn);
-                        if(degreesToTurn > 180){
-                            degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
-                        }
-                        degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
-                        brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
-                        brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
-                        brainsData.tx_data[3] = (uint8_t)brainsData.algData.distToGo; // distance to travel 
-                        brainsData.tx_data[4] = 0x00; // unused data 2
-                        brainsData.tx_data[5] = 0x00; // unused data 2
-                        brainsData.tx_data[6] = 0x00; // counter 
-                        brainsData.tx_data[7] = 0x00;
-                        break;
-                    case FOUND_LINE: // inform Raspberry PI that we were trapped by our own line
-                        switch(brainsData.notifyPicNum){
-                            case 0:
-                                brainsData.tx_data[0] =  0x98; // sending message to rpi
-                                break;
-                            case 1: 
-                                 brainsData.tx_data[0] =  0x99; // sending to pic 1 muscles 
-                                break;
-                            case 2:
-                                 brainsData.tx_data[0] =  0x9a; // sending to pic 2 sensors
-                                break;
-                            case 4:
-                                brainsData.tx_data[0] =  0x9c; // sending to pic 2 sensors
-                                brainsData.tx_data[1] = 0xF0;
-                                brainsData.tx_data[2] = 0xF0;
-                                brainsData.tx_data[3] = 0xF0;
-                                brainsData.tx_data[4] = 0xF0;
-                                brainsData.tx_data[5] = 0xF0;
-                                brainsData.tx_data[6] = 0xF0;
-                                brainsData.tx_data[7] = 0xF0;
-                                break;
-                            default: 
-                                break;
-                        }
-                        if(brainsData.notifyPicNum < 4){
-                            brainsData.tx_data[1] = 0x0F;
-                            brainsData.tx_data[2] = 0x0F;
-                            brainsData.tx_data[3] = 0x0F;
-                            brainsData.tx_data[4] = 0x0F;
-                            brainsData.tx_data[5] = 0x0F;
-                            brainsData.tx_data[6] = 0x0F;
-                            brainsData.tx_data[7] = 0x0F;
-                        }
-                        
-                        break;
-                    case FOUND_ENDPOINT: // inform Raspberry PI that we were trapped by our own line
-                         switch(brainsData.notifyPicNum){
-                            case 0:
-                                brainsData.tx_data[0] =  0x98; // sending message to rpi
-                                break;
-                            case 1: 
-                                 brainsData.tx_data[0] =  0x99; // sending to pic 1 muscles 
-                                break;
-                            case 2:
-                                 brainsData.tx_data[0] =  0x9a; // sending to pic 2 sensors
-                                break;
-                            case 4:
-                                brainsData.tx_data[0] =  0x9c; // sending to pic 2 sensors
-                                break;
-                            default: 
-                                break;
-                        }
-                        if(brainsData.notifyPicNum < 4){
-                            brainsData.tx_data[1] = 0x0F;
-                            brainsData.tx_data[2] = 0x0F;
-                            brainsData.tx_data[3] = 0x0F;
-                            brainsData.tx_data[4] = 0x0F;
-                            brainsData.tx_data[5] = 0x0F;
-                            brainsData.tx_data[6] = 0x0F;
-                            brainsData.tx_data[7] = 0x0F;
-                        }
-                        else{
-                            brainsData.tx_data[1] = 0xF0;
-                            brainsData.tx_data[2] = 0xF0;
-                            brainsData.tx_data[3] = 0xF0;
-                            brainsData.tx_data[4] = 0xF0;
-                            brainsData.tx_data[5] = 0xF0;
-                            brainsData.tx_data[6] = 0xF0;
-                            brainsData.tx_data[7] = 0xF0;
-                        }
-                        break;
-                    case OBSTACLE_ENCOUNTERED:
-                        brainsData.tx_data[0] =  0x99; // sending message to pic 1 muscles
-                        degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn);
-                        if(degreesToTurn > 180){
-                            degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
-                        }
-                        degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
-                        brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
-                        brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
-                        brainsData.tx_data[3] = (uint8_t)brainsData.algData.distToGo; // distance to travel 
-                        brainsData.tx_data[4] = 0x00; // unused data 2
-                        brainsData.tx_data[5] = 0x00; // unused data 2
-                        brainsData.tx_data[6] = 0x00; // counter 
-                        brainsData.tx_data[7] = 0x00;
-                        break;
-                    default:
-                        break;
-
-                }         
+            brainsData.tx_data[0] =  0x99; // sending message to pic 1 muscles
+            int16_t degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn);
+            if(degreesToTurn > 180){
+                degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
             }
-            else if(brainsData.prevBrainState == BRAINS_STATE_RECEIVE_MESSAGE){
-                // this means that sensors found an obstacle and we need to send motors a stop
-                brainsData.tx_data[0] =  0x99;
-                brainsData.tx_data[1] =  0xFF; 
-                brainsData.tx_data[2] =  0xFF; 
-                brainsData.tx_data[3] =  0xFF; 
-                brainsData.tx_data[4] =  0xFF; 
-                brainsData.tx_data[5] =  0xFF; 
-                brainsData.tx_data[6] =  0xFF; 
-                brainsData.tx_data[7] =  0xFF; 
-            }
+            degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
+            brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
+            brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
+            brainsData.tx_data[3] = (uint8_t)brainsData.algData.distToGo; // distance to travel 
+            brainsData.tx_data[4] = 0x00; // unused data 2
+            brainsData.tx_data[5] = 0x00; // unused data 2
+            brainsData.tx_data[6] = 0x00; // counter 
+            brainsData.tx_data[7] = 0x00;
             
-            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
             wait_on_ack = true;
+            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            dbgOutputVal((uint8_t)brainsData.notifyPicNum);
             //StoreMessage(motorsData.tx_data);
-            brainsData.state = BRAINS_STATE_WAIT_ACK;
+            brainsData.state = BRAINS_STATE_WAIT_ACK_FINDING_PATH;
+        }
+        case BRAINS_STATE_TRANSMIT_END_CONDITION:
+        {
+            switch(brainsData.notifyPicNum){
+                case 0:
+                    brainsData.tx_data[0] =  0x98; // sending message to rpi
+                    break;
+                case 1: 
+                     brainsData.tx_data[0] =  0x99; // sending to pic 1 muscles 
+                    break;
+                case 2:
+                     brainsData.tx_data[0] =  0x9a; // sending to pic 2 sensors
+                    break;
+                case 4:
+                    brainsData.tx_data[0] =  0x9c; // sending to pic 4 follower
+                    break;
+                default: 
+                    break;
+            }
+            if(brainsData.notifyPicNum < 4){
+                brainsData.tx_data[1] = 0x0F;
+                brainsData.tx_data[2] = 0x0F;
+                brainsData.tx_data[3] = 0x0F;
+                brainsData.tx_data[4] = 0x0F;
+                brainsData.tx_data[5] = 0x0F;
+                brainsData.tx_data[6] = 0x0F;
+                brainsData.tx_data[7] = 0x0F;
+            }
+            else{
+                brainsData.tx_data[1] = 0xF0;
+                brainsData.tx_data[2] = 0xF0;
+                brainsData.tx_data[3] = 0xF0;
+                brainsData.tx_data[4] = 0xF0;
+                brainsData.tx_data[5] = 0xF0;
+                brainsData.tx_data[6] = 0xF0;
+                brainsData.tx_data[7] = 0xF0;
+            }
+            wait_on_ack = true;
+            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            dbgOutputVal((uint8_t)brainsData.notifyPicNum);
+            //StoreMessage(motorsData.tx_data);
+            brainsData.state = BRAINS_STATE_WAIT_ACK_END_CONDITION;
             break;
         }
-        case BRAINS_STATE_WAIT_ACK:
+        case BRAINS_STATE_TRANSMIT_OBSTACLE_ENCOUNTERED:
         {
-            if (!wait_on_ack)
-            {
-                // Receive the message from the receiver thread
-                // xQueueReceive(MessageQueueWin, motorsData.rx_data, portMAX_DELAY);
-                if(brainsData.prevBrainState == BRAINS_STATE_RECEIVE_MESSAGE){
-                    // do nothing for now 
-                   brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE;
-                   brainsData.prevBrainState = BRAINS_STATE_WAIT_ACK;   
-                }
-                else if(brainsData.prevBrainState == BRAINS_STATE_WORK_ON_DATA){
-                     switch(brainsData.algStateSentFrom)
-                    {
-                        case FINDING_PATH:
-                            brainsData.algData.states = ROTATE_AND_MOVE;
-                            brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                            break;
-                        case FOUND_LINE: // inform Raspberry PI that we were trapped by our own line
-                            brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-                            if(brainsData.notifyPicNum == 0){
-                                brainsData.notifyPicNum = 1;
-                            }
-                            else if(brainsData.notifyPicNum == 1){
-                                brainsData.notifyPicNum = 2;
-                            }
-                            else if(brainsData.notifyPicNum == 2){
-                                brainsData.notifyPicNum = 4;
-                            }
-                            else if(brainsData.notifyPicNum == 4){
-                                brainsData.state = BRAINS_STATE_DONE;
-                            }
-                            else{
-                                brainsData.notifyPicNum = 0;
-                            }
-                            break;
-                        case FOUND_ENDPOINT: // inform Raspberry PI that we were trapped by our own line
-                            dbgOutputVal((uint8_t)brainsData.notifyPicNum);
-                            brainsData.state = BRAINS_STATE_TRANSMIT_DATA;
-                            if(brainsData.notifyPicNum == 0){
-                                brainsData.notifyPicNum = 1;
-                                
-                            }
-                            else if(brainsData.notifyPicNum == 1){
-                                brainsData.notifyPicNum = 2;
-                            }
-                            else if(brainsData.notifyPicNum == 2){
-                                brainsData.notifyPicNum = 4;
-                            }
-                            else if(brainsData.notifyPicNum == 4){
-                                brainsData.state = BRAINS_STATE_DONE;
-                            }
-                            else{
-                                brainsData.notifyPicNum = 0;
-                            }
-                            break;
-                        case OBSTACLE_ENCOUNTERED:
-                            brainsData.algData.states = OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE;
-                            brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-                            break;
-                        default:
-                            break;
-
-                    } 
-                     
-                }                                
+            brainsData.tx_data[0] =  0x99; // sending message to pic 1 muscles
+            int16_t degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn);
+            if(degreesToTurn > 180){
+                degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
             }
+            degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
+            brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
+            brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
+            brainsData.tx_data[3] = (uint8_t)OBSACLE_AVOIDANCE_DISTANCE; // distance to travel 
+            brainsData.tx_data[4] = 0x00; // unused data 2
+            brainsData.tx_data[5] = 0x00; // unused data 2
+            brainsData.tx_data[6] = 0x00; // counter 
+            brainsData.tx_data[7] = 0x00;
+            
+            wait_on_ack = true;
+            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            dbgOutputVal((uint8_t)brainsData.notifyPicNum);
+            //StoreMessage(motorsData.tx_data);
+            brainsData.state = BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED;
+            break;
+        }
+        case BRAINS_STATE_TRANSMIT_MOTOR_STOP:
+        {
+            // this means that sensors found an obstacle and we need to send motors a stop
+            brainsData.tx_data[0] =  0x99;
+            brainsData.tx_data[1] =  0xFF; 
+            brainsData.tx_data[2] =  0xFF; 
+            brainsData.tx_data[3] =  0xFF; 
+            brainsData.tx_data[4] =  0xFF; 
+            brainsData.tx_data[5] =  0xFF; 
+            brainsData.tx_data[6] =  0xFF; 
+            brainsData.tx_data[7] =  0xFF;
+			
+            wait_on_ack = true;
+            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            dbgOutputVal((uint8_t)brainsData.notifyPicNum);
+            //StoreMessage(motorsData.tx_data);
+            brainsData.state = BRAINS_STATE_WAIT_ACK_MOTOR_STOP;
+            break;
+        }
+        case BRAINS_STATE_WAIT_ACK_FINDING_PATH:
+        {
+            while(!wait_on_ack){
+                
+            }
+            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_ROTATE_AND_MOVE;
+        }
+        case BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED:
+        {
+            while(!wait_on_ack){
+                
+            }
+            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE;;
+        }
+        case BRAINS_STATE_WAIT_ACK_END_CONDITION:
+        {
+            while(!wait_on_ack){
+                
+            }
+            if(brainsData.notifyPicNum <= 0){
+                brainsData.notifyPicNum = 1;
+                brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+            }
+            else if(brainsData.notifyPicNum == 1){
+                brainsData.notifyPicNum = 2;
+                brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+            }
+            else if(brainsData.notifyPicNum == 2){
+                brainsData.notifyPicNum = 4;
+                brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+            }
+            else if(brainsData.notifyPicNum >= 4){
+                brainsData.state = BRAINS_STATE_DONE;
+            }
+            else{
+               brainsData.state = BRAINS_STATE_DONE;
+            }
+        }
+        case BRAINS_STATE_WAIT_ACK_MOTOR_STOP:
+        {
+            while(!wait_on_ack){
+                
+            }
+            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_WAIT;  
         }
         case BRAINS_STATE_DONE:
         {
             // DO nothing
+            //dbgOutputVal(0xAA);
+            //dbgOutputVal((uint8_t)brainsData.notifyPicNum);
             
         }
         /* The default state should never be executed. */

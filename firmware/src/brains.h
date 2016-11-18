@@ -89,12 +89,20 @@ typedef enum
 {
 	/* Application's state machine's initial state. */
 	BRAINS_STATE_INIT=0,
-	BRAINS_STATE_RECEIVE_MESSAGE,
-            BRAINS_STATE_SEND_ACK,
-            BRAINS_STATE_WORK_ON_DATA,
-            BRAINS_STATE_TRANSMIT_DATA,
-            BRAINS_STATE_WAIT_ACK,
-            BRAINS_STATE_DONE
+    BRAINS_STATE_RECEIVE_MESSAGE_INIT,
+    BRAINS_STATE_RECEIVE_MESSAGE_ROTATE_AND_MOVE,
+    BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE,
+    BRAINS_STATE_RECEIVE_MESSAGE_WAIT,
+    BRAINS_STATE_WORK_ON_DATA,
+    BRAINS_STATE_TRANSMIT_MOTOR_STOP,
+    BRAINS_STATE_TRANSMIT_FINDING_PATH,
+    BRAINS_STATE_TRANSMIT_END_CONDITION,
+    BRAINS_STATE_TRANSMIT_OBSTACLE_ENCOUNTERED,
+    BRAINS_STATE_WAIT_ACK_FINDING_PATH,
+    BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED,
+    BRAINS_STATE_WAIT_ACK_END_CONDITION,
+    BRAINS_STATE_WAIT_ACK_MOTOR_STOP,
+    BRAINS_STATE_DONE
 
 	/* TODO: Define states used by the application state machine. */
 
@@ -121,8 +129,6 @@ typedef struct
     uint8_t rx_data [8]; // receive buffer 
     uint8_t tx_data [8]; // transmit buffer 
     ALGORITHM_DATA algData; // struct containing algorithm's internal data 
-    BRAINS_STATES prevBrainState; // the previous brain state, used when jumping between states 
-    ALGORITHM_STATES algStateSentFrom; // algorithm state that a transmit is being sent from or a receive being received in
     int notifyPicNum; // number representing which pic should be notified next about end condition
 } BRAINS_DATA;
 
