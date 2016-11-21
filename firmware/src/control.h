@@ -120,14 +120,16 @@ typedef struct
 {
     /* The application's current state */
     CONTROL_STATES state;
-    int8_t rx_data [8];
+    uint8_t rx_data [8];
     uint8_t tx_data [8];
+    uint8_t ex_data [8];
     uint8_t debug_data [8];
     uint8_t dx_data [4];
     int curr_degrees;
     int new_degrees;
     int first;
     int second;
+    int16_t receivedDegrees;
     int8_t rotation_amount;
     int8_t distance_amount;
 

@@ -15,6 +15,8 @@ bool magflag;
 void GetMagnetometerAq();
 void GetMagnetometerData();
 void StopGettingMagData();
+void StartMagDebug();
+void GetOffset();
 QueueHandle_t MessageQueueDin;
 
 

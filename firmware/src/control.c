@@ -97,7 +97,14 @@ CONTROL_DATA controlData;
 
 /* TODO:  Add any necessary local functions.
 */
-
+bool isRunning() {
+    switch (controlData.state) {
+        case CONTROL_STATE_RECEIVE_MESSAGE:
+            return false;
+        default:
+            return true;
+    }
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -117,6 +124,14 @@ void CONTROL_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     controlData.state = CONTROL_STATE_INIT;
+    controlData.ex_data[0] = 0x8b;
+    controlData.ex_data[1] = 0x00;
+    controlData.ex_data[2] = 0x00;
+    controlData.ex_data[3] = 0x00;
+    controlData.ex_data[4] = 0x00;
+    controlData.ex_data[5] = 0x00;
+    controlData.ex_data[6] = 0x00;
+    controlData.ex_data[7] = 0x00;
 
     
     /* TODO: Initialize your application's state machine and other
@@ -157,29 +172,34 @@ void CONTROL_Tasks ( void )
         /*State used to wait till a valid message has been received from the controller*/
         case CONTROL_STATE_RECEIVE_MESSAGE:
         {
-            // Wait till the message has been received before moving to the 
-            if (uxQueueMessagesWaiting(MessageQueueWin))
-            {
-                // Receive the message from the receiver thread
-                xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
-                
-                // Reset the transmit bits that will be used to send data
-                controlData.tx_data[1] = 0;
-                controlData.tx_data[2] = 0;
-                
-                // Check to see if the angle needs to be altered
-                if (controlData.rx_data[1] != 0)
+            if (getMoveState() == WAIT) {
+                // Wait till the message has been received before moving to the 
+                if (uxQueueMessagesWaiting(MessageQueueWin))
                 {
-                    //turn_left();
-                    xQueueReset(MessageQueueDin);                           // Clear the magnetometer register
-                    GetMagnetometerAq();                                  // Send a message to get initial angle
-                    controlData.state = CONTROL_STATE_GET_CURRENT_DEGREES;  // Go to the wait on degree state
-                }
-                // If it deosnt have to be altered then just go to the move state
-                else
-                {
-                    move_forward(controlData.rx_data[2], controlData.rx_data[2]);   // Set the distance that needs to be moved
-                    controlData.state = CONTROL_STATE_MOVE_FORWARD;                 // Go to the move forward state
+                    // Receive the message from the receiver thread
+                    xQueueReceive(MessageQueueWin, controlData.rx_data, portMAX_DELAY);
+
+                    // Get the received degrees
+                    controlData.receivedDegrees = (controlData.rx_data[1] << 8) | controlData.rx_data[2];
+                    // Reset the transmit bits that will be used to send data
+                    controlData.tx_data[1] = 0;
+                    controlData.tx_data[2] = 0;
+                    controlData.tx_data[3] = 0;
+
+                    // Check to see if the angle needs to be altered
+                    if (controlData.receivedDegrees != 0)
+                    {
+                        
+                        xQueueReset(MessageQueueDin);                           // Clear the magnetometer register
+                        GetMagnetometerAq();                                  // Send a message to get initial angle
+                        controlData.state = CONTROL_STATE_GET_CURRENT_DEGREES;  // Go to the wait on degree state
+                    }
+                    // If it deosnt have to be altered then just go to the move state
+                    else
+                    {
+                        move_forward(controlData.rx_data[3], controlData.rx_data[3]);   // Set the distance that needs to be moved
+                        controlData.state = CONTROL_STATE_MOVE_FORWARD;                 // Go to the move forward state
+                    }
                 }
             }
             break;
@@ -187,18 +207,20 @@ void CONTROL_Tasks ( void )
         /*State used to get the current*/
         case CONTROL_STATE_GET_CURRENT_DEGREES:
         {
+            
             if (uxQueueMessagesWaiting(MessageQueueDin)) 
             {
+                
                 xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
                 controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
-                controlData.new_degrees = controlData.curr_degrees + controlData.rx_data[1];
+                controlData.new_degrees = controlData.curr_degrees + controlData.receivedDegrees;
                 controlData.first = controlData.curr_degrees;
-                
-                SendMessage(controlData.first/2,0);
+                controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                SendMessageOnce(controlData.ex_data);
                 dbgOutputVal(controlData.curr_degrees/2);
-                if (controlData.rx_data[1] < 0)
+                if (controlData.receivedDegrees < 0)
                 {
-                    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     turn_right();
                 }
                 else
@@ -212,7 +234,9 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_STATE_TURN:
         {
-            if ( controlData.rx_data[1] < 0)
+            
+            int16_t angleCalc;
+            if ( controlData.receivedDegrees < 0)
             {
                 if (controlData.new_degrees < 0)
                 {
@@ -223,11 +247,17 @@ void CONTROL_Tasks ( void )
                         while (!uxQueueMessagesWaiting(MessageQueueDin));
                         xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
                         controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
-                        SendMessage(controlData.curr_degrees/2,1);
+                        controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                        controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                        SendMessageOnce(controlData.ex_data);
                         dbgOutputVal(controlData.curr_degrees/2);
                     }
-                    controlData.tx_data[1] = controlData.first - (360 - controlData.curr_degrees);
-                    SendMessage(controlData.curr_degrees/2,1);
+                    angleCalc = controlData.first - (360 - controlData.curr_degrees);
+                    controlData.tx_data[1] = ((angleCalc >> 8) & 0xFF);
+                    controlData.tx_data[2] = ((angleCalc) & 0xFF);
+                    controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                    controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                    SendMessageOnce(controlData.ex_data);
                 }
                 else
                 {
@@ -237,11 +267,17 @@ void CONTROL_Tasks ( void )
                         while (!uxQueueMessagesWaiting(MessageQueueDin));
                         xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
                         controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
-                        SendMessage(controlData.curr_degrees/2,1);
+                        controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                        controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                        SendMessageOnce(controlData.ex_data);
                         dbgOutputVal(controlData.curr_degrees/2);
                     }
-                    controlData.tx_data[1] = controlData.curr_degrees - controlData.first;
-                    SendMessage(controlData.curr_degrees/2,1);
+                    angleCalc = controlData.curr_degrees - controlData.first;
+                    controlData.tx_data[1] = ((angleCalc >> 8) & 0xFF);
+                    controlData.tx_data[2] = ((angleCalc) & 0xFF);
+                    controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                    controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                    SendMessageOnce(controlData.ex_data);
                 }
                 StopGettingMagData();
                 move_stop();
@@ -260,11 +296,17 @@ void CONTROL_Tasks ( void )
                         while (!uxQueueMessagesWaiting(MessageQueueDin));
                         xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
                         controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
-                        SendMessage(controlData.curr_degrees/2,1);
+                        controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                        controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                        SendMessageOnce(controlData.ex_data);
                         dbgOutputVal(controlData.curr_degrees/2);
                     }
-                    controlData.tx_data[1] = (360 - controlData.first) + controlData.curr_degrees;
-                    SendMessage(controlData.curr_degrees/2,1);
+                    angleCalc = (360 - controlData.first) + controlData.curr_degrees;
+                    controlData.tx_data[1] = ((angleCalc >> 8) & 0xFF);
+                    controlData.tx_data[2] = ((angleCalc) & 0xFF);
+                    controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                    controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                    SendMessageOnce(controlData.ex_data);
                 }
                 else
                 {
@@ -274,20 +316,25 @@ void CONTROL_Tasks ( void )
                         while (!uxQueueMessagesWaiting(MessageQueueDin));
                         xQueueReceive(MessageQueueDin, controlData.dx_data, portMAX_DELAY);
                         controlData.curr_degrees = (controlData.dx_data[0] << 8) | controlData.dx_data[1];
-                        SendMessage(controlData.curr_degrees/2,1);
+                        controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                        controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                        SendMessageOnce(controlData.ex_data);
                         dbgOutputVal(controlData.curr_degrees/2);
                     }
-                    controlData.tx_data[1] = controlData.curr_degrees - controlData.first;
-                    SendMessage(controlData.curr_degrees/2,1);
+                    angleCalc = controlData.curr_degrees - controlData.first;
+                    controlData.tx_data[1] = ((angleCalc >> 8) & 0xFF);
+                    controlData.tx_data[2] = ((angleCalc) & 0xFF);
+                    controlData.ex_data[2] = ((controlData.curr_degrees >> 8) & 0xFF);
+                    controlData.ex_data[3] = ((controlData.curr_degrees) & 0xFF);
+                    SendMessageOnce(controlData.ex_data);
                 }
-                StopGettingMagData();
                 move_stop();
                 
                 //dbgOutputVal(controlData.tx_data[1]);
             }
-            if (controlData.rx_data[2] != 0)
+            if (controlData.rx_data[3] != 0)
             {
-                move_forward(controlData.rx_data[2], controlData.rx_data[2]);
+                move_forward(controlData.rx_data[3], controlData.rx_data[3]);
                 controlData.state = CONTROL_STATE_MOVE_FORWARD;
             }
             else
@@ -297,10 +344,12 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_STATE_MOVE_FORWARD:
         {
-            
-            if (getMoveState() == WAIT)
+            if (!(getMoveState() == WAIT))
+                controlData.tx_data[3] = get_distance(LEFT);
+            if ((getMoveState() == WAIT) || stopAllProcesses())
             {
-                controlData.tx_data[2] = get_distance(LEFT);
+                clear_encoders();
+                clearStop();
                 controlData.state = CONTROL_STATE_WORK_ON_DATA;
             }
             break;
@@ -308,9 +357,8 @@ void CONTROL_Tasks ( void )
         
         case CONTROL_STATE_WORK_ON_DATA:
         {
-            
+            xQueueReset(MessageQueueWout);
             controlData.tx_data[0] = 0x8b;
-            controlData.tx_data[3] = 0xaa;
             controlData.tx_data[4] = 0xaa;
             controlData.tx_data[5] = 0xaa;
             controlData.tx_data[6] = 0xaa;

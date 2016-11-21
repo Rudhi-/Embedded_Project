@@ -11,7 +11,8 @@
 typedef enum
 {     
     NEGATIVE=-1, //unused value to ensure enum is signed
-    CRAWL=250,
+    STOP=0,
+    CRAWL=300,
     WALK=400,
     JOG=600,
     RUN=800,
@@ -35,6 +36,32 @@ typedef enum
 QueueHandle_t MessageQueueM;
 
 #define MOTOR_THREAD_ID 0x01
+#define MAG_THREAD_ID   0x03
+
+//motor settings for follower
+#ifdef FOLLOWER
+
+#define FORWARD 0
+#define REVERSE 1
+#define LEFT_CHANNEL PORT_CHANNEL_G 
+#define LEFT_PORT PORTS_BIT_POS_1
+#define LEFT_OC OC_ID_2
+#define RIGHT_CHANNEL PORT_CHANNEL_C
+#define RIGHT_PORT PORTS_BIT_POS_14
+#define RIGHT_OC OC_ID_1
+
+#else //motor settings for leader
+
+#define FORWARD 1
+#define REVERSE 0
+#define LEFT_CHANNEL PORT_CHANNEL_C 
+#define LEFT_PORT PORTS_BIT_POS_14
+#define LEFT_OC OC_ID_1
+#define RIGHT_CHANNEL PORT_CHANNEL_G
+#define RIGHT_PORT PORTS_BIT_POS_1
+#define RIGHT_OC OC_ID_2
+
+#endif
 
 // Follower rover
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed);
@@ -47,6 +74,8 @@ void move_stop();
 void spin_right();
 void spin_left();
 
+void clear_encoders();
+
 MOVE_STATE getMoveState();
 
 // Leader Rover
@@ -55,6 +84,8 @@ void turn_left();
 void move_forward();
 void move_backward();
 int get_distance(SIDE side);
+bool isRunning();
 
 
 #endif	/* MOTORS_PUBLIC_H */
+

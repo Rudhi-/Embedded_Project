@@ -127,16 +127,31 @@ void UARTTX_Initialize ( void )
      */
 }
 
-void SendMessage(uint8_t first, uint8_t second)
+void SendMessageOnce(uint8_t *msg)
 {
-    uarttxData.debug_data[0] = 0x8;
-    uarttxData.debug_data[1] = first;
-    uarttxData.debug_data[2] = second;
-    uarttxData.debug_data[3] = 0x0;
-    uarttxData.debug_data[4] = 0x0;
-    uarttxData.debug_data[5] = 0x0;
-    uarttxData.debug_data[6] = 0x0;
-    uarttxData.debug_data[7] = 0x0;
+    uarttxData.debug_data[0] = msg[0];
+    uarttxData.debug_data[1] = msg[1];
+    uarttxData.debug_data[2] = msg[2];
+    uarttxData.debug_data[3] = msg[3];
+    uarttxData.debug_data[4] = msg[4];
+    uarttxData.debug_data[5] = msg[5];
+    uarttxData.debug_data[6] = msg[6];
+    uarttxData.debug_data[7] = msg[7];
+    xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
+    
+}
+
+void SendMessageAck(uint8_t *msg)
+{
+    wait_on_ack = true;
+    uarttxData.debug_data[0] = msg[0];
+    uarttxData.debug_data[1] = msg[1];
+    uarttxData.debug_data[2] = msg[2];
+    uarttxData.debug_data[3] = msg[3];
+    uarttxData.debug_data[4] = msg[4];
+    uarttxData.debug_data[5] = msg[5];
+    uarttxData.debug_data[6] = msg[6];
+    uarttxData.debug_data[7] = msg[7];
     xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
     
 }
@@ -198,6 +213,7 @@ void UARTTX_Tasks ( void )
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
                 if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
                 {
+                    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     int i = 0;
                     for (i = 4; i >= 0; i--)
                     {
@@ -207,8 +223,11 @@ void UARTTX_Tasks ( void )
                     //                      debug     SRC          DST
                 }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
+                dbgOutputVal(uarttxData.tx_data[0]);
+                //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 if (uarttxData.tx_data[0] & 0x80)
                 {
+                    
                     uarttxData.tx_data[6] = tx_counter;
                     tx_counter = tx_counter + 1;
                     if (tx_counter == 20)

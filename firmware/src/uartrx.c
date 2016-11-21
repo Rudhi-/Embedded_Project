@@ -116,6 +116,7 @@ void UARTRX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uartrxData.state = UARTRX_STATE_INIT;
+    uartrxData.stopAll = false;
     rx_counter = 100;
     receiveState = WAIT_ON_MESSAGE;
     MessageQueueWin = xQueueCreate(2, 8*sizeof(char));
@@ -125,6 +126,16 @@ void UARTRX_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+}
+
+bool stopAllProcesses()
+{
+    return uartrxData.stopAll;
+}
+
+void clearStop()
+{
+    uartrxData.stopAll = false;
 }
 
 
@@ -167,8 +178,17 @@ void SendToTheQueue()
                         uartrxData.tx_data[i] = 0x00;
                     }
                     xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
-                    //pass data in
-                    xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                    // Check if its a stop message
+                    if ((uartrxData.rx_data[1] == 0x0F) && (uartrxData.rx_data[2] == 0x0F) && (uartrxData.rx_data[3] == 0x0F) && (uartrxData.rx_data[4] == 0x0F) && (uartrxData.rx_data[5] == 0x0F))
+                    {
+                        PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                        uartrxData.stopAll = true;
+                    }
+                    else
+                    {
+                        //pass data in
+                        xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
+                    }
                 }
                 else if (crcMatches(uartrxData.rx_data, 7) && ((uartrxData.rx_data[0] & 0xC0) == 0x00) && (uartrxData.rx_data[6] != rx_counter))
                 {
@@ -183,10 +203,22 @@ void SendToTheQueue()
                         xQueueSendFromISR(MessageQueueM, uartrxData.rx_data, pdFAIL);
                     }
 #endif
+#ifdef MAG_THREAD_ID
+                    if (uartrxData.rx_data[1] == (INTERNALMASK | SETMASK | SOURCEWRITEMASK | MAGTHREADMASK ))
+                    {
+                        StartMagDebug();
+                    }
+                    if (uartrxData.rx_data[1] == ( INTERNALMASK | GETMASK | SOURCEWRITEMASK | MAGTHREADMASK ))
+                    {
+                        GetOffset();
+                    }
+#endif
+
                 }
                 break;
             case WAIT_ON_ACK:
                 if ((uartrxData.rx_data[0] & 0x80)) {
+                    
                     break;
                 }
                 // xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );

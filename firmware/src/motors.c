@@ -107,9 +107,9 @@ void init_motors() {
     PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     
     //left motor enable
-    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_D, PORTS_BIT_POS_1);
-    //left motor direction
-    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT);
+    //right motor direction
+    PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT);
     
     //Start OC drivers    
     PLIB_OC_Enable(OC_ID_1);
@@ -117,8 +117,7 @@ void init_motors() {
     
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
-    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 6;
-    set_dist(60,60); 
+    motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 10; 
     
     set_speed(WALK,WALK);
     move_stop();
@@ -147,19 +146,23 @@ void set_dist(int leftDist, int rightDist) {
 void set_speed(MOTOR_SPEEDS leftSpeed, MOTOR_SPEEDS rightSpeed) {
     //left motor
     if (leftSpeed < 0) {
-        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
         leftSpeed *= -1;
     } else {
-        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
     }
     motorsData.leftSpeed = leftSpeed;
     
     //right motor
     if (rightSpeed < 0) {
-        PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
         rightSpeed *= -1;
     } else {
-        PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+        PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
     }
     motorsData.rightSpeed = rightSpeed;
 }
@@ -179,20 +182,19 @@ MOTOR_SPEEDS get_speed(SIDE side) {
 
 //Stops all motors immediately
 void move_stop() {
-    //right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     //left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
-    
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, 0);
+    //right motor
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, 0);
 }
 
 //sets motors to drive at current speed and direction
 void move_start() {
     rightEncoder = leftEncoder = 0;
     //left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, motorsData.leftSpeed + motorsData.leftSpeed_Offset);    
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, motorsData.leftSpeed + motorsData.leftSpeed_Offset);    
     //right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, motorsData.rightSpeed + motorsData.rightSpeed_Offset);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, motorsData.rightSpeed + motorsData.rightSpeed_Offset);
 }
 
 
@@ -201,50 +203,60 @@ void move_start() {
 void turn_left() {
     set_dist(200,200);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, CRAWL + motorsData.rightSpeed_Offset); 
     
     //stop left motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, 0);
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, WALK + motorsData.rightSpeed_Offset); 
 }
 
 //spin the rover clockwise
 void spin_left() {
     set_dist(35,35);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK + motorsData.rightSpeed_Offset); 
     
     //left motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, WALK + motorsData.leftSpeed_Offset);  
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, WALK + motorsData.rightSpeed_Offset);
 }
 
 //turn the rover to the left
 void turn_right() {
     set_dist(200,200);
     rightEncoder = leftEncoder = 0;
-    //stop right motor
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, CRAWL + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, WALK + motorsData.leftSpeed_Offset); 
+    
+    //stop right motor
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, 0); 
 }
 
 //spin the rover counterclockwise
 void spin_right() {
     set_dist(35,35);
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, WALK + motorsData.rightSpeed_Offset); 
     
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, WALK + motorsData.leftSpeed_Offset);  
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    PLIB_OC_PulseWidth16BitSet(LEFT_OC, WALK + motorsData.leftSpeed_Offset);  
+    
+    //right motor
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
+    PLIB_OC_PulseWidth16BitSet(RIGHT_OC, WALK + motorsData.rightSpeed_Offset); 
 }
 
 //function to move forwards
@@ -253,11 +265,14 @@ void move_forward(int leftDist, int rightDist) {
     set_dist (leftDist, rightDist);
     motorsData.moveState = MOVE;
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
 
     //left motor
-    PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, FORWARD);
+    
+    //right motor
+    //PLIB_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, FORWARD);
 
     move_start();
 }
@@ -265,12 +280,15 @@ void move_forward(int leftDist, int rightDist) {
 //function to move backwards
 void move_backward() {
     rightEncoder = leftEncoder = 0;
-    //right motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
     
     //left motor
-    PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, LEFT_CHANNEL, LEFT_PORT, REVERSE);
 
+    //right motor
+    //PLIB_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14);
+    PLIB_PORTS_PinWrite(PORTS_ID_0, RIGHT_CHANNEL, RIGHT_PORT, REVERSE);
+    
     move_start();
 }
 
@@ -284,12 +302,19 @@ bool forward_movement_done() {
 int get_distance(SIDE side) {
     switch (side) {
         case LEFT:
-            return leftEncoder * motorsData.leftEncoder_Conv;
+            return leftEncoder/motorsData.leftEncoder_Conv;
         case RIGHT:
-            return rightEncoder * motorsData.rightEncoder_Conv;
+            return rightEncoder/motorsData.rightEncoder_Conv;
         default:
             return 0;
     }
+}
+
+void clear_encoders()
+{
+    move_stop();
+    rightEncoder = leftEncoder = 0;
+    motorsData.moveState = WAIT;
 }
 
 MOVE_STATE getMoveState() {
@@ -321,7 +346,6 @@ void MOTORS_Initialize ( void )
      */
 }
 
-int x = 0;
 
 /******************************************************************************
   Function:
@@ -347,7 +371,11 @@ void MOTORS_Tasks ( void )
             
                 motorsData.state = MOTORS_STATE_SERVICE_TASKS;
             }
+#ifdef DEBUGGING
             motorsData.moveState = INIT;
+#else
+            motorsData.moveState = WAIT;
+#endif
             break;
         }
 
@@ -356,24 +384,18 @@ void MOTORS_Tasks ( void )
             switch (motorsData.moveState) {
                 case INIT:
                     move_stop();
-                    set_speed(RUN, RUN);
+                    set_speed(SPRINT, RUN);
                     set_dist(30,30);
                     move_start();
-                    motorsData.moveState = WAIT;
                     motorsData.testState = MOVE1;
+                    motorsData.moveState = TEST;
+                    break;
                 case TEST:
                     switch (motorsData.testState) {
                         case MOVE1:
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
                                 move_stop();
-                                spin_left();
-                                motorsData.testState = SPIN1;
-                            }
-                            break;
-                        case SPIN1:
-                            if (rightEncoder > motorsData.rightDist) {
-                                move_stop();
-                                set_speed(RUN, RUN);
+                                set_speed(-RUN, -RUN);
                                 set_dist(30,30);
                                 move_start();
                                 motorsData.testState = MOVE2;
@@ -382,26 +404,37 @@ void MOTORS_Tasks ( void )
                         case MOVE2:
                             if ((rightEncoder > motorsData.rightDist) && (leftEncoder > motorsData.leftDist)) {
                                 move_stop();
-                                spin_right();
-                                motorsData.testState = SPIN2;
+#ifdef DEBUGGING
+                                motorsData.testState = TURNL;
+                                turn_left();
+                                set_dist(5,5);
+#else
+                                motorsData.testState = MOVE1;
+                                motorsData.moveState = WAIT;
+#endif
                             }
                             break;
-                        case SPIN2:
+#ifdef DEBUGGING
+                        case TURNL:
+                            if (rightEncoder > motorsData.rightDist) {
+                                move_stop();
+                                motorsData.testState = TURNR;
+                                turn_right();
+                                set_dist(5,5);
+                            }
+                            break;
+                        case TURNR:
                             if (leftEncoder > motorsData.leftDist) {
                                 move_stop();
                                 motorsData.testState = MOVE1;
                                 motorsData.moveState = WAIT;
                             }
                             break;
+#endif
                     }
                     break;                    
                 case WAIT:
-                    if (x==0)
-                    {
-                        move_stop();
-                        x = 1;
-                    }
-                    if (uxQueueMessagesWaiting(MessageQueueM)) {
+                    if (uxQueueMessagesWaiting(MessageQueueM) && !isRunning()) {
                         move_stop();
                         int temp[4], i; //temps for set and get values, iterator
                         xQueueReceive(MessageQueueM, motorsData.motor_msg, portMAX_DELAY);
@@ -409,40 +442,30 @@ void MOTORS_Tasks ( void )
                             break;
                         }
                         if (motorsData.motor_msg[0] & 0x20){ //if set command
-                            for (i = 0; i < 3; i++) {
+                            for (i = 0; i < 4; i++) {
                                 if (motorsData.motor_msg[i+1] & 0x80) {
                                     temp[i] = 0xFFFFFF00 | motorsData.motor_msg[i+1];
                                 } else {
                                     temp[i] = 0x00000000 | motorsData.motor_msg[i+1];
                                 }
                             }
-                            motorsData.leftEncoder_Conv += temp[0];
-                            motorsData.rightEncoder_Conv += temp[1];
-                            motorsData.leftSpeed_Offset += temp[2];
-                            motorsData.rightSpeed_Offset += temp[3];
+                            motorsData.leftEncoder_Conv = temp[0];
+                            motorsData.rightEncoder_Conv = temp[1];
+                            motorsData.leftSpeed_Offset = temp[2];
+                            motorsData.rightSpeed_Offset = temp[3];
                             //now test
                             
                             motorsData.moveState = TEST;
-                            set_dist(50,50);
+                            set_dist(30,30);
                             set_speed(RUN, RUN);
                             move_start();
-                            
                         } else {    //else if get command
-                            if (motorsData.motor_msg[1] & 0x01) { //check if getting encoders
-                                motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv >> 8);
-                                motorsData.motor_msg[2] = (char)(motorsData.leftEncoder_Conv);
-                                motorsData.motor_msg[3] = (char)(motorsData.rightEncoder_Conv >> 8);
-                                motorsData.motor_msg[4] = (char)(motorsData.rightEncoder_Conv);
-                            } else if (motorsData.motor_msg[1] & 0x02){ //else sending speeds
-                                motorsData.motor_msg[1] = (char)(motorsData.leftSpeed_Offset >> 8);
-                                motorsData.motor_msg[2] = (char)(motorsData.leftSpeed_Offset);
-                                motorsData.motor_msg[3] = (char)(motorsData.rightSpeed_Offset >> 8);
-                                motorsData.motor_msg[4] = (char)(motorsData.rightSpeed_Offset);
-                            } else {
-                                break;
-                            }
-                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4) | (MOTOR_THREAD_ID << 2) | 0x00 ;
-                            //info                   int         get           SRC                   DST
+                            motorsData.motor_msg[1] = (char)(motorsData.leftEncoder_Conv);
+                            motorsData.motor_msg[2] = (char)(motorsData.rightEncoder_Conv);
+                            motorsData.motor_msg[3] = (char)(motorsData.leftSpeed_Offset);
+                            motorsData.motor_msg[4] = (char)(motorsData.rightSpeed_Offset);
+                            motorsData.motor_msg[0] = 0xC0 | (0x01 << 4)     | (MOTOR_THREAD_ID << 2) | CONTROL_THREAD_ID ;
+                            //info                   int       get response        SRC                   DST
                             xQueueSend(MessageQueueWout, motorsData.motor_msg, pdFAIL);
                         }
                     }
@@ -450,7 +473,7 @@ void MOTORS_Tasks ( void )
                 case MOVE:
                     if (rightEncoder > motorsData.rightDist && leftEncoder > motorsData.leftDist) {
                         move_stop();
-                        rightEncoder = leftEncoder = 0;
+                        //rightEncoder = leftEncoder = 0;
                         motorsData.moveState = WAIT;
                     }
                     break;

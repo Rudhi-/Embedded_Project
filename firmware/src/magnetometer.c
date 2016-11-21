@@ -135,13 +135,45 @@ void StopGettingMagData()
     magnetometerData.state = MAGNETOMETER_STATE_WAIT;
 }
 
+void StartMagDebug()
+{
+    magnetometerData.state = MAGNETOMETER_STATE_DEBUG;
+}
+
+void GetOffset()
+{
+    magnetometerData.ex_data[0] = 0x08;
+    magnetometerData.ex_data[1] = 0xDC;
+    magnetometerData.ex_data[2] = ((magnetometerData.xoffset >> 8) & 0xFF);
+    magnetometerData.ex_data[3] = ((magnetometerData.xoffset) & 0xFF);
+    magnetometerData.ex_data[4] = ((magnetometerData.yoffset >> 8) & 0xFF);
+    magnetometerData.ex_data[5] = ((magnetometerData.yoffset) & 0xFF);
+    magnetometerData.ex_data[6] = 0x00;
+    magnetometerData.ex_data[7] = 0x00;
+    SendMessageOnce(magnetometerData.ex_data);
+}
+
 void MAGNETOMETER_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     magnetometerData.state = MAGNETOMETER_STATE_INIT;
     magnetometerData.getval = false;
+    magnetometerData.ex_data[0] = 0x08;
+    magnetometerData.ex_data[1] = 0xDC;
+    magnetometerData.ex_data[2] = 0x00;
+    magnetometerData.ex_data[3] = 0x00;
+    magnetometerData.ex_data[4] = 0x00;
+    magnetometerData.ex_data[5] = 0x00;
+    magnetometerData.ex_data[6] = 0x00;
+    magnetometerData.ex_data[7] = 0x00;
     magnetometerData.rxbufferx = 0;
     magnetometerData.rxbuffery = 0;
+    magnetometerData.minx = 0;
+    magnetometerData.miny = 0;
+    magnetometerData.maxx = 0;
+    magnetometerData.maxy = 0;
+    magnetometerData.xoffset = 15;
+    magnetometerData.yoffset = 85;
     MessageQueueDin = xQueueCreate(2, 4*sizeof(uint8_t));
     
     /* TODO: Initialize your application's state machine and other
@@ -200,31 +232,30 @@ void MAGNETOMETER_Tasks ( void )
         case MAGNETOMETER_STATE_AQUIRE:
         {
             int i,j;
-            
             for (i = 0; i < 10; i++)
             {
                 for (j = 0; j < 1000000;j++)
                 {
                     j = j + 1 -1;
                 }
+                PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 magnetometerData.i2c_handle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_READWRITE);             
                 //while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( magnetometerData.i2c_handle, magnetometerData.txbufferhandle ));
-                //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 DRV_I2C_Transmit ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), NULL);
-                for (j = 0; j < 1000;j++)
+                for (j = 0; j < 10000;j++)
                 {
                     j = j + 1 -1;
                 }
                 //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 DRV_I2C_Receive ( magnetometerData.i2c_handle, 0x3d, rx_buffer, 6, NULL);
-
+                
                 DRV_I2C_Close( magnetometerData.i2c_handle );
 
                 magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
                 magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
                 
-                magnetometerData.rxbufferx = (magnetometerData.rxbufferx + 10) * .92;
-                magnetometerData.rxbuffery = (magnetometerData.rxbuffery - 10) * .92;
+                magnetometerData.rxbufferx = (magnetometerData.rxbufferx - magnetometerData.xoffset) * .92;
+                magnetometerData.rxbuffery = (magnetometerData.rxbuffery - magnetometerData.yoffset) * .92;
 
                 magnetometerData.bearing[0] = atan2(magnetometerData.rxbuffery, magnetometerData.rxbufferx) * 360/ (2*M_PI);
 
@@ -235,7 +266,9 @@ void MAGNETOMETER_Tasks ( void )
                     i = i - 1;
                     //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 }
+                
             }
+            
             magnetometerData.state = MAGNETOMETER_STATE_SERVICE_TASKS;
             break;
         }
@@ -244,6 +277,7 @@ void MAGNETOMETER_Tasks ( void )
         {   
             int i;
             int j;
+            
             for (i = 0; i < LOOP_SIZE; i++)
             {
                 for (j = 0; j < 1000000;j++)
@@ -258,7 +292,7 @@ void MAGNETOMETER_Tasks ( void )
                 //while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( magnetometerData.i2c_handle, magnetometerData.txbufferhandle ));
                 
                 DRV_I2C_Transmit ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), NULL);
-                for (j = 0; j < 1000;j++)
+                for (j = 0; j < 10000;j++)
                 {
                     j = j + 1 -1;
                 }
@@ -270,8 +304,8 @@ void MAGNETOMETER_Tasks ( void )
                 magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
                 magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
                 
-                magnetometerData.rxbufferx = (magnetometerData.rxbufferx + 15) * .92;
-                magnetometerData.rxbuffery = (magnetometerData.rxbuffery + 85) * .92;
+                magnetometerData.rxbufferx = (magnetometerData.rxbufferx - magnetometerData.xoffset) * .92;
+                magnetometerData.rxbuffery = (magnetometerData.rxbuffery - magnetometerData.yoffset) * .92;
 
                 magnetometerData.bearing[i] = atan2(magnetometerData.rxbuffery, magnetometerData.rxbufferx) * 360/ (2*M_PI);
                 
@@ -294,7 +328,6 @@ void MAGNETOMETER_Tasks ( void )
             magnetometerData.dx_data[1] = magnetometerData.bearingAvg & 0xFF;  
             dbgOutputVal(magnetometerData.bearingAvg/2);
             
-            SendMessage(magnetometerData.bearingAvg/2,0);
             
             xQueueSend( MessageQueueDin, magnetometerData.dx_data, pdFAIL );
             
@@ -302,9 +335,118 @@ void MAGNETOMETER_Tasks ( void )
             break;
         }
         
+        case MAGNETOMETER_STATE_DEBUG:
+        {
+            int i,j;
+            turn_left();
+            magnetometerData.counter = 0;
+            for (i = 0; i < 250; i++)
+            {
+                for (j = 0; j < 1000000;j++)
+                {
+                    j = j + 1 -1;
+                }
+                magnetometerData.i2c_handle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_READWRITE);             
+                DRV_I2C_Transmit ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), NULL);
+                for (j = 0; j < 10000;j++)
+                {
+                    j = j + 1 -1;
+                }
+                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                DRV_I2C_Receive ( magnetometerData.i2c_handle, 0x3d, rx_buffer, 6, NULL);
+
+                DRV_I2C_Close( magnetometerData.i2c_handle );
+
+                magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
+                magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
+
+                magnetometerData.bearing[0] = atan2(magnetometerData.rxbuffery, magnetometerData.rxbufferx) * 360/ (2*M_PI);
+
+                if (magnetometerData.bearing[0] < 0)
+                    magnetometerData.bearing[0] = 360 + magnetometerData.bearing[0];
+                if (magnetometerData.rxbufferx == 0)
+                {
+                    i = i - 1;
+                }
+                else
+                {
+                    if (magnetometerData.rxbufferx < magnetometerData.minx)
+                        magnetometerData.minx = magnetometerData.rxbufferx;
+                    if (magnetometerData.rxbufferx > magnetometerData.maxx)
+                        magnetometerData.maxx = magnetometerData.rxbufferx;
+                    if (magnetometerData.rxbuffery < magnetometerData.miny)
+                        magnetometerData.miny = magnetometerData.rxbuffery;
+                    if (magnetometerData.rxbuffery > magnetometerData.maxy)
+                        magnetometerData.maxy = magnetometerData.rxbuffery;
+
+                    magnetometerData.ex_data[1] = (INTERNALMASK | GETMASK | MAGTHREADMASK | SOURCEWRITEMASK);
+                    magnetometerData.ex_data[2] = (magnetometerData.bearing[0] >> 8) & 0xFF;
+                    magnetometerData.ex_data[3] = (magnetometerData.bearing[0]) & 0xFF;
+                    magnetometerData.ex_data[4] = (magnetometerData.counter/2);
+                    magnetometerData.ex_data[5] = (0x00);
+                    magnetometerData.counter = magnetometerData.counter + 1;
+                    SendMessageOnce(magnetometerData.ex_data);
+                }
+            }
+            turn_right();
+            for (i = 0; i < 250; i++)
+            {
+                for (j = 0; j < 1000000;j++)
+                {
+                    j = j + 1 -1;
+                }
+                magnetometerData.i2c_handle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_READWRITE);             
+                DRV_I2C_Transmit ( magnetometerData.i2c_handle, 0x3c, txBuffer, (sizeof(txBuffer)-1), NULL);
+                for (j = 0; j < 10000;j++)
+                {
+                    j = j + 1 -1;
+                }
+                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                DRV_I2C_Receive ( magnetometerData.i2c_handle, 0x3d, rx_buffer, 6, NULL);
+
+                DRV_I2C_Close( magnetometerData.i2c_handle );
+
+                magnetometerData.rxbufferx = (rx_buffer[0] << 8) | rx_buffer[1];
+                magnetometerData.rxbuffery = (rx_buffer[4] << 8) | rx_buffer[5];
+
+                magnetometerData.bearing[0] = atan2(magnetometerData.rxbuffery, magnetometerData.rxbufferx) * 360/ (2*M_PI);
+
+                if (magnetometerData.bearing[0] < 0)
+                    magnetometerData.bearing[0] = 360 + magnetometerData.bearing[0];
+                if (magnetometerData.rxbufferx == 0)
+                {
+                    i = i - 1;
+                }
+                else
+                {
+                    if (magnetometerData.rxbufferx < magnetometerData.minx)
+                        magnetometerData.minx = magnetometerData.rxbufferx;
+                    if (magnetometerData.rxbufferx > magnetometerData.maxx)
+                        magnetometerData.maxx = magnetometerData.rxbufferx;
+                    if (magnetometerData.rxbuffery < magnetometerData.miny)
+                        magnetometerData.miny = magnetometerData.rxbuffery;
+                    if (magnetometerData.rxbuffery > magnetometerData.maxy)
+                        magnetometerData.maxy = magnetometerData.rxbuffery;
+
+                    magnetometerData.ex_data[1] = (INTERNALMASK | GETMASK | MAGTHREADMASK | SOURCEWRITEMASK);
+                    magnetometerData.ex_data[2] = (magnetometerData.bearing[0] >> 8) & 0xFF;
+                    magnetometerData.ex_data[3] = (magnetometerData.bearing[0]) & 0xFF;
+                    magnetometerData.ex_data[4] = (magnetometerData.counter/2);
+                    magnetometerData.ex_data[5] = (0x00);
+                    magnetometerData.counter = magnetometerData.counter + 1;
+                    SendMessageOnce(magnetometerData.ex_data);
+                }
+            }
+            move_stop();
+            magnetometerData.xoffset = (magnetometerData.maxx + magnetometerData.minx)/2;
+            magnetometerData.yoffset = (magnetometerData.maxy + magnetometerData.miny)/2;
+            GetOffset();
+            magnetometerData.state = MAGNETOMETER_STATE_WAIT;
+            break;
+        }
+        
         case MAGNETOMETER_STATE_WAIT:
         {
-            
             break;
         }
 

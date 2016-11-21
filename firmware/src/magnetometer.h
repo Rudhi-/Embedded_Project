@@ -90,7 +90,8 @@ typedef enum
 	MAGNETOMETER_STATE_INIT=0,
 	MAGNETOMETER_STATE_SERVICE_TASKS,
     MAGNETOMETER_STATE_WAIT,
-    MAGNETOMETER_STATE_AQUIRE
+    MAGNETOMETER_STATE_AQUIRE,
+    MAGNETOMETER_STATE_DEBUG
 
 	/* TODO: Define states used by the application state machine. */
 
@@ -120,10 +121,18 @@ typedef struct
     int16_t             rxbufferx;
     int16_t             rxbuffery;
     uint8_t dx_data [2];
+    uint8_t ex_data [8];
     uint8_t txBuffer_2[2];
     uint8_t txBuffer_3[2];
     int16_t bearing[LOOP_SIZE];
     int16_t bearingAvg;
+    int16_t minx;
+    int16_t miny;
+    int16_t maxx;
+    int16_t maxy;
+    int16_t xoffset;
+    int16_t yoffset;
+    uint16_t counter;
     double float_val;
 
     /* TODO: Define any additional data used by the application. */
