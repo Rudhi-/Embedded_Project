@@ -116,7 +116,6 @@ void UARTTX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
-    uarttxData.reset_msg[0] = 'm';
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     DRV_TMR0_Start();
     wait_on_ack = false;
@@ -171,19 +170,14 @@ void ReSendMessage()
 
 void TransmitTheMessage ()
 {
-    //PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
-    if (uarttxData.tx_data[0] != 'm') 
-    {
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
-    }
-        
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);        
 }
 
 void UARTTX_Tasks ( void )
@@ -213,7 +207,6 @@ void UARTTX_Tasks ( void )
                 xQueueReceive(MessageQueueWout, uarttxData.tx_data, portMAX_DELAY);
                 if ((uarttxData.tx_data[0] & 0xC0) == 0xC0)     //Convert internal messages to debug
                 {
-                    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     int i = 0;
                     for (i = 4; i >= 0; i--)
                     {
@@ -224,7 +217,6 @@ void UARTTX_Tasks ( void )
                 }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
                 dbgOutputVal(uarttxData.tx_data[0]);
-                //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 if (uarttxData.tx_data[0] & 0x80)
                 {
                     
@@ -233,10 +225,8 @@ void UARTTX_Tasks ( void )
                     if (tx_counter == 20)
                         tx_counter = 0;
                     receiveState = WAIT_ON_ACK;
-                    wait_on_ack = true;
                     uarttxData.state = UARTTX_STATE_WAIT;
                 }
-                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
                 
                 
