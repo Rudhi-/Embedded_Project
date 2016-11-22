@@ -191,10 +191,16 @@ void MAIN_TASK_Tasks ( void )
                     dbgOutputVal(0x00);
                 }
                 */
-                
-                //if(!wait_on_ack){
-                if(1){
-                    xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                if ( (main_taskData.prev_data[1] != packet_tx_data[1]) || (main_taskData.prev_data[2] != packet_tx_data[2]) || (main_taskData.prev_data[3] != packet_tx_data[3]) || (main_taskData.prev_data[4] != packet_tx_data[4]))
+                {
+                    if (((packet_tx_data[2] < 35) || (packet_tx_data[3] < 35) || (packet_tx_data[4] < 35)) || (packet_tx_data[1] != 0))
+                    {
+                        xQueueSend( MessageQueueWout, packet_tx_data, pdFAIL );
+                        main_taskData.prev_data[1] = packet_tx_data[1];
+                        main_taskData.prev_data[2] = packet_tx_data[2];
+                        main_taskData.prev_data[3] = packet_tx_data[3];
+                        main_taskData.prev_data[4] = packet_tx_data[4];
+                    }
                 }
                 PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 //PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, PORTS_BIT_POS_0);

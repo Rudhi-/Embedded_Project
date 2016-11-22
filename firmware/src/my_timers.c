@@ -34,7 +34,6 @@ void callback_LED_OFF( TimerHandle_t xTimer ){
     start_LED_OFF = 1;
     
     xTimerStop(timer_LED_OFF, 0);
-                
     PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_8, 0);
     PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_9, 0);
     PLIB_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, PORTS_BIT_POS_10, 0);
@@ -71,7 +70,6 @@ void callback_LED_INPUT( TimerHandle_t xTimer ){
          (PORTBbits.RB10 << 2) +
          (PORTBbits.RB9 << 1) +
          (PORTBbits.RB8));
-
     //reflectance_output = reflectance_output ^ 0xFF;
     packet_tx_data[1] = reflectance_output;
 

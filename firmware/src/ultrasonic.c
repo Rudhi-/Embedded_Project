@@ -175,11 +175,7 @@ void ULTRASONIC_Tasks ( void )
 
         case ULTRASONIC_STATE_SERVICE_TASKS:
         {
-            /*
-            if (flag) {
-                do ultrasonic stuff
-            }
-            */
+            int16_t j;
             
             if (start_ultrasonic) {
                 start_ultrasonic = 0;
@@ -196,23 +192,45 @@ void ULTRASONIC_Tasks ( void )
                 uint8_t range_1[2];
                 uint8_t range_2[2];
                 
-                
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }
                 ultrasonicData.rxbufferhandle = DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x08, range_0, 2, NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.rxbufferhandle ));
-
+                
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }
                 ultrasonicData.rxbufferhandle = DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x10, range_1, 2, NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.rxbufferhandle ));
 
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }
                 ultrasonicData.rxbufferhandle = DRV_I2C_Receive(ultrasonicData.i2c_handle, 0x20, range_2, 2, NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.rxbufferhandle ));
 
-                
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }                
                 ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x08, &range_command, sizeof(range_command), NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.txbufferhandle ));
 
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }
                 ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x10, &range_command, sizeof(range_command), NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.txbufferhandle ));
 
+                for (j = 0; j < 10000; j++)
+                {
+                    j = j + 1 - 1;
+                }
                 ultrasonicData.txbufferhandle = DRV_I2C_Transmit(ultrasonicData.i2c_handle, 0x20, &range_command, sizeof(range_command), NULL);
                 while(!DRV_I2C_BUFFER_EVENT_COMPLETE == DRV_I2C_TransferStatusGet ( ultrasonicData.i2c_handle, ultrasonicData.txbufferhandle ));
                 
