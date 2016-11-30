@@ -18,17 +18,15 @@ extern "C" {
     
 // Definitions of Values used in code 
 #define MIN_ROTATION_INCREMENT 30 // the angle increment that the rover can rotate by
-#define OBSACLE_AVOIDANCE_DISTANCE 5 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
+#define OBSACLE_AVOIDANCE_DISTANCE 10 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
 #define ROTATION_AMOUNT 30
 #define DEBUG_START_DIST 25
 #define DEBUG_START_DEGREES_TO_TURN 45
 #define START_CURRENT_ANG_ROT 0
-#define DEBUG_START true
-#define OBJECT_DETECT_DISTANCE 0x32 // 50 (cm))
+//#define DEBUG_START true
+#define OBJECT_DETECT_DISTANCE 0x23 // 50 (cm))
 
 
-// Main algorithm function what will be called in the lead rover's loop
-void algorithm(); 
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler(); 
 // calculation function to get a third leg (leg C) when doing law of cosines 
@@ -39,17 +37,6 @@ void algoInit();
 int getCurrentTravelDistance();
 // set new local origin by messaging the motors that they should remeasure the distance traveled so far from the current point
     //void setLocalOrigin();
-
-
-// States for ALgorithm State machine 
-typedef enum {
-	FINDING_PATH = 0,
-	//ROTATE_AND_MOVE,
-	OBSTACLE_ENCOUNTERED,
-	FOUND_LINE,
-	FOUND_ENDPOINT,
-	//OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE
-} ALGORITHM_STATES;
 
 
 // Struct containing all of the algorithm's data 
@@ -72,10 +59,8 @@ typedef struct {
 	int currRotAng;
     // current distance traveled
     int currDistTrav;
-    
-	int side;
-	ALGORITHM_STATES states;
-	
+    // which side to go
+	int side;	
 } ALGORITHM_DATA;
 
 #ifdef	__cplusplus

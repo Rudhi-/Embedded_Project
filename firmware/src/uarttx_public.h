@@ -11,7 +11,8 @@
 QueueHandle_t MessageQueueWout;
 volatile bool wait_on_ack;
 
-void SendMessage(uint8_t first, uint8_t second);
+void SendMessageOnce(uint8_t *msg);
+void SendMessageAck(uint8_t *msg);
 void ReSendMessage();
 void TransmitTheMessage();
 

@@ -93,109 +93,11 @@ BRAINS_DATA brainsData;
 // *****************************************************************************
 // *****************************************************************************
 
-// Main algorithm function what will be called in the lead rover's loop
-void algorithm() {
-	switch (brainsData.algData.states)
-	{
-        case FINDING_PATH:
-        {
-            //legB here is the distance traveled from the most recent start point
-            brainsData.algData.legB = getCurrentTravelDistance();// = sqrt(sq(brainsData.algData.position.x - brainsData.algData.origin.x) + sq(brainsData.algData.position.y - brainsData.algData.origin.y));
-
-            brainsData.algData.distToGo = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angToTurn);
-            float temp = fmod(asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo)), MIN_ROTATION_INCREMENT);
-            brainsData.algData.angToTurn =  temp + asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo));
-
-            // determine when if its faster to rotate right or faster to rotate left 
-            if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
-                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
-                        brainsData.algData.turnRight = true;
-                    } else {
-                        brainsData.algData.turnRight = false;
-                    }
-                } else {
-                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
-                        brainsData.algData.turnRight = false;
-                    } else {
-                        brainsData.algData.turnRight = true;
-                    }
-                }
-            // switch brain state to send message mode in order to tell muscles to rotate and move
-            brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;
-            break;
-        }
-        case OBSTACLE_ENCOUNTERED:
-        {
-            brainsData.algData.numObjsCollide++;
-
-            if (brainsData.algData.numObjsCollide == 1) {	
-
-                brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
-
-                turnHandler();
-            }
-            else if (brainsData.algData.numObjsCollide >= 2) {
-                brainsData.algData.legB = getCurrentTravelDistance();
-                brainsData.algData.legA = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angC);
-                turnHandler();
-            }
-            else {
-                // This Should never happen 
-                break;
-            }
-
-            brainsData.algData.currRotAng = fmod(brainsData.algData.currRotAng,360);
-            brainsData.algData.angToTurn =	fmod(brainsData.algData.angToTurn,360);
-            // which way to rotate?
-
-            int travelDist = getCurrentTravelDistance();
-
-            if (travelDist < 1) { // this is so that if the rover immediately encountering another obstacle it doesn't turn a different direction. 
-                brainsData.algData.turnRight = brainsData.algData.turnRight;
-            } else {
-                if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
-                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
-                        brainsData.algData.turnRight = true;
-                    } else {
-                        brainsData.algData.turnRight = false;
-                    }
-                } else {
-                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
-                        brainsData.algData.turnRight = false;
-                    } else {
-                        brainsData.algData.turnRight = true;
-                    }
-                }
-            }
-            // Send message to motors that they need to start rotating and then move after
-            brainsData.state = BRAINS_STATE_TRANSMIT_OBSTACLE_ENCOUNTERED;
-            break;
-        }
-        case FOUND_LINE:
-        {
-            brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
-            break;
-        }
-        case FOUND_ENDPOINT:
-        {
-            brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
-            break;
-        }
-        default:
-        {
-            break;
-        }
-	}
-}
-
 // TODO implement distance traveled so far function
 int getCurrentTravelDistance() {
     return brainsData.algData.currDistTrav;
 }
-// TODO implement set new local origin method 
-/*void setLocalOrigin() {
 
-}*/
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler() {
    
@@ -275,7 +177,6 @@ void algoInit(){
 	brainsData.algData.angToTurn = 0;
 	brainsData.algData.numObjsCollide = 0;
 	brainsData.algData.turnRight = true;
-	brainsData.algData.states = FINDING_PATH;
 	brainsData.algData.currRotAng = 0;
     brainsData.algData.currDistTrav = 0;
 }
@@ -333,13 +234,13 @@ void BRAINS_Tasks ( void )
         case BRAINS_STATE_RECEIVE_MESSAGE_INIT:
         {
             if (uxQueueMessagesWaiting(MessageQueueWin)){
-                //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                
                 
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
                 
                 if(brainsData.rx_data[0] == 0x83){ // from raspi
-#if DEBUG_START == true
+#ifdef DEBUG_START //== true
                     brainsData.algData.distToGo = DEBUG_START_DIST;
                     brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
                     brainsData.algData.angToTurn = (brainsData.algData.currRotAng + DEBUG_START_DEGREES_TO_TURN)%360;
@@ -353,18 +254,28 @@ void BRAINS_Tasks ( void )
             }
             break;
         }
-        case BRAINS_STATE_RECEIVE_MESSAGE_ROTATE_AND_MOVE:
+        case BRAINS_STATE_RECEIVE_MESSAGE_ROTATE:
+        {
+            //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
+                // message from motors that angle was rotated
+                if(brainsData.rx_data[0] == 0x8b){
+                    brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_MOVE;
+                }           
+            }
+            break;
+        }
+        case BRAINS_STATE_RECEIVE_MESSAGE_MOVE:
         {
             if (uxQueueMessagesWaiting(MessageQueueWin)){
-                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-                
                 // Receive the message from the receiver thread
                 xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
                 // message from sensors that line was encountered 
                 if( (brainsData.rx_data[0] == 0x93) && (brainsData.rx_data[1] > 0x00)){
 					// end condition reached 
-                     brainsData.algData.states = FOUND_LINE;
-                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                     brainsData.state = BRAINS_STATE_ALGORITM_FOUND_LINE;
                 }
                 // message from sensors that obstacle was encountered 
                 else if((brainsData.rx_data[0] == 0x93) && 
@@ -375,14 +286,28 @@ void BRAINS_Tasks ( void )
                 }
                 // message from motors of the distance traveled and the angle rotated
                 else if(brainsData.rx_data[0] == 0x8b){
+					//PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     // this means that we have reached the end
-                    brainsData.algData.states = FOUND_ENDPOINT;
-                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                    //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                    brainsData.state = BRAINS_STATE_ALGORITM_FOUND_ENDPOINT;
                 }           
             }
             break;
         }
-        case BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE:
+        case BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE:
+        {
+            if (uxQueueMessagesWaiting(MessageQueueWin)){
+                // Receive the message from the receiver thread
+                xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
+                
+                // message from motors that they finished rotating
+                if(brainsData.rx_data[0] == 0x8b){
+                    brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE;
+                }        
+            }
+            break;
+        }
+        case BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE:
         {
             if (uxQueueMessagesWaiting(MessageQueueWin)){
                 //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
@@ -392,8 +317,7 @@ void BRAINS_Tasks ( void )
                 
                 // message from sensors that line was encountered 
                 if( (brainsData.rx_data[0] == 0x93) && (brainsData.rx_data[1] > 0x00)){
-                     brainsData.algData.states = FOUND_LINE;
-                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                     brainsData.state = BRAINS_STATE_ALGORITM_FOUND_LINE;
                 }
                 // message from sensors that obstacle was encountered 
                 else if((brainsData.rx_data[0] == 0x93) && 
@@ -405,9 +329,7 @@ void BRAINS_Tasks ( void )
                 // message from motors that they navigated past the obstacle
                 else if(brainsData.rx_data[0] == 0x8b){
                     // this means that we have reached the end
-                    brainsData.algData.states = FINDING_PATH;
-                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
-
+                    brainsData.state = BRAINS_STATE_ALGORITM_FINDING_PATH;//FINDING_PATH;
                 }        
             }
             break;
@@ -426,20 +348,97 @@ void BRAINS_Tasks ( void )
                     brainsData.algData.currRotAng += ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
                     
                     // going to algorithm state obstacle encountered 
-                    brainsData.algData.states = OBSTACLE_ENCOUNTERED;
-                    brainsData.state = BRAINS_STATE_WORK_ON_DATA;
+                    brainsData.state = BRAINS_STATE_ALGORITM_OBSTACLE_ENCOUNTERED;//OBSTACLE_ENCOUNTERED;
                 }
             }
             break;
         }
-        case BRAINS_STATE_WORK_ON_DATA:
+        case BRAINS_STATE_ALGORITM_FINDING_PATH:
         {
-            algorithm();
+            //legB here is the distance traveled from the most recent start point
+            brainsData.algData.legB = getCurrentTravelDistance();// = sqrt(sq(brainsData.algData.position.x - brainsData.algData.origin.x) + sq(brainsData.algData.position.y - brainsData.algData.origin.y));
+
+            brainsData.algData.distToGo = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angToTurn);
+            float temp = fmod(asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo)), MIN_ROTATION_INCREMENT);
+            brainsData.algData.angToTurn =  temp + asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo));
+
+            // determine when if its faster to rotate right or faster to rotate left 
+            if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
+                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
+                        brainsData.algData.turnRight = true;
+                    } else {
+                        brainsData.algData.turnRight = false;
+                    }
+                } else {
+                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
+                        brainsData.algData.turnRight = false;
+                    } else {
+                        brainsData.algData.turnRight = true;
+                    }
+                }
+            // switch brain state to send message mode in order to tell muscles to rotate and move
+            brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;
+            break;
+        }
+        case BRAINS_STATE_ALGORITM_OBSTACLE_ENCOUNTERED:
+        {
+            brainsData.algData.numObjsCollide++;
+
+            if (brainsData.algData.numObjsCollide == 1) {	
+
+                brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
+
+                turnHandler();
+            }
+            else if (brainsData.algData.numObjsCollide >= 2) {
+                brainsData.algData.legB = getCurrentTravelDistance();
+                brainsData.algData.legA = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angC);
+                turnHandler();
+            }
+            else {
+                // This Should never happen 
+                break;
+            }
+
+            brainsData.algData.currRotAng = fmod(brainsData.algData.currRotAng,360);
+            brainsData.algData.angToTurn =	fmod(brainsData.algData.angToTurn,360);
+            // which way to rotate?
+
+            int travelDist = getCurrentTravelDistance();
+
+            if (travelDist < 1) { // this is so that if the rover immediately encountering another obstacle it doesn't turn a different direction. 
+                brainsData.algData.turnRight = brainsData.algData.turnRight;
+            } else {
+                if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
+                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
+                        brainsData.algData.turnRight = true;
+                    } else {
+                        brainsData.algData.turnRight = false;
+                    }
+                } else {
+                    if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
+                        brainsData.algData.turnRight = false;
+                    } else {
+                        brainsData.algData.turnRight = true;
+                    }
+                }
+            }
+            // Send message to motors that they need to start rotating and then move after
+            brainsData.state = BRAINS_STATE_TRANSMIT_OBSTACLE_ENCOUNTERED;
+            break;
+        }
+        case BRAINS_STATE_ALGORITM_FOUND_LINE:
+        {
+            brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+            break;
+        }
+        case BRAINS_STATE_ALGORITM_FOUND_ENDPOINT:
+        {
+            brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
             break;
         }
         case BRAINS_STATE_TRANSMIT_FINDING_PATH:
         {
-            //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             brainsData.tx_data[0] =  0x99; // sending message to pic 1 muscles
             int16_t degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn);
             if(degreesToTurn > 180){
@@ -454,8 +453,9 @@ void BRAINS_Tasks ( void )
             brainsData.tx_data[6] = 0x00; // counter 
             brainsData.tx_data[7] = 0x00;
             
-            wait_on_ack = true;
-            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            SendMessageAck(brainsData.tx_data);
+            //wait_on_ack = true;
+            //xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
             dbgOutputVal((uint8_t)brainsData.notifyPicNum);
             //StoreMessage(motorsData.tx_data);
             brainsData.state = BRAINS_STATE_WAIT_ACK_FINDING_PATH;
@@ -463,57 +463,27 @@ void BRAINS_Tasks ( void )
         }
         case BRAINS_STATE_TRANSMIT_END_CONDITION:
         {
-            switch(brainsData.notifyPicNum)
-            {
-                case 0:
-                {
-                    brainsData.tx_data[0] =  0x98; // sending message to rpi
-                    break;
-                }
-                case 1: 
-                {
-                     brainsData.tx_data[0] =  0x99; // sending to pic 1 muscles 
-                    break;
-                }
-                case 2:
-                {
-                     brainsData.tx_data[0] =  0x9a; // sending to pic 2 sensors
-                    break;
-                }
-                case 4:
-                {
-                    brainsData.tx_data[0] =  0x9c; // sending to pic 4 follower
-                    break;
-                }
-                default: 
-                {
-                    break;
-                }
+            //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+            if(brainsData.notifyPicNum ==  0){
+                brainsData.tx_data[0] =  0x98; // sending message to rpi
             }
-            if(brainsData.notifyPicNum < 4)
-            {
-                brainsData.tx_data[1] = 0x0F;
-                brainsData.tx_data[2] = 0x0F;
-                brainsData.tx_data[3] = 0x0F;
-                brainsData.tx_data[4] = 0x0F;
-                brainsData.tx_data[5] = 0x0F;
-                brainsData.tx_data[6] = 0x0F;
-                brainsData.tx_data[7] = 0x0F;
+            else if(brainsData.notifyPicNum ==  1){
+                brainsData.tx_data[0] =  0x99; // sending to pic 1 muscles 
             }
-            else
-            {
-                brainsData.tx_data[1] = 0xF0;
-                brainsData.tx_data[2] = 0xF0;
-                brainsData.tx_data[3] = 0xF0;
-                brainsData.tx_data[4] = 0xF0;
-                brainsData.tx_data[5] = 0xF0;
-                brainsData.tx_data[6] = 0xF0;
-                brainsData.tx_data[7] = 0xF0;
+            else if(brainsData.notifyPicNum ==  2){
+                brainsData.tx_data[0] =  0x9a; // sending to pic 2 sensors
             }
-            wait_on_ack = true;
-            xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
+            // stop command 
+            brainsData.tx_data[1] = 0x0F;
+            brainsData.tx_data[2] = 0x0F;
+            brainsData.tx_data[3] = 0x0F;
+            brainsData.tx_data[4] = 0x0F;
+            brainsData.tx_data[5] = 0x0F;
+            brainsData.tx_data[6] = 0x0F;
+            brainsData.tx_data[7] = 0x0F;
+            // actually sending message out
+            SendMessageAck(brainsData.tx_data);
             dbgOutputVal((uint8_t)brainsData.notifyPicNum);
-            //StoreMessage(motorsData.tx_data);
             brainsData.state = BRAINS_STATE_WAIT_ACK_END_CONDITION;
             break;
         }
@@ -533,6 +503,7 @@ void BRAINS_Tasks ( void )
             brainsData.tx_data[6] = 0x00; // counter 
             brainsData.tx_data[7] = 0x00;
             
+            //SendMessageAck(brainsData.tx_data);
             wait_on_ack = true;
             xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
             dbgOutputVal((uint8_t)brainsData.notifyPicNum);
@@ -552,6 +523,7 @@ void BRAINS_Tasks ( void )
             brainsData.tx_data[6] =  0xFF; 
             brainsData.tx_data[7] =  0xFF;
 			
+            //SendMessageAck(brainsData.tx_data);
             wait_on_ack = true;
             xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
             dbgOutputVal((uint8_t)brainsData.notifyPicNum);
@@ -561,42 +533,40 @@ void BRAINS_Tasks ( void )
         }
         case BRAINS_STATE_WAIT_ACK_FINDING_PATH:
         {
-            while(wait_on_ack){
-                
+            //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+            if (!wait_on_ack){
+             // wait blocking   
+                brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_ROTATE;
             }
             //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_ROTATE_AND_MOVE;
+            //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+            
             break;
         }
         case BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED:
         {
-            while(wait_on_ack){
-                
-            }
-            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE_AND_MOVE;
+            while(wait_on_ack);
+            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_ROTATE;
             break;
         }
         case BRAINS_STATE_WAIT_ACK_END_CONDITION:
         {
             while(wait_on_ack){
-                PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
+                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             }
             //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-            if(brainsData.notifyPicNum <= 0){
+            if(brainsData.notifyPicNum == 0){
                 brainsData.notifyPicNum = 1;
-                brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+                //brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
+                brainsData.state = BRAINS_STATE_DONE;
             }
-            else if(brainsData.notifyPicNum == 1){
+            /*else if(brainsData.notifyPicNum == 1){
                 brainsData.notifyPicNum = 2;
                 brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
             }
             else if(brainsData.notifyPicNum == 2){
-                brainsData.notifyPicNum = 4;
-                brainsData.state = BRAINS_STATE_TRANSMIT_END_CONDITION;
-            }
-            else if(brainsData.notifyPicNum >= 4){
                 brainsData.state = BRAINS_STATE_DONE;
-            }
+            }*/
             else{
                brainsData.state = BRAINS_STATE_DONE;
             }
@@ -604,9 +574,7 @@ void BRAINS_Tasks ( void )
         }
         case BRAINS_STATE_WAIT_ACK_MOTOR_STOP:
         {
-            while(wait_on_ack){
-                
-            }
+            while(wait_on_ack);
             brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_WAIT;  
             break;
         }

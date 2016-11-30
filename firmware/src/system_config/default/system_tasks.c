@@ -107,7 +107,7 @@ void SYS_Tasks ( void )
     /* Create OS Thread for BRAINS Tasks. */
     xTaskCreate((TaskFunction_t) _BRAINS_Tasks,
                 "BRAINS Tasks",
-                1024, NULL, 1, NULL);
+                2048, NULL, 1, NULL);
 
     /**************
      * Start RTOS * 

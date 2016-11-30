@@ -116,7 +116,6 @@ void UARTTX_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     uarttxData.state = UARTTX_STATE_INIT;
-    uarttxData.reset_msg[0] = 'm';
     MessageQueueWout = xQueueCreate(2, 8*sizeof(char));
     DRV_TMR0_Start();
     wait_on_ack = false;
@@ -127,16 +126,31 @@ void UARTTX_Initialize ( void )
      */
 }
 
-void SendMessage(uint8_t first, uint8_t second)
+void SendMessageOnce(uint8_t *msg)
 {
-    uarttxData.debug_data[0] = 0x8;
-    uarttxData.debug_data[1] = first;
-    uarttxData.debug_data[2] = second;
-    uarttxData.debug_data[3] = 0x0;
-    uarttxData.debug_data[4] = 0x0;
-    uarttxData.debug_data[5] = 0x0;
-    uarttxData.debug_data[6] = 0x0;
-    uarttxData.debug_data[7] = 0x0;
+    uarttxData.debug_data[0] = msg[0];
+    uarttxData.debug_data[1] = msg[1];
+    uarttxData.debug_data[2] = msg[2];
+    uarttxData.debug_data[3] = msg[3];
+    uarttxData.debug_data[4] = msg[4];
+    uarttxData.debug_data[5] = msg[5];
+    uarttxData.debug_data[6] = msg[6];
+    uarttxData.debug_data[7] = msg[7];
+    xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
+    
+}
+
+void SendMessageAck(uint8_t *msg)
+{
+    wait_on_ack = true;
+    uarttxData.debug_data[0] = msg[0];
+    uarttxData.debug_data[1] = msg[1];
+    uarttxData.debug_data[2] = msg[2];
+    uarttxData.debug_data[3] = msg[3];
+    uarttxData.debug_data[4] = msg[4];
+    uarttxData.debug_data[5] = msg[5];
+    uarttxData.debug_data[6] = msg[6];
+    uarttxData.debug_data[7] = msg[7];
     xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
     
 }
@@ -156,19 +170,14 @@ void ReSendMessage()
 
 void TransmitTheMessage ()
 {
-    //PLIB_USART_TransmitterByteSend(USART_ID_1, 'm');
-    if (uarttxData.tx_data[0] != 'm') 
-    {
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
-        PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);
-    }
-        
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[0]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[1]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[2]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[3]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[4]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[5]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[6]);
+    PLIB_USART_TransmitterByteSend(USART_ID_1, uarttxData.tx_data[7]);        
 }
 
 void UARTTX_Tasks ( void )
@@ -207,17 +216,17 @@ void UARTTX_Tasks ( void )
                     //                      debug     SRC          DST
                 }
                 uarttxData.tx_data[7] = checksumCreator(uarttxData.tx_data, 7);
+                dbgOutputVal(uarttxData.tx_data[0]);
                 if (uarttxData.tx_data[0] & 0x80)
                 {
+                    PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     uarttxData.tx_data[6] = tx_counter;
                     tx_counter = tx_counter + 1;
                     if (tx_counter == 20)
                         tx_counter = 0;
                     receiveState = WAIT_ON_ACK;
-                    //wait_on_ack = true;
                     uarttxData.state = UARTTX_STATE_WAIT;
                 }
-                //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                 PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
                 
                 
