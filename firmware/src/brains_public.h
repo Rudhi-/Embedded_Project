@@ -17,14 +17,14 @@ extern "C" {
 #include <stdbool.h>
     
 // Definitions of Values used in code 
-#define MIN_ROTATION_INCREMENT 1 // the angle increment that the rover can rotate by
 #define OBSACLE_AVOIDANCE_DISTANCE 20 // the minimum distance the rover should travel upon encountering an obstacle in order to get past said obstacle 
-#define ROTATION_AMOUNT 30
+#define ROTATION_AMOUNT 45
 #define DEBUG_START_DIST 25
 #define DEBUG_START_DEGREES_TO_TURN 45
 #define START_CURRENT_ANG_ROT 0
 //#define DEBUG_START true
 #define OBJECT_DETECT_DISTANCE 0x23 // 50 (cm))
+#define PI 3.14159265
 
 
 // responsible for setting the turn at which rover will go when it encounters an obstacle

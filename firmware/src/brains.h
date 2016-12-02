@@ -134,7 +134,7 @@ typedef struct
     uint8_t rx_data [8]; // receive buffer 
     uint8_t tx_data [8]; // transmit buffer 
     ALGORITHM_DATA algData; // struct containing algorithm's internal data 
-    int notifyPicNum; // number representing which pic should be notified next about end condition
+    
 } BRAINS_DATA;
 
 
