@@ -94,15 +94,15 @@ BRAINS_DATA brainsData;
 // *****************************************************************************
 
 // TODO implement distance traveled so far function
-int getCurrentTravelDistance() {
+int16_t getCurrentTravelDistance() {
     return brainsData.algData.currDistTrav;
 }
 
 // responsible for setting the turn at which rover will go when it encounters an obstacle
 void turnHandler() {
    
-	int leftObjs = 0; // number of obstacles on left  (-60)
-	int rightObjs = 0; // number of obstacles on right (+60)
+	int16_t leftObjs = 0; // number of obstacles on left  (-60)
+	int16_t rightObjs = 0; // number of obstacles on right (+60)
 	
     // LeftAng and rightAng are the angles we should glance in to see which side is better 
     //float leftAng = (brainsData.algData.currRotAng - 90) - fmod((brainsData.algData.currRotAng - 90),MIN_ROTATION_INCREMENT);
@@ -112,14 +112,14 @@ void turnHandler() {
 	
 	
 	// "weight" adjustment based upon distance of possible path's endpoint to final endpoint
-	int leftMag;
-	int tempAng = ROTATION_AMOUNT;
+	int16_t leftMag;
+	int16_t tempAng = ROTATION_AMOUNT;
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.legB)) - ROTATION_AMOUNT;
 	}
     
 	leftMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
-	int rightMag;
+	int16_t rightMag;
 	tempAng = ROTATION_AMOUNT;
 	if (brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - asin(brainsData.algData.legB * (sin(brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
@@ -137,7 +137,7 @@ void turnHandler() {
 	}
 
 	if (leftObjs > rightObjs) { //turn left
-		brainsData.algData.angToTurn = (brainsData.algData.currRotAng - ROTATION_AMOUNT) - fmod((brainsData.algData.currRotAng - ROTATION_AMOUNT), MIN_ROTATION_INCREMENT);
+		brainsData.algData.angToTurn = (brainsData.algData.currRotAng - ROTATION_AMOUNT) - ((brainsData.algData.currRotAng - ROTATION_AMOUNT)% MIN_ROTATION_INCREMENT);
 		if (brainsData.algData.angToTurn < 0) {
 			brainsData.algData.angToTurn += 360;
 		}
@@ -147,11 +147,11 @@ void turnHandler() {
 		} else if (brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.angC = 180 - asin(brainsData.algData.legB * (sin(brainsData.algData.angC) / brainsData.algData.legA)) - ROTATION_AMOUNT;
 		}
-
+		brainsData.algData.turnRight = false;
 		brainsData.algData.side = 1;
 	} else {
 		// turn right
-		brainsData.algData.angToTurn = fmod((brainsData.algData.currRotAng + ROTATION_AMOUNT), MIN_ROTATION_INCREMENT) + (brainsData.algData.currRotAng + ROTATION_AMOUNT);
+		brainsData.algData.angToTurn = ((brainsData.algData.currRotAng + ROTATION_AMOUNT)% MIN_ROTATION_INCREMENT) + (brainsData.algData.currRotAng + ROTATION_AMOUNT);
 		if (brainsData.algData.angToTurn < 0) {
 			brainsData.algData.angToTurn += 360;
 		}
@@ -162,10 +162,11 @@ void turnHandler() {
 			brainsData.algData.angC = 180 - asin(brainsData.algData.legB * (sin(brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
 		}
 		brainsData.algData.side = -1;
+		 brainsData.algData.turnRight = true;
 	}
 }
 // calculation function to get a third leg (leg C) when doing law of cosines 
-int getLegC() {
+int16_t getLegC() {
 	return sqrt(pow(brainsData.algData.legA,2) + pow(brainsData.algData.legB,2) - (2 * brainsData.algData.legA * brainsData.algData.legB * cos(brainsData.algData.angC)));
 }
 // algorithm initializer function 
@@ -245,9 +246,17 @@ void BRAINS_Tasks ( void )
                     brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
                     brainsData.algData.angToTurn = (brainsData.algData.currRotAng + DEBUG_START_DEGREES_TO_TURN)%360;
 #else
-                    brainsData.algData.distToGo = (int)brainsData.rx_data[3];
+                    brainsData.algData.distToGo = (int16_t)brainsData.rx_data[3];
                     brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
-                    brainsData.algData.angToTurn += (brainsData.algData.currRotAng + ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]))%360;
+                    int16_t temp = ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
+                    temp%=360;
+                    brainsData.algData.angToTurn = (brainsData.algData.currRotAng + temp);
+                    if ((((brainsData.rx_data[1]<<8)|brainsData.rx_data[2])) < 0){
+                        brainsData.algData.turnRight = false;
+                    }
+                    else{
+                        brainsData.algData.turnRight = true;
+                    }
 #endif                    
                     brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;                       
                 }  
@@ -329,6 +338,9 @@ void BRAINS_Tasks ( void )
                 // message from motors that they navigated past the obstacle
                 else if(brainsData.rx_data[0] == 0x8b){
                     // this means that we have reached the end
+                    brainsData.algData.currDistTrav = (int16_t)brainsData.rx_data[3];
+                    brainsData.algData.currRotAng += ((int16_t)((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]));
+					brainsData.algData.angC = abs(((int16_t)((brainsData.rx_data[1]<<8)|brainsData.rx_data[2])));
                     brainsData.state = BRAINS_STATE_ALGORITM_FINDING_PATH;//FINDING_PATH;
                 }        
             }
@@ -344,8 +356,8 @@ void BRAINS_Tasks ( void )
                 xQueueReceive(MessageQueueWin, brainsData.rx_data, portMAX_DELAY);
                 
                 if(brainsData.rx_data[0] == 0x8b){
-                    brainsData.algData.currDistTrav = (int)brainsData.rx_data[3];
-                    brainsData.algData.currRotAng += ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
+                    brainsData.algData.currDistTrav = (int16_t)brainsData.rx_data[3];
+                    brainsData.algData.currRotAng += ((int16_t)((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]));
                     
                     // going to algorithm state obstacle encountered 
                     brainsData.state = BRAINS_STATE_ALGORITM_OBSTACLE_ENCOUNTERED;//OBSTACLE_ENCOUNTERED;
@@ -358,10 +370,11 @@ void BRAINS_Tasks ( void )
             //legB here is the distance traveled from the most recent start point
             brainsData.algData.legB = getCurrentTravelDistance();// = sqrt(sq(brainsData.algData.position.x - brainsData.algData.origin.x) + sq(brainsData.algData.position.y - brainsData.algData.origin.y));
 
-            brainsData.algData.distToGo = getLegC(brainsData.algData.legA, brainsData.algData.legB, brainsData.algData.angToTurn);
-            float temp = fmod(asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo)), MIN_ROTATION_INCREMENT);
-            brainsData.algData.angToTurn =  temp + asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo));
-
+            brainsData.algData.distToGo = getLegC();
+            int16_t temp = asin(brainsData.algData.legA * (sin(brainsData.algData.angC) / brainsData.algData.distToGo));
+            brainsData.algData.angToTurn =  (temp%MIN_ROTATION_INCREMENT) + temp;
+			brainsData.algData.angA =  abs(180 - temp);
+            
             // determine when if its faster to rotate right or faster to rotate left 
             if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
                     if (fabs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
@@ -404,7 +417,7 @@ void BRAINS_Tasks ( void )
             brainsData.algData.angToTurn =	fmod(brainsData.algData.angToTurn,360);
             // which way to rotate?
 
-            int travelDist = getCurrentTravelDistance();
+            int16_t travelDist = getCurrentTravelDistance();
 
             if (travelDist < 1) { // this is so that if the rover immediately encountering another obstacle it doesn't turn a different direction. 
                 brainsData.algData.turnRight = brainsData.algData.turnRight;
@@ -444,9 +457,15 @@ void BRAINS_Tasks ( void )
             if(degreesToTurn > 180){
                 degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
             }
-            degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
-            brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
+            
+            if(brainsData.algData.numObjsCollide >= 1){
+                degreesToTurn = brainsData.algData.angA;
+            }
+            
+            degreesToTurn = (!brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
+            
             brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
+            brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
             brainsData.tx_data[3] = (uint8_t)brainsData.algData.distToGo; // distance to travel 
             brainsData.tx_data[4] = 0x00; // unused data 2
             brainsData.tx_data[5] = 0x00; // unused data 2
@@ -494,7 +513,7 @@ void BRAINS_Tasks ( void )
             if(degreesToTurn > 180){
                 degreesToTurn = abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn + 360);
             }
-            degreesToTurn = (brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
+            degreesToTurn = (!brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
             brainsData.tx_data[2] =  0xFF & degreesToTurn; // lower 8 bits for number of degrees rover needs to turn 
             brainsData.tx_data[1] =  0xFF & (degreesToTurn >> 8); // upper 8 bits for number of degrees rover needs to turn
             brainsData.tx_data[3] = (uint8_t)OBSACLE_AVOIDANCE_DISTANCE; // distance to travel 
