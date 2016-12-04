@@ -134,7 +134,7 @@ typedef struct
     uint8_t rx_data [8]; // receive buffer 
     uint8_t tx_data [8]; // transmit buffer 
     ALGORITHM_DATA algData; // struct containing algorithm's internal data 
-    
+    BRAINS_STATES altStateObs; // used to check if an obstacle was detected during movement to endpoint or while escaping another obstacle
 } BRAINS_DATA;
 
 

@@ -107,13 +107,13 @@ void turnHandler() {
 	// "weight" adjustment based upon distance of possible path's endpoint to final endpoint
 	int16_t leftMag = 0;
 	int16_t tempAng = ROTATION_AMOUNT;
-	if (brainsData.algData.numObjsCollide >= 2) {
+	if (brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE){//(brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - (180/PI)*asin(brainsData.algData.legA * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legB)) - ROTATION_AMOUNT;
         leftMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
 	}
 	int16_t rightMag = 0;
 	tempAng = ROTATION_AMOUNT;
-	if (brainsData.algData.numObjsCollide >= 2) {
+	if (brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE){//(brainsData.algData.numObjsCollide >= 2) {
 		tempAng = 180 - (180/PI)*asin(brainsData.algData.legB * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
         tempAng%=360;
         rightMag = getLegC(brainsData.algData.legA, OBSACLE_AVOIDANCE_DISTANCE, tempAng);
@@ -135,7 +135,7 @@ void turnHandler() {
 		brainsData.algData.angToTurn= (brainsData.algData.angToTurn% 360);
 		if (brainsData.algData.numObjsCollide == 1) {
 			brainsData.algData.angC = ROTATION_AMOUNT;
-		} else if (brainsData.algData.numObjsCollide >= 2) {
+		} else if (brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE){//(brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.angC = 180 - (180/PI)*asin(brainsData.algData.legB * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legA)) - ROTATION_AMOUNT;
 		}
 		brainsData.algData.turnRight = false;
@@ -149,7 +149,7 @@ void turnHandler() {
 		brainsData.algData.angToTurn = (brainsData.algData.angToTurn % 360);
 		if (brainsData.algData.numObjsCollide == 1) {
 			brainsData.algData.angC = ROTATION_AMOUNT;
-		} else if (brainsData.algData.numObjsCollide >= 2) {
+		} else if (brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE){//(brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.angC = 180 - (180/PI)*asin(brainsData.algData.legB * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
 		}
 		brainsData.algData.turnRight = true;
@@ -191,7 +191,7 @@ void BRAINS_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
     brainsData.state = BRAINS_STATE_INIT;
-    
+    brainsData.altStateObs = BRAINS_STATE_RECEIVE_MESSAGE_MOVE;
     algoInit();
 }
 
@@ -285,6 +285,7 @@ void BRAINS_Tasks ( void )
                         (brainsData.rx_data[3] <= OBJECT_DETECT_DISTANCE) || 
                         (brainsData.rx_data[4] <= OBJECT_DETECT_DISTANCE) ) ){
                     brainsData.state = BRAINS_STATE_TRANSMIT_MOTOR_STOP;
+                    brainsData.altStateObs = BRAINS_STATE_RECEIVE_MESSAGE_MOVE;
                 }
                 // message from motors of the distance traveled and the angle rotated
                 else if(brainsData.rx_data[0] == 0x8b){
@@ -327,6 +328,7 @@ void BRAINS_Tasks ( void )
                         (brainsData.rx_data[3] <= OBJECT_DETECT_DISTANCE) || 
                         (brainsData.rx_data[4] <= OBJECT_DETECT_DISTANCE) ) ){
                     brainsData.state = BRAINS_STATE_TRANSMIT_MOTOR_STOP;
+                    brainsData.altStateObs = BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE;
                 }
                 // message from motors that they navigated past the obstacle
                 else if(brainsData.rx_data[0] == 0x8b){
@@ -395,13 +397,13 @@ void BRAINS_Tasks ( void )
         {
             brainsData.algData.numObjsCollide++;
 
-            if (brainsData.algData.numObjsCollide <= 1) {	
+            if (brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_MOVE){	
 
                 brainsData.algData.legA = brainsData.algData.distToGo - getCurrentTravelDistance();
 
                 turnHandler();
             }
-            else if (brainsData.algData.numObjsCollide >= 2) {
+            else if(brainsData.altStateObs == BRAINS_STATE_RECEIVE_MESSAGE_OBSTACLE_ENCOUNTERED_MOVE){//if (brainsData.algData.numObjsCollide >= 2) {
                 brainsData.algData.legB = getCurrentTravelDistance();
                 brainsData.algData.legA = getLegC();
                 turnHandler();
@@ -453,6 +455,10 @@ void BRAINS_Tasks ( void )
             
             if(brainsData.algData.numObjsCollide >= 1){
                 degreesToTurn = abs(180 - brainsData.algData.angA);
+                if(degreesToTurn > 10){
+                    // degree offset
+                    degreesToTurn= abs(degreesToTurn+15);
+                }
             }
             
             degreesToTurn = (!brainsData.algData.turnRight)? degreesToTurn : -1 * degreesToTurn;      
