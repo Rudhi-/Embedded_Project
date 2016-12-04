@@ -139,7 +139,7 @@ void turnHandler() {
 			brainsData.algData.angC = 180 - (180/PI)*asin(brainsData.algData.legB * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legA)) - ROTATION_AMOUNT;
 		}
 		brainsData.algData.turnRight = false;
-		brainsData.algData.side = 1;
+		
 	} else {
 		// turn right
 		brainsData.algData.angToTurn = (brainsData.algData.currRotAng + ROTATION_AMOUNT);
@@ -152,8 +152,7 @@ void turnHandler() {
 		} else if (brainsData.algData.numObjsCollide >= 2) {
 			brainsData.algData.angC = 180 - (180/PI)*asin(brainsData.algData.legB * (sin((PI/180)*brainsData.algData.angC) / brainsData.algData.legA)) + ROTATION_AMOUNT;
 		}
-		brainsData.algData.side = -1;
-		 brainsData.algData.turnRight = true;
+		brainsData.algData.turnRight = true;
 	}
 }
 // calculation function to get a third leg (leg C) when doing law of cosines 
@@ -165,6 +164,7 @@ void algoInit(){
 	brainsData.algData.legA = 0;
 	brainsData.algData.legB = 0;
 	brainsData.algData.angC = 0;
+    brainsData.algData.angA = 0;
 	brainsData.algData.distToGo = 0;
 	brainsData.algData.angToTurn = 0;
 	brainsData.algData.numObjsCollide = 0;
@@ -240,14 +240,16 @@ void BRAINS_Tasks ( void )
                     brainsData.algData.distToGo = (int16_t)brainsData.rx_data[3];
                     brainsData.algData.currRotAng = START_CURRENT_ANG_ROT;
                     int16_t temp = ((brainsData.rx_data[1]<<8)|brainsData.rx_data[2]);
-                    temp%=360;
-                    brainsData.algData.angToTurn = (brainsData.algData.currRotAng + temp);
-                    if ((((brainsData.rx_data[1]<<8)|brainsData.rx_data[2])) < 0){
-                        brainsData.algData.turnRight = false;
-                    }
-                    else{
+                    if (temp < 0){
                         brainsData.algData.turnRight = true;
                     }
+                    else{
+                        brainsData.algData.turnRight = false;
+                    }
+                    temp%=360;
+                    
+                    brainsData.algData.angToTurn = (brainsData.algData.currRotAng + temp);
+                    
 #endif                    
                     brainsData.state = BRAINS_STATE_TRANSMIT_FINDING_PATH;                       
                 }  
@@ -413,7 +415,6 @@ void BRAINS_Tasks ( void )
             brainsData.algData.angToTurn =	(brainsData.algData.angToTurn%360);
             // which way to rotate?
 
-            
             if (brainsData.algData.currRotAng < brainsData.algData.angToTurn) {
                 if (abs(brainsData.algData.currRotAng - brainsData.algData.angToTurn) < 180) {
                     brainsData.algData.turnRight = true;
@@ -472,7 +473,6 @@ void BRAINS_Tasks ( void )
         case BRAINS_STATE_TRANSMIT_END_CONDITION:
         {
             brainsData.tx_data[0] =  0x98; // sending message to rpi
-            
             // stop command 
             brainsData.tx_data[1] = 0x0F;
             brainsData.tx_data[2] = 0x0F;
@@ -507,8 +507,7 @@ void BRAINS_Tasks ( void )
             //SendMessageAck(brainsData.tx_data);
             wait_on_ack = true;
             xQueueSend( MessageQueueWout, brainsData.tx_data, pdFAIL );
-            
-            //StoreMessage(motorsData.tx_data);
+           
             brainsData.state = BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED;
             break;
         }
@@ -533,14 +532,10 @@ void BRAINS_Tasks ( void )
         }
         case BRAINS_STATE_WAIT_ACK_FINDING_PATH:
         {
-            //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             if (!wait_on_ack){
              // wait blocking   
                 brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_ROTATE;
-            }
-            //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-            //PLIB_PORTS_PinSet (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
-            
+            }            
             break;
         }
         case BRAINS_STATE_WAIT_ACK_OBSTACLE_ENCOUNTERED:
@@ -554,9 +549,7 @@ void BRAINS_Tasks ( void )
             while(wait_on_ack){
                 //PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
             }
-              
             brainsData.state = BRAINS_STATE_DONE;
-            
             break;
         }
         case BRAINS_STATE_WAIT_ACK_MOTOR_STOP:
@@ -567,9 +560,9 @@ void BRAINS_Tasks ( void )
         }
         case BRAINS_STATE_DONE:
         {
-            // DO nothing
-            //dbgOutputVal(0xAA);
-            //dbgOutputVal((uint8_t)brainsData.notifyPicNum);
+            // resetting all data and going back to waiting for more commands from raspi
+            algoInit();
+            brainsData.state = BRAINS_STATE_RECEIVE_MESSAGE_INIT;
             break;
             
         }

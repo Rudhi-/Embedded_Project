@@ -177,7 +177,14 @@ void SendToTheQueue()
                     for (i =1; i < 7; i++) {
                         uartrxData.tx_data[i] = 0x00;
                     }
-                    xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);
+                    xQueueSendFromISR( MessageQueueWout, uartrxData.tx_data, pdFAIL);  
+                    int k = 0;
+                    int p = 0;
+                    for(k = 0; k < 10000000; k++){
+                        p = k;
+                        k = k+p;
+                    }
+                    k = p;        
                     // Check if its a stop message
                     if ((uartrxData.rx_data[1] == 0x0F) && (uartrxData.rx_data[2] == 0x0F) && (uartrxData.rx_data[3] == 0x0F) && (uartrxData.rx_data[4] == 0x0F) && (uartrxData.rx_data[5] == 0x0F))
                     {
@@ -186,6 +193,13 @@ void SendToTheQueue()
                     }
                     else
                     {
+                        int k = 0;
+                        int p = 0;
+                        for(k = 0; k < 10000000; k++){
+                            p = k;
+                            k = k+p;
+                        }
+                        k = p;
                         //pass data in
                         xQueueSendFromISR( MessageQueueWin, uartrxData.rx_data, pdFAIL );
                     }

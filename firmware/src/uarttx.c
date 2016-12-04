@@ -142,16 +142,16 @@ void SendMessageOnce(uint8_t *msg)
 
 void SendMessageAck(uint8_t *msg)
 {
+    uarttxData.tx_data[0] = msg[0];
+    uarttxData.tx_data[1] = msg[1];
+    uarttxData.tx_data[2] = msg[2];
+    uarttxData.tx_data[3] = msg[3];
+    uarttxData.tx_data[4] = msg[4];
+    uarttxData.tx_data[5] = msg[5];
+    uarttxData.tx_data[6] = msg[6];
+    uarttxData.tx_data[7] = msg[7];
     wait_on_ack = true;
-    uarttxData.debug_data[0] = msg[0];
-    uarttxData.debug_data[1] = msg[1];
-    uarttxData.debug_data[2] = msg[2];
-    uarttxData.debug_data[3] = msg[3];
-    uarttxData.debug_data[4] = msg[4];
-    uarttxData.debug_data[5] = msg[5];
-    uarttxData.debug_data[6] = msg[6];
-    uarttxData.debug_data[7] = msg[7];
-    xQueueSend( MessageQueueWout, uarttxData.debug_data, pdFAIL );
+    xQueueSend( MessageQueueWout, uarttxData.tx_data, pdFAIL );
     
 }
 
@@ -165,7 +165,7 @@ void SendMessageAck(uint8_t *msg)
 
 void ReSendMessage()
 {
-    xQueueSendFromISR( MessageQueueWout, uarttxData.tx_data, pdFAIL );
+    xQueueSendFromISR( MessageQueueWout, uarttxData.re_data, pdFAIL );
 }
 
 void TransmitTheMessage ()
@@ -221,6 +221,14 @@ void UARTTX_Tasks ( void )
                 {
                     PLIB_PORTS_PinToggle (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_1);
                     uarttxData.tx_data[6] = tx_counter;
+                    uarttxData.re_data[0] = uarttxData.tx_data[0];
+                    uarttxData.re_data[1] = uarttxData.tx_data[1];
+                    uarttxData.re_data[2] = uarttxData.tx_data[2];
+                    uarttxData.re_data[3] = uarttxData.tx_data[3];
+                    uarttxData.re_data[4] = uarttxData.tx_data[4];
+                    uarttxData.re_data[5] = uarttxData.tx_data[5];
+                    uarttxData.re_data[6] = uarttxData.tx_data[6];
+                    uarttxData.re_data[7] = uarttxData.tx_data[7];
                     tx_counter = tx_counter + 1;
                     if (tx_counter == 20)
                         tx_counter = 0;

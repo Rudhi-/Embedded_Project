@@ -118,6 +118,7 @@ typedef struct
     uint8_t saved_message[8];
     uint8_t tx_data[8];
     uint8_t debug_data[8];
+    uint8_t re_data[8];
     uint8_t reset_msg[2];
 
     /* TODO: Define any additional data used by the application. */
