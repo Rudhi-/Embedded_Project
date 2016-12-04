@@ -118,6 +118,7 @@ void init_motors() {
     MessageQueueM = xQueueCreate(2, 8*sizeof(char));
     
     motorsData.leftEncoder_Conv = motorsData.rightEncoder_Conv = 10; 
+    motorsData.leftSpeed_Offset = motorsData.rightSpeed_Offset = 0;
     
     set_speed(WALK,WALK);
     move_stop();

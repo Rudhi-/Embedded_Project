@@ -205,23 +205,23 @@ void CONTROL_Tasks ( void )
                         if (controlData.rx_data[1] && ((controlData.rx_data[1] & 0xc3) != 0xc3)) {
                             if ((controlData.rx_data[1] & 0x30) && (controlData.rx_data[1] & 0x0c)) {
                                 //move straight
-                                set_speed(JOG, JOG);
+                                set_speed(WALK, WALK);
                                 move_start();
                             } else if (controlData.rx_data[1] & 0x03){
                                 //turn sharp left
-                                set_speed(SPRINT, STOP);
+                                set_speed(JOG, -300);
                                 move_start();
                             } else if (controlData.rx_data[1] & 0x0c) {
                                 //turn left
-                                set_speed(SPRINT, CRAWL);
+                                set_speed(JOG, CRAWL);
                                 move_start();
                             } else if (controlData.rx_data[1] & 0xc0) {
                                 //turn sharp right
-                                set_speed(STOP, SPRINT);
+                                set_speed(-300, JOG);
                                 move_start();
                             } else if (controlData.rx_data[1] & 0x30) {
                                 //turn right
-                                set_speed(CRAWL, SPRINT);
+                                set_speed(CRAWL, JOG);
                                 move_start();
                             }
                             controlData.test[0] = controlData.test[1] = controlData.test[2] = false;

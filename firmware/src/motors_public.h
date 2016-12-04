@@ -12,11 +12,11 @@ typedef enum
 {     
     NEGATIVE=-1, //unused value to ensure enum is signed
     STOP=0,
-    CRAWL=300,
-    WALK=400,
-    JOG=600,
-    RUN=800,
-    SPRINT=1000,            
+    CRAWL=100,
+    WALK=200,
+    JOG=400,
+    RUN=600,
+    SPRINT=8000,            
 } MOTOR_SPEEDS;
 
 typedef enum
